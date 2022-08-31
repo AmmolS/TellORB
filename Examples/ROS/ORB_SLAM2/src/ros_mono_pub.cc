@@ -431,8 +431,8 @@ bool parseParams(int argc, char **argv) {
 				ros::shutdown();
 				return 0;
 			}
-			int img_height = cap_obj.get(CV_CAP_PROP_FRAME_HEIGHT);
-			int img_width = cap_obj.get(CV_CAP_PROP_FRAME_WIDTH);
+			int img_height = cap_obj.get(cv::CAP_PROP_FRAME_HEIGHT);
+			int img_width = cap_obj.get(cv::CAP_PROP_FRAME_WIDTH);
 			printf("Images are of size: %d x %d\n", img_width, img_height);
 		}
 		else {
