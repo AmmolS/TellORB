@@ -48,16 +48,20 @@
 
 //! parameters
 bool read_from_topic = false, read_from_camera = false;
-std::string image_topic = "/camera/image_raw"; // change to /tello
+//for connecting to tello
+//http://wiki.ros.org/tello_driver
+//just by doing roslaunch, we can get tello to publish images? to the below topic?
+std::string image_topic = "/tello/image_raw";
+//std::string image_topic = "/camera/image_raw"; // change to /tello
 int all_pts_pub_gap = 0;
 bool show_viewer = true;
 
 
-vector<cv::Mat> vFeaturedImages;
+vector<cv::Mat> vFeaturedImages;//vector of images in the videos
 
-vector<string> vstrImageFilenames;
-vector<double> vTimestamps;
-cv::VideoCapture cap_obj;
+vector<string> vstrImageFilenames;//name of the images files-its vector
+vector<double> vTimestamps;//vector of timestamps
+cv::VideoCapture cap_obj;//to capture the video a special object
 
 bool pub_all_pts = false;
 int pub_count = 0;
@@ -68,7 +72,7 @@ inline bool isInteger(const std::string & s);
 void publish(ORB_SLAM2::System &SLAM, ros::Publisher &pub_pts_and_pose,
 	ros::Publisher &pub_all_kf_and_pts, int frame_id, cv::Mat &im);
 
-image_transport::Publisher pub_image;
+image_transport::Publisher pub_image;//class for publishing images in ROS declared.
 
 class ImageGrabber{
 public:
@@ -100,14 +104,18 @@ int main(int argc, char **argv){
 	ORB_SLAM2::System SLAM(argv[1], argv[2], ORB_SLAM2::System::MONOCULAR, show_viewer);
 	ros::NodeHandle nodeHandler;
 	//ros::Publisher pub_cloud = nodeHandler.advertise<sensor_msgs::PointCloud2>("cloud_in", 1000);
-	ros::Publisher pub_pts_and_pose = nodeHandler.advertise<geometry_msgs::PoseArray>("pts_and_pose", 1000);
+	ros::Publisher pub_pts_and_pose = nodeHandler.advertise<geometry_msgs::PoseArray>("pts_and_pose", 1000);//pub_pts_pose is a ros publisher node that publishes on the given topic in "" and it publishes:https://github.com/IntelRealSense/librealsense/blob/master/third-party/realsense-file/rosbag/msgs/geometry_msgs/PoseArray.h
 	ros::Publisher pub_all_kf_and_pts = nodeHandler.advertise<geometry_msgs::PoseArray>("all_kf_and_pts", 1000);
 	
 	image_transport::ImageTransport it(nodeHandler);
-	pub_image = it.advertise("orb_camera/image", 1);
+	pub_image = it.advertise("orb_camera/image", 1);//connection from image to ROS publisher node.
 	if (read_from_topic) {
 		ImageGrabber igb(SLAM, pub_pts_and_pose, pub_all_kf_and_pts);
 		ros::Subscriber sub = nodeHandler.subscribe(image_topic, 1, &ImageGrabber::GrabImage, &igb);
+		//initialize a ROS subscriber node that subscribes to "image_topic", 
+		//queue size =1 and upon receiving an image, calls Grab Image function, 
+		//and passes to that function the igb object of Image grabber class 
+		//with the given 2 publisher nodes defined above
 		ros::spin();
 	}
 	else{
@@ -399,6 +407,8 @@ void LoadImages(const string &strPathToSequence, vector<string> &vstrImageFilena
 	}
 }
 
+//for more info on input parameter of this function
+//sensor_msgs::http://docs.ros.org/en/api/sensor_msgs/html/msg/Image.html
 void ImageGrabber::GrabImage(const sensor_msgs::ImageConstPtr& msg){
 	// Copy the ros image message to cv::Mat.
 	cv_bridge::CvImageConstPtr cv_ptr;
@@ -431,8 +441,8 @@ bool parseParams(int argc, char **argv) {
 				ros::shutdown();
 				return 0;
 			}
-			int img_height = cap_obj.get(cv::CAP_PROP_FRAME_HEIGHT);
-			int img_width = cap_obj.get(cv::CAP_PROP_FRAME_WIDTH);
+			int img_height = cap_obj.get(CV_CAP_PROP_FRAME_HEIGHT);
+			int img_width = cap_obj.get(CV_CAP_PROP_FRAME_WIDTH);
 			printf("Images are of size: %d x %d\n", img_width, img_height);
 		}
 		else {
