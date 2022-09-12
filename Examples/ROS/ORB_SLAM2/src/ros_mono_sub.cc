@@ -52,14 +52,21 @@ typedef std::unique_ptr<flannMatT> flannMatT_;
 
 
 // parameters
+//what do each of these parameters mean and how we should edit them
 float scale_factor = 3;
+//"Since the ORB SLAM coordinate locations are in units
+//of meters, a finer grid resolution is obtained by multiplying all positions by
+//a scaling factor which is chosen as the inverse of the desired resolution in
+//m/cell. For instance, if a resolution of 10 cm/cell or 0.1 m/cell is needed, the
+//scaling factor becomes 10."-If we increase these numbers, we should expect to see better results but slower?
 float resize_factor = 5;
+//resize factor is usually being set to 1 in examples, not relevant
 float cloud_max_x = 10;
 float cloud_min_x = -10.0;
 float cloud_max_z = 16;
 float cloud_min_z = -5;
 float free_thresh = 0.55;
-float occupied_thresh = 0.50;
+float occupied_thresh = 0.50; //to declare a cell as occupied or not
 float thresh_diff = 0.01;
 int visit_thresh = 0;
 unsigned int use_local_counters = 0;
@@ -73,6 +80,8 @@ int cam_radius = 3;
 // no. of keyframes between successive goal messages that are published
 unsigned int goal_gap = 20;
 bool enable_goal_publishing = false;
+//enable_goal_publishing is a setting for RVIZ-which is our navigation visualizer
+//that when set=0, means user is selecting a destination for the robot
 
 #ifndef DISABLE_FLANN
 double normal_thresh_deg = 0;
@@ -176,7 +185,7 @@ int main(int argc, char **argv){
 
 	parseParams(argc, argv);
 	printParams();
-
+    //grid map creation stuff, abstracting away for now.
 #ifndef DISABLE_FLANN
 	if (normal_thresh_deg > 0 && normal_thresh_deg <= 90) {
 		use_plane_normals = true;
@@ -233,22 +242,63 @@ int main(int argc, char **argv){
 	norm_factor_z = float(grid_res_z - 1) / float(grid_max_z - grid_min_z);
 	printf("norm_factor_x: %f\n", norm_factor_x);
 	printf("norm_factor_z: %f\n", norm_factor_z);
+    //grid map creation stuff above
 
+    //ROS stuff
 	ros::NodeHandle nodeHandler;
+    //intialize the ros subsriber node that will subsribe to pose,key frame data published by mono_pub.cc-custom function not standard ROS stuff
+	//upon receiving the data from the pub.cc, it calls the function ptCallback
+	//pt call back does a number of things:
+    //1.publishes the initial jey frame as the initial pose
+	//2.publishes the goal key frames pose
 	ros::Subscriber sub_pts_and_pose = nodeHandler.subscribe("pts_and_pose", 1000, ptCallback);
+	//move base simple is a standard ROS node for navigating a moving robot-http://wiki.ros.org/move_base
+	//refer to: http://wiki.ros.org/navigation/Tutorials/SendingSimpleGoals, for simple example on 
+	//functionality of this stack
+    //sub_goal is a ros node that lets u subscribe to the topic move_base_simple/goal and upon receiving data 
+	//from the topic, call goalCallback function
+	//when enable_goal_publishing = 1
+	//the following happens
+    //ptCallBack function publishes the initial pose and it publishes the goal pose after #goal_gap key frames
+	//this automatically published goals are sent to goalCallback which then
+	//tries to navigate from intial pose to goal pose
+
+	//However in the case, when enable_goal_publishing = 0 
+	//ptCallback function does not publish initial or goal pose, it
+	//keeps publishing current pose information as usual-but does not publish the initial or goal poses
+	//this is used by currentPoseCallBack to navigate from current pose to goal pose, where
+	//goal is set manually in RVIZ-how exactly not sure but tried setting in RVIZ from gui and worked
+	//when enable_goal_publishing = 0 , we are sure that goalCallBack in not issuing any commands,
+	//so that works but what about the case where enable_goal_publishing = 1, and we set a goal in Rviz
+	// what will happen?
+	// I think goals being published by RVIZ are just ignored and goals coming from ptCallBack are
+	//relayed across to goalCallback from where they make it to move_base_simple client?
+
 	ros::Subscriber sub_goal = nodeHandler.subscribe("move_base_simple/goal", 1000, goalCallback);
+	//initial pose topic is there for AMCL method to work for localization
+	//this subscriber ros node calls initialPoseCallback to process the intial pose info received
+	//it initializes stuff like starting angle etc, gets goals from goalcallBack
 	ros::Subscriber sub_initial_pose = nodeHandler.subscribe("initialpose", 1000, initialPoseCallback);
+	//takes current pose data published by pt call back function and tries to navigate from the 
+	//current pose to goal pose using bfs
 	ros::Subscriber sub_current_pose = nodeHandler.subscribe("robot_pose", 1000, currentPoseCallback);
 	ros::Subscriber sub_all_kf_and_pts = nodeHandler.subscribe("all_kf_and_pts", 1000, loopClosingCallback);
+
 	pub_grid_map = nodeHandler.advertise<nav_msgs::OccupancyGrid>("map", 1000);
 	pub_grid_map_metadata = nodeHandler.advertise<nav_msgs::MapMetaData>("map_metadata", 1000);
 	pub_current_pose = nodeHandler.advertise<geometry_msgs::PoseWithCovarianceStamped>("robot_pose", 1000);
+	//actual publishing of initpose is taking place in ptCallback
 	pub_initial_pose = nodeHandler.advertise<geometry_msgs::PoseWithCovarianceStamped>("initialpose", 1000, true);
 	pub_goal_path = nodeHandler.advertise<nav_msgs::Path>("goal_path", 1000);
 	pub_command = nodeHandler.advertise<std_msgs::String>("tello/command", 1000);
+    
+	//< run Monosub with enable_goal_publishing set to 1 for automatic goal setting and 0 for manual
+    //goal selection in Rviz 
+	//so if enable_goal_publishing  = 1, we do not select a goal in RVIZ.
 
 	if (enable_goal_publishing) {
 		pub_goal = nodeHandler.advertise<geometry_msgs::PoseStamped>("move_base_simple/goal", 1000);
+		//.advertise returns a ROS publisher node-called pub_goal here, that allows you to publish on the topic: move_base_simple/goal
 		pub_current_particles = nodeHandler.advertise<geometry_msgs::PoseArray>("particlecloud", 1000, true);
 	}
 	tf::TransformBroadcaster br;
@@ -391,6 +441,11 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 }
 
 void goalCallback(const geometry_msgs::PoseStamped new_goal){
+	//this "goal" is what gets sent to the move_base_simple/goal node
+	//this goal here is being set using the new_goal
+	//where is new_goal coming from?
+	//new_goal is coming from the ptCallBack function.......
+	//which publishes when enable_goal_publishing = 1
 	goal.pose = new_goal.pose;
 
 	// ROS_INFO("current DFS pose: (%i, %i)\n", kf_pos_grid_x, kf_pos_grid_z);
@@ -414,7 +469,7 @@ void goalCallback(const geometry_msgs::PoseStamped new_goal){
 		ROS_INFO("Invalid Indices: (%i, %i)\n", kf_goal_pos_x, kf_goal_pos_z);
 		return;
 	}
-	
+	//this function generates the list of commands for the bot to go the new goal
 	// vector<geometry_msgs::Point> BFSpath =  BFS(kf_pos_grid_x, kf_pos_grid_z, kf_goal_pos_x, kf_goal_pos_z);
 	vector<geometry_msgs::Point> BFSpath = BFS(int_pos_grid_x, int_pos_grid_z, kf_goal_pos_x, kf_goal_pos_z);
 
@@ -689,7 +744,7 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
 //	}
 	if (loop_closure_being_processed){ return; }
 
-	updateGridMap(pts_and_pose);
+	updateGridMap(pts_and_pose); //use the info from publisher to construct the grid map
 
 	tf::TransformBroadcaster br;
 	tf::Transform odom_to_map_transform;
@@ -715,7 +770,7 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
 	float kf_pos_grid_z_us = (kf_location.z - cloud_min_z) ;
 	// float kf_pos_grid_z_us = (kf_location.z) * norm_factor_z_us;
 
-
+    //current pose's x and y is set here
 	curr_pose.pose.position.x = kf_pos_grid_x_us;
 	curr_pose.pose.position.y = kf_pos_grid_z_us;
 
@@ -736,7 +791,7 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
 	curr_pose_stamped.header.seq = ++curr_pose_id;
 	curr_pose_stamped.pose = curr_pose;
 
-	pub_current_pose.publish(curr_pose_stamped);
+	pub_current_pose.publish(curr_pose_stamped);//used by current pose call back
 
 
 	//temp stuff for meeting
@@ -757,9 +812,9 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
 	// init_pose_stamped.pose = init_pose;
 
 	// pub_initial_pose.publish(init_pose_stamped);
-
+    //if enable_goal publishing is set, init_pose is start position-from where the robot is supposed to start?
 	if (enable_goal_publishing) {
-		if (kf_id == 0) {
+		if (kf_id == 0) { //if it is the first key frame, it is our start position, with key grame id=0
 			init_pose.pose.position.x = kf_pos_grid_x_us;
 			init_pose.pose.position.y = kf_pos_grid_z_us;
 			ROS_INFO("Publishing initial pose: (%f, %f)\n", kf_pos_grid_x_us, kf_pos_grid_z_us);
@@ -774,7 +829,7 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
 			init_pose_stamped.header.stamp = ros::Time::now();
 			init_pose_stamped.header.seq = ++init_pose_id;
 			init_pose_stamped.pose = init_pose;
-			pub_initial_pose.publish(init_pose_stamped);
+			pub_initial_pose.publish(init_pose_stamped); //the first key frame's initial pose published for AMCL
 			// pub_current_pose.publish(init_pose.pose);
 			geometry_msgs::PoseArray curr_particles;
 			curr_particles.header = init_pose_stamped.header;
@@ -782,8 +837,8 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
 			pub_current_particles.publish(curr_particles);
 		}
 		else if (kf_id % goal_gap == 0) {
-			if (goal_id>0){
-				curr_pose.pose = goal.pose;
+			if (goal_id>0){ //if it is not the first key frame and we have covered enough key frames, given by gap parameter to publish a goal, we do so
+				curr_pose.pose = goal.pose; //the current pose is set to be the goal
 				// ROS_INFO("Publishing current pose: (%f, %f)\n",curr_pose.pose.position.x, curr_pose.pose.position.y);
 				//curr_pose.pose.position.z = 0;
 				////init_pose.pose.orientation = kf_orientation;
@@ -799,6 +854,7 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
 			}
 
 			ROS_INFO("Publishing goal: (%f, %f)\n", kf_pos_grid_x_us, kf_pos_grid_z_us);
+			//this publishes the position of the goal key frame-which is used by goal call back function
 			// goal.pose.position.x = kf_pos_grid_x_us;
 			// goal.pose.position.y = kf_pos_grid_z_us;
 			// goal.pose.orientation.x = kf_orientation.x;
@@ -808,7 +864,7 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
 			goal.header.frame_id = "map";
 			goal.header.stamp = ros::Time::now();
 			goal.header.seq = ++goal_id;
-			// pub_goal.publish(goal);
+			// pub_goal.publish(goal);//why is this commented out??
 		}
 		//	
 		//::ros::console::print();
@@ -823,7 +879,7 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
 	map_metadata.origin.position.z = 0;
 	pub_grid_map.publish(grid_map_msg);
 	pub_grid_map_metadata.publish(map_metadata);
-	++kf_id;
+	++kf_id; //advance to the next key frame
 		
 	//goal.target_pose.header.stamp = ros::Time::now();
 	//goal.target_pose.pose.position.x = kf_pos_grid_x;
@@ -1049,6 +1105,9 @@ void updateGridMap(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
 	//double grid_res_x = max_pt.x - min_pt.x, grid_res_z = max_pt.z - min_pt.z;
 
 	//printf("Received frame %u \n", pts_and_pose->header.seq);
+    //this function is taking the pts_pose array comming from the publisher
+	//then it is using those x,y,z co ordinates and trying to construct the 
+	//grid map from it.
 
 	kf_location = pts_and_pose->poses[0].position;
 	kf_orientation = pts_and_pose->poses[0].orientation;
