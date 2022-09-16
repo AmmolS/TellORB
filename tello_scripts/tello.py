@@ -2,8 +2,10 @@ from djitellopy import Tello
 from threading import Thread, Event
 import time, cv2
 import signal
+import logging
 
-tello = Tello()
+tello = Tello(skipAddressCheck=True)
+tello.LOGGER.setLevel(logging.INFO)
 tello.connect()
 keepRecording = Event()
 keepRecording.set()
@@ -14,8 +16,9 @@ frame_read = tello.get_frame_read()
 def videoRecorder():
     # create a VideoWrite object, recoring to ./video.avi
     height, width, _ = frame_read.frame.shape
-    video = cv2.VideoWriter('video.avi', cv2.VideoWriter_fourcc(*'MJPG'), 30, (width, height))
+    
     print("Start recording")
+    video = cv2.VideoWriter('video.avi', cv2.VideoWriter_fourcc(*'MJPG'), 30, (width, height))
 
     while keepRecording.is_set():
         video.write(frame_read.frame)
