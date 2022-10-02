@@ -118,13 +118,18 @@ geometry_msgs::Point kf_location;
 geometry_msgs::Quaternion kf_orientation;
 unsigned int kf_id = 0;
 unsigned int init_pose_id = 0, curr_pose_id = 0, curr_path_id = 0, goal_id = 0;
+
+//our globals for dfs stack and visited list initialized here
 bool tello_move_completed = true;
+std::stack<vector<geometry_msgs::Point> > dfs_stack;  // DFS stack this should be global
+cv::Mat visited; //this should be global too
+
 
 using namespace std;
 using namespace cv;
 
 // Search functions
-vector<geometry_msgs::Point> DFS(int init_x, int init_y, int final_x, int final_y);
+vector<geometry_msgs::Point> DFS(int init_x, int init_y);
 bool isValid(int valid_x, int valid_y);
 void returnNextCommand(vector<geometry_msgs::Point>& path);
 void generatePath(vector<geometry_msgs::Point>& path);
@@ -161,6 +166,12 @@ int main(int argc, char **argv){
 
 	parseParams(argc, argv);
 	printParams();
+
+    //our globals for dfs stack and visited list initialized here
+	
+	visited.create(h, w, CV_32FC1);
+	visited.setTo(cv::Scalar(0)); //set all nodes to unvisited in the start
+
     //grid map creation stuff, abstracting away for now.
 #ifndef DISABLE_FLANN
 	if (normal_thresh_deg > 0 && normal_thresh_deg <= 90) {
@@ -299,6 +310,7 @@ void saveMap(unsigned int id) {
 }
 
 void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_pose) {
+	tello_move_completed = false ;// pause all call backs until we are done executing
 	curr_pose = current_pose.pose;
 
 	float pt_pos_x = curr_pose.pose.position.x*scale_factor;
@@ -314,15 +326,16 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 	/*ECE496 CODE ADDITIONS START HERE*/
 	vector<geometry_msgs::Point> DFSpath = DFS(int_pos_grid_x, int_pos_grid_z);
 
-	printPointPath(DFSpath);
+	printPointPath(DFSpath);//TO DO
 
-	generatePath(DFSpath);
+	generatePath(DFSpath);//TO DO
 
-    returnNextCommand(DFSpath);
+    returnNextCommand(DFSpath);//TO DO 
 
-    tello_move_completed = false;
-    //issue command to tello
-    //the above flag will be set once drone has finished moving
+    //send command to tello
+	//once indication of successful navigation received, set the flag, for future call backs
+	tello_move_completed = true;
+    
 
   
 
@@ -331,7 +344,10 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 
 }
 
-vector<geometry_msgs::Point>  DFS(int init_x, int init_y, int final_x, int final_y){
+
+
+
+vector<geometry_msgs::Point>  DFS(int init_x, int init_y){
 	// int MIN_PATH_SIZE = 5;
 	int MAX_OCCUPIED_PROB = 75;
 
@@ -340,7 +356,7 @@ vector<geometry_msgs::Point>  DFS(int init_x, int init_y, int final_x, int final
 	int rowNum[] = {-1, 0, 0, 1}; 
 	int colNum[] = {0, -1, 1, 0};
 
-	ROS_INFO("Start/end indexes: (%i, %i) end (%i, %i)\n", init_x, init_y,final_x, final_y );
+	ROS_INFO("Start indexes: (%i, %i) \n", init_x, init_y);
 
 
 	cv::Mat test_grid_map_int = cv::Mat(h, w, CV_16SC1, (char*)(grid_map_msg.data.data()));
@@ -369,47 +385,52 @@ vector<geometry_msgs::Point>  DFS(int init_x, int init_y, int final_x, int final
 
 	////////////////////////////////////
     vector<geometry_msgs::Point> path; // Store path history
-	std::queue<vector<geometry_msgs::Point> > q;  // BFS queue
-	cv::Mat visited;
-	visited.create(h, w, CV_32FC1);
-	visited.setTo(cv::Scalar(0));
 	
-	visited.at<int>(init_x, init_y) = 1;
+	
 
 	// Distance of source cell is 0 
+
+	//the current position of the drone is marked visited since it is already there
+	visited.at<int>(init_x, init_y) = 1;
+
 	geometry_msgs::Point s; 
 	s.x = init_x;
 	s.y = init_y;
     path.push_back(s); 	
-	q.push(path); // Enqueue source cell 
+	dfs_stack.push(path); // push the current source node onto the stack
 
-	while (!q.empty()) 
+	while (!dfs_stack.empty()) 
 	{ 
-        path = q.front();
-
-
-		geometry_msgs::Point pt = path[path.size() - 1]; 
-
-        if (pt.x == final_x && pt.y == final_y ) 
-        {
-            return path; 
-        }
-
-        q.pop();
-
+        path = dfs_stack.top();
+		geometry_msgs::Point pt = path[path.size() - 1]; //not sure what this is doing.
+        dfs_stack.pop();
+		//check if the popped node from the stack is unvisited, unoccupied
+		//this will never be true for the first iteration of the loop
+        int probability = (int)img_final.at<short>(pt.x, pt.y);
+		if (isValid(pt.x, pt.y) 
+				&& probability < MAX_OCCUPIED_PROB 
+				&& probability >= 0 
+				&& visited.at<int>(pt.x, pt.y) != 1)
+			{   
+				//we have our path ready here, since this is the next node to move to
+				
+				return path;
+				
+			} 
+        //get the adjacent vertices of the current source, if they are not visited,unoccupied
+		//push it on the stack
 		for (int i = 0; i < 4; i++) 
 		{ 
 			int col = pt.x + rowNum[i]; 
 			int row = pt.y + colNum[i]; 
-
-			int probability = (int)img_final.at<short>(row, col);
-			if (isValid(row, col) 
+            int probability = (int)img_final.at<short>(pt.x, pt.y);
+		    if (isValid(row, col) 
 				&& probability < MAX_OCCUPIED_PROB 
 				&& probability >= 0 
 				&& visited.at<int>(row, col) != 1)
 			{ 
-				// mark cell as visited and enqueue it 
-				visited.at<int>(row, col) = 1;
+				// push onto the stack
+
 				geometry_msgs::Point newPoint;
 				newPoint.x = col;
 				newPoint.y = row;
@@ -417,8 +438,10 @@ vector<geometry_msgs::Point>  DFS(int init_x, int init_y, int final_x, int final
                 vector<geometry_msgs::Point> newpath(path);
                 newpath.push_back(newPoint); 
 
-				q.push(newpath); 
+				dfs_stack.push(newpath); 
 			} 
+			
+			
 		} 
 	} 
 
