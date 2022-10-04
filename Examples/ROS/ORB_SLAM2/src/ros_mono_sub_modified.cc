@@ -34,6 +34,8 @@
 #include <Eigen/Dense>
 #include <tf/transform_broadcaster.h>
 #include <queue>
+#include <stack>
+
 
 #ifndef DISABLE_FLANN
 #include <flann/flann.hpp>
@@ -119,12 +121,6 @@ geometry_msgs::Quaternion kf_orientation;
 unsigned int kf_id = 0;
 unsigned int init_pose_id = 0, curr_pose_id = 0, curr_path_id = 0, goal_id = 0;
 
-//our globals for dfs stack and visited list initialized here
-bool tello_move_completed = true;
-std::stack<vector<geometry_msgs::Point> > dfs_stack;  // DFS stack this should be global
-cv::Mat visited; //this should be global too
-
-
 using namespace std;
 using namespace cv;
 
@@ -158,19 +154,23 @@ void showGridMap(unsigned int id = 0);
 void parseParams(int argc, char **argv);
 void printParams();
 
+
+
+//our globals for dfs stack and visited list initialized here
+bool tello_move_completed = true;
+std::stack<vector<geometry_msgs::Point> > dfs_stack;  // DFS stack this should be global
+cv::Mat visited; //this should be global too
+
 int main(int argc, char **argv){
 	ros::init(argc, argv, "Monosub");
 	ros::start();
 
-	
+        printf("starting mono pub\n");	
 
 	parseParams(argc, argv);
 	printParams();
 
-    //our globals for dfs stack and visited list initialized here
-	
-	visited.create(h, w, CV_32FC1);
-	visited.setTo(cv::Scalar(0)); //set all nodes to unvisited in the start
+    
 
     //grid map creation stuff, abstracting away for now.
 #ifndef DISABLE_FLANN
@@ -229,6 +229,10 @@ int main(int argc, char **argv){
 	norm_factor_z = float(grid_res_z - 1) / float(grid_max_z - grid_min_z);
 	printf("norm_factor_x: %f\n", norm_factor_x);
 	printf("norm_factor_z: %f\n", norm_factor_z);
+	//our globals for dfs stack and visited list initialized here
+	
+	visited.create(h, w, CV_32FC1);
+	visited.setTo(cv::Scalar(0)); //set all nodes to unvisited in the start
     //grid map creation stuff above
 
     //ROS stuff
@@ -406,34 +410,39 @@ vector<geometry_msgs::Point>  DFS(int init_x, int init_y){
         dfs_stack.pop();
 		//check if the popped node from the stack is unvisited, unoccupied
 		//this will never be true for the first iteration of the loop
-        int probability = (int)img_final.at<short>(pt.x, pt.y);
+        int probability_current = (int)img_final.at<short>(pt.x, pt.y);
+        printf("exploring nodes for path %d, %d\n",int(pt.x),int(pt.y));
+        printf("occupied %d\n",probability_current);
+        printf("visited %d\n",visited.at<int>(pt.x, pt.y));
 		if (isValid(pt.x, pt.y) 
-				&& probability < MAX_OCCUPIED_PROB 
-				&& probability >= 0 
+				&& probability_current < MAX_OCCUPIED_PROB 
+				&& probability_current >= 0 
 				&& visited.at<int>(pt.x, pt.y) != 1)
 			{   
 				//we have our path ready here, since this is the next node to move to
-				
+				printf("returningpath from here, longer than 1 node\n");
 				return path;
 				
-			} 
+			}
+		
         //get the adjacent vertices of the current source, if they are not visited,unoccupied
 		//push it on the stack
 		for (int i = 0; i < 4; i++) 
 		{ 
-			int col = pt.x + rowNum[i]; 
-			int row = pt.y + colNum[i]; 
-            int probability = (int)img_final.at<short>(pt.x, pt.y);
+			int row = pt.x + rowNum[i]; 
+			int col = pt.y + colNum[i]; 
+            int probability_nearby = (int)img_final.at<short>(row, col);
+            
 		    if (isValid(row, col) 
-				&& probability < MAX_OCCUPIED_PROB 
-				&& probability >= 0 
+				&& probability_nearby < MAX_OCCUPIED_PROB 
+				&& probability_nearby >= 0 
 				&& visited.at<int>(row, col) != 1)
 			{ 
 				// push onto the stack
-
+                printf("exploring nearby nodes %d, %d\n",row,col);
 				geometry_msgs::Point newPoint;
-				newPoint.x = col;
-				newPoint.y = row;
+				newPoint.x = row;
+				newPoint.y = col;
 
                 vector<geometry_msgs::Point> newpath(path);
                 newpath.push_back(newPoint); 
@@ -446,6 +455,7 @@ vector<geometry_msgs::Point>  DFS(int init_x, int init_y){
 	} 
 
 	
+	printf("returning path from here for source node\n");
 	return path; 	 
 }
 
@@ -1161,4 +1171,3 @@ void printParams() {
 	printf("gaussian_kernel_size: %d\n", gaussian_kernel_size);
 	printf("cam_radius: %d\n", cam_radius);
 }
-
