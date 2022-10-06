@@ -411,9 +411,9 @@ vector<geometry_msgs::Point>  DFS(int init_x, int init_y){
 		//check if the popped node from the stack is unvisited, unoccupied
 		//this will never be true for the first iteration of the loop
         int probability_current = (int)img_final.at<short>(pt.x, pt.y);
-        printf("exploring nodes for path %d, %d\n",int(pt.x),int(pt.y));
-        printf("occupied %d\n",probability_current);
-        printf("visited %d\n",visited.at<int>(pt.x, pt.y));
+         printf("exploring nodes for path %d, %d\n",int(pt.x),int(pt.y));
+         printf("occupied %d\n",probability_current);
+         printf("visited %d\n",visited.at<int>(pt.x, pt.y));
 		if (isValid(pt.x, pt.y) 
 				&& probability_current < MAX_OCCUPIED_PROB 
 				&& probability_current >= 0 
