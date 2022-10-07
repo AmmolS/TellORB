@@ -1,9 +1,5 @@
-import time, cv2
-from threading import Thread
-from djitellopy import Tello
-
-
 import rospy
+
 from std_msgs.msg import Empty, UInt8, Bool
 from std_msgs.msg import UInt8MultiArray
 from std_msgs.msg import String
@@ -18,9 +14,13 @@ from cv_bridge import CvBridge, CvBridgeError
 #import av
 import math
 import numpy as np
-import threading
 import time
 
+from djitellopy import Tello
+from threading import Thread, Event
+import time, cv2
+import signal
+import logging
 
 #tello = Tello()
 #Step 1 connect to Tello
@@ -28,6 +28,8 @@ import time
 
 #Step 2 publish images to node /camera/image_raw
 #To do 
+
+
 
 
 
@@ -57,9 +59,20 @@ def main():
     sub = command_subscriber()
       
     print('Currently in the main function...')
+    pub = rospy.Publisher("test/raw", String, queue_size=10)
+    pub_img_test = rospy.Publisher("tello/image_raw", Image, queue_size=10)
       
     # initializing the subscriber node
     rospy.init_node('command_subscriber', anonymous=True)
+    
+    rospy.loginfo("Sending \"hello world!\"")
+    image = Image()
+    image.height = 100
+    image.width = 300
+    for i in range(10):
+        time.sleep(0.5)
+        pub.publish("hello world at {} times".format(i))
+        pub_img_test.publish(image)
     rospy.spin()
   
 if __name__ == '__main__':
