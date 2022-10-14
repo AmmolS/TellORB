@@ -41,7 +41,7 @@ bridge = CvBridge()
 
 
 
-# tello.takeoff()
+tello.takeoff()
 # cv2.imwrite("picture.png", frame_read.frame)
 
 # time.sleep(3)
@@ -95,6 +95,13 @@ class command_subscriber:
         #http://wiki.ros.org/rospy_tutorials/Tutorials/WritingPublisherSubscriber
         rospy.loginfo(rospy.get_caller_id() + "The commands in coming are %s",
                       String)
+        
+        # To handle commands
+        # check if tello is busy (as a backup, in case for some reason ros_mono_sub/pub doesn't realize it is busy)
+        # Use switch case to determine which command it is
+        # Call the revelant DJITelloPy API function to have the command work
+        # Set flag to indicate tello is busy
+        # 
   
   
 def main():
@@ -102,20 +109,21 @@ def main():
     sub = command_subscriber()
       
     print('Currently in the main function...')
-    pub = rospy.Publisher("test/raw", String, queue_size=10)
-    pub_img_test = rospy.Publisher("tello/image_raw", Image, queue_size=10)
+    # pub = rospy.Publisher("test/raw", String, queue_size=10)
+    pub_img = rospy.Publisher("tello/image_raw", Image, queue_size=10)
       
     # initializing the subscriber node
     rospy.init_node('command_subscriber', anonymous=True)
     
-    rospy.loginfo("Sending \"hello world!\"")
-    image = Image()
-    image.height = 100
-    image.width = 300
-    for i in range(10):
-        time.sleep(0.5)
-        pub.publish("hello world at {} times".format(i))
-        pub_img_test.publish(image)
+    # the following commented code is for debugging rospy
+    # rospy.loginfo("Sending \"hello world!\"")
+    # image = Image()
+    # image.height = 100
+    # image.width = 300
+    # for i in range(10):
+    #     time.sleep(0.5)
+    #     pub.publish("hello world at {} times".format(i))
+    #     pub_img.publish(image)
 
     def videoRecorder():
         # create a VideoWrite object, recoring to ./video.avi
@@ -126,7 +134,7 @@ def main():
 
         while keepRecording.is_set():
             img_msg = bridge.cv2_to_imgmsg(frame_read.frame, encoding='rgb8')
-            pub_img_test.publish(img_msg)
+            pub_img.publish(img_msg)
             video.write(frame_read.frame)
             time.sleep(1 / 60)
 
@@ -137,6 +145,7 @@ def main():
     # we need to run the recorder in a seperate thread, otherwise blocking options
     #  would prevent frames from getting added to the video
 
+    # this delay is for legacy testing purposes. It may be removed if it causes issues or if it doesn't cause issues to remove it down the road
     time.sleep(2)
 
     recorder = Thread(target=videoRecorder)
