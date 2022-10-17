@@ -32,6 +32,7 @@
 #include "sensor_msgs/PointCloud2.h"
 #include "geometry_msgs/PoseStamped.h"
 #include "geometry_msgs/PoseArray.h"
+#include "std_msgs/String.h"
 
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
@@ -90,6 +91,14 @@ public:
 };
 bool parseParams(int argc, char **argv);
 
+void printFunction(const std_msgs::String::ConstPtr& value) {
+	printf("Received message from ros_tello.py at test/raw with value=%s\n", value->data.c_str());
+}
+
+void reportImage(const sensor_msgs::ImageConstPtr img) {
+	printf("Got image with width %u and height %u\n", img->width, img->height);
+}
+
 using namespace std;
 
 int main(int argc, char **argv){
@@ -106,12 +115,13 @@ int main(int argc, char **argv){
 	//ros::Publisher pub_cloud = nodeHandler.advertise<sensor_msgs::PointCloud2>("cloud_in", 1000);
 	ros::Publisher pub_pts_and_pose = nodeHandler.advertise<geometry_msgs::PoseArray>("pts_and_pose", 1000);//pub_pts_pose is a ros publisher node that publishes on the given topic in "" and it publishes:https://github.com/IntelRealSense/librealsense/blob/master/third-party/realsense-file/rosbag/msgs/geometry_msgs/PoseArray.h
 	ros::Publisher pub_all_kf_and_pts = nodeHandler.advertise<geometry_msgs::PoseArray>("all_kf_and_pts", 1000);
-	
 	image_transport::ImageTransport it(nodeHandler);
 	pub_image = it.advertise("orb_camera/image", 1);//connection from image to ROS publisher node.
 	if (read_from_topic) {
 		ImageGrabber igb(SLAM, pub_pts_and_pose, pub_all_kf_and_pts);
 		ros::Subscriber sub = nodeHandler.subscribe(image_topic, 1, &ImageGrabber::GrabImage, &igb);
+		ros::Subscriber subTest = nodeHandler.subscribe("test/raw", 10, printFunction);
+		ros::Subscriber subImageTest = nodeHandler.subscribe("test/image", 10, reportImage);
 		//initialize a ROS subscriber node that subscribes to "image_topic", 
 		//queue size =1 and upon receiving an image, calls Grab Image function, 
 		//and passes to that function the igb object of Image grabber class 
