@@ -35,6 +35,7 @@
 #include <tf/transform_broadcaster.h>
 #include <queue>
 #include <stack>
+#include <cmath>
 
 
 #ifndef DISABLE_FLANN
@@ -127,7 +128,7 @@ using namespace cv;
 // Search functions
 vector<geometry_msgs::Point> DFS(int init_x, int init_y);
 bool isValid(int valid_x, int valid_y);
-void returnNextCommand(vector<geometry_msgs::Point>& path);
+vector<std::string> returnNextCommand(vector<geometry_msgs::Point>& path);
 void generatePath(vector<geometry_msgs::Point>& path);
 void printPointPath(vector<geometry_msgs::Point>& path);
 void publishCommand(std::string command);
@@ -330,20 +331,25 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 	/*ECE496 CODE ADDITIONS START HERE*/
 	vector<geometry_msgs::Point> DFSpath = DFS(int_pos_grid_x, int_pos_grid_z);
 
-	printPointPath(DFSpath);//TO DO
+	printPointPath(DFSpath);//CAN RE USE
 
-	generatePath(DFSpath);//TO DO
+	generatePath(DFSpath);//CAN RE USE
 
-    returnNextCommand(DFSpath);//TO DO 
+        vector<std::string> command_list = returnNextCommand(DFSpath);//TO DO 
+  	//print the commands here to see what is happening
+    	for (int i = 0; i < command_list.size(); i++)  {
+		cout << command_list[i];    
+	}
+    	cout << endl; 
 
-    //send command to tello
+    	//send command to tello
 	//once indication of successful navigation received, set the flag, for future call backs
 	tello_move_completed = true;
     
 
   
 
-    /*ECE496 CODE ADDITIONS END HERE*/
+    	/*ECE496 CODE ADDITIONS END HERE*/
 
 
 }
@@ -439,7 +445,7 @@ vector<geometry_msgs::Point>  DFS(int init_x, int init_y){
 				&& visited.at<int>(row, col) != 1)
 			{ 
 				// push onto the stack
-                printf("exploring nearby nodes %d, %d\n",row,col);
+                               printf("exploring nearby nodes %d, %d\n",row,col);
 				geometry_msgs::Point newPoint;
 				newPoint.x = row;
 				newPoint.y = col;
@@ -510,11 +516,25 @@ void generatePath(vector<geometry_msgs::Point>& path)
 	pub_goal_path.publish(goal_path);
 } 
 
-void returnNextCommand(vector<geometry_msgs::Point>& path)
+vector<std::string> returnNextCommand(vector<geometry_msgs::Point>& path)
 {
-	
+	vector<std::string> command_list;
 	int x_diff =  path[1].x - path[0].x;
 	int y_diff =  path[1].y - path[0].y;
+	
+	//Euclidean distance for now
+	//distance must be in world co ordinates that is m and then converted to cm for tello
+	float world_x1 = (path[1].x) / (norm_factor_x * scale_factor); 
+	float world_y1 = (path[1].y) / (norm_factor_z * scale_factor);
+	float world_x0 = (path[0].x) / (norm_factor_x * scale_factor); 
+	float world_y0 = (path[0].y) / (norm_factor_z * scale_factor);
+	
+	int x_world_diff =  world_x1  - world_x0;
+	int y_world_diff =  world_y1 -  world_y0;
+	
+	
+	int distance = int(sqrt(pow(x_world_diff,2) + pow(y_world_diff,2)));
+	std::string dis = std::to_string(distance);
 	
 	
 
@@ -543,45 +563,41 @@ void returnNextCommand(vector<geometry_msgs::Point>& path)
 
 
 	AngleDiff -= 360. * std::floor((AngleDiff + 180.) * (1. / 360.));
+	std::string angle = std::to_string(AngleDiff);
 
 	cout << "angle_diff wrap: " << AngleDiff << endl; 
 	cout << "path size: " << path.size() << endl; 
-
-	if(ros::Time::now() > next_command_time){
-		cout << ros::Time::now() << endl;
-
-		if(path.size() < 6) {
-			publishCommand("land");
-		}
-		else if (AngleDiff >= 90) {
-			publishCommand("ccw");
+	
+	//Based on the angle difference, we rotate first
+	//then we go forward by x cm.
+	
+	//We return an array of 2 sets of strings with our commands
+	//Then in current pose call back we send both the commands.
+	if(path.size() < 2){
+		//hover or drift correct //no command as map not complete yet
+		command_list.push_back("still exploring");
+	  
+	}else{
+		//Rotate first
+		if (AngleDiff >= 90) {
+			command_list.push_back("ccw "+ angle);
 		} else if (AngleDiff <= -90) {
-			publishCommand("cw");
-		} else {
-			publishCommand("forward");
+			command_list.push_back("cw "+ angle);
 		}
+		//Just issue a forward after this, not really sure if this works, but lets try
+		//can we just use simple euclidean distance for now?
+		
+		command_list.push_back("forward " + dis); //smallest distance the tello can move is 20cm
+		//will need to do some error correction for the tello	
+	
 	}
+	
 
-
-
-	float world_x = (path[1].x) / (norm_factor_x * scale_factor);
-	float world_y = (path[1].y) / (norm_factor_z * scale_factor);
 
 	
-}
+	return command_list;
 
-
-
-
-void publishCommand(std::string command){
-	std_msgs::String msg;
-	std::stringstream ss;
-	ss << command;
-	msg.data = ss.str();
-	cout << "Publish Command: " << ss.str() << endl;
-	pub_command.publish(msg);
-
-	next_command_time = ros::Time::now() + ros::Duration(5);
+	
 }
 
 void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
