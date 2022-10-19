@@ -53,8 +53,7 @@ def exitCatcher():
 
 
 def exit_handler(signum, frame):
-    msg = "Stopping drone. Drone will now hover. Please shutdown manually by pressing the button on the drone"
-    print(msg, flush=True)
+    msg = "Stopping drone. Drone will now hover.\n W = forward\nS = backwards\nA = left\nD = right\nQ = turn left\nE = turn right\nZ = ascend\nX = descend\nENTER = land\nSPACEBAR = hover\nPlease shutdown manually by pressing the button on the drone or press ENTER to land the drone."    print(msg, flush=True)
     keepRecording.clear()
     keepingAlive = Thread(target=exitCatcher)
     keepingAlive.start()
@@ -94,17 +93,17 @@ def exit_handler(signum, frame):
                 tello.land()
                 keepAlive.clear()
                 recorder.join()
-                keepAlive.join()
                 exit(1)
             elif inputChar == readchar.key.ESC:
                 exit(1)
+            else:
+                print("Tello Battery Level = {}%".format(tello.get_battery()))
             # PRESS SPACEBAR TO HOVER
             tello.send_rc_control(leftRightV, forwardBackwardV, updownV, yawV)
     except KeyboardInterrupt:
         print("Exiting keepAlive")
         keepAlive.clear()
         recorder.join()
-        keepingAlive.join()
         print("Killing program")
         exit(1)
 

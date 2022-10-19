@@ -21,6 +21,7 @@ from threading import Thread, Event
 import time, cv2
 import signal
 import logging
+import readchar
 
 #tello = Tello()
 #Step 1 connect to Tello
@@ -34,47 +35,14 @@ tello.LOGGER.setLevel(logging.INFO)
 tello.connect()
 keepRecording = Event()
 keepRecording.set()
+keepAlive = Event()
+keepAlive.set()
 
 tello.streamon()
 frame_read = tello.get_frame_read()
 bridge = CvBridge()
 
-
-
-tello.takeoff()
-# cv2.imwrite("picture.png", frame_read.frame)
-
-# time.sleep(3)
-
-# cv2.imwrite("picture2.png", frame_read.frame)
-
-# tello.move("up", 80)
-# cv2.imwrite("picture3.png", frame_read.frame)
-
-# tello.move("forward", 50)
-# cv2.imwrite("picture4.png", frame_read.frame)
-
-# tello.move("left", 30)
-# cv2.imwrite("picture5.png", frame_read.frame)
-
-# tello.move("right", 60)
-# cv2.imwrite("picture6.png", frame_read.frame)
-
-# tello.move("left", 30)
-# cv2.imwrite("picture7.png", frame_read.frame)
-
-# tello.move("up", 20)
-# cv2.imwrite("picture8.png", frame_read.frame)
-
-# tello.move("back", 50)
-# cv2.imwrite("picture9.png", frame_read.frame)
-
-
-# tello.land()
-
-
-
-
+print("Tello Battery Level = {}%".format(tello.get_battery()))
 
 #Step 3 subscribe to commands published by mono_sub.cc
 #code borrowed from : https://www.geeksforgeeks.org/ros-subscribers-using-python/ 
@@ -146,31 +114,121 @@ def main():
     #  would prevent frames from getting added to the video
 
     # this delay is for legacy testing purposes. It may be removed if it causes issues or if it doesn't cause issues to remove it down the road
+
     time.sleep(2)
 
     recorder = Thread(target=videoRecorder)
     recorder.start()
 
+    def exitCatcher():
+        while keepAlive.is_set():
+            try:
+                tello.send_keepalive()
+            except Exception:
+                print("Keeping alive")
+            time.sleep(10)
+
+
     def exit_handler(signum, frame):
-        msg = "Stopping drone. Drone will now hover. Please shutdown manually by pressing the button on the drone"
-        print(msg, end="", flush=True)
-        keepRecording.clear()
-        tello.streamoff()
-        recorder.join()
-        exit(1)
+        msg = "Stopping drone. Drone will now hover.\n W = forward\nS = backwards\nA = left\nD = right\nQ = turn left\nE = turn right\nZ = ascend\nX = descend\nENTER = land\nSPACEBAR = hover\nPlease shutdown manually by pressing the button on the drone or press ENTER to land the drone."
+        print(msg, flush=True)
+        keepingAlive = Thread(target=exitCatcher)
+        keepingAlive.start()
+
+        try:
+            while True:
+                inputChar = readchar.readchar()
+                updownV = 0
+                leftRightV = 0
+                forwardBackwardV = 0
+                yawV = 0
+                if inputChar == 'w':
+                    forwardBackwardV = 30
+                elif inputChar == 's':
+                    forwardBackwardV = -30
+                elif inputChar == 'a':
+                    leftRightV = -30
+                elif inputChar == 'd':
+                    leftRightV = 30
+                elif inputChar == 'z':
+                    updownV = 30
+                elif inputChar == 'x':
+                    updownV = -30
+                elif inputChar == 'q':
+                    yawV = -50
+                elif inputChar == 'e':
+                    yawV = 50
+                elif inputChar == readchar.key.ENTER:
+                    tello.land()
+                    keepAlive.clear()
+                    keepRecording.clear()
+                    recorder.join()
+                    rospy.spin()
+                elif inputChar == readchar.key.ESC:          # THIS IS A DANGEROUS COMMAND. ONLY USE WHEN DRONE HAS LANDED ALREADY FOR WHATEVER REASON (auto landing, crash landing, etc.) TO EXIT THE PROGRAM.
+                    keepAlive.clear()
+                    keepRecording.clear()
+                    rospy.spin()
+                else:
+                    print("Tello Battery Level = {}%".format(tello.get_battery()))
+                # PRESS SPACEBAR TO HOVER
+                tello.send_rc_control(leftRightV, forwardBackwardV, updownV, yawV)
+        except KeyboardInterrupt:
+            print("Exiting keepAlive")
+            keepAlive.clear()
+            keepRecording.clear()
+            recorder.join()
+            print("Killing program")
+            rospy.spin()
 
     signal.signal(signal.SIGINT, exit_handler)
+
+
+
+    tello.takeoff()
+    cv2.imwrite("picture.png", frame_read.frame)
+
+    time.sleep(3)
+
+    # You can add forced commands here if you want it to run by script (though it may fail in bad lighting or other issues)
+    # Most reliable way to control drone is with `send_rc` commands rather then `move` commands
+
+    # cv2.imwrite("picture2.png", frame_read.frame)
+
+    # tello.move("up", 80)
+    # cv2.imwrite("picture3.png", frame_read.frame)
+
+    # tello.move("forward", 40)
+    # cv2.imwrite("picture4.png", frame_read.frame)
+
+    # tello.move("left", 20)
+    # cv2.imwrite("picture5.png", frame_read.frame)
+
+    # tello.move("right", 40)
+    # cv2.imwrite("picture6.png", frame_read.frame)
+
+    # tello.move("left", 20)
+    # cv2.imwrite("picture7.png", frame_read.frame)
+
+    # tello.move("up", 20)
+    # cv2.imwrite("picture8.png", frame_read.frame)
+
+    # tello.move("back", 30)
+    # cv2.imwrite("picture9.png", frame_read.frame)
+
+    # print("Landing drone!")
+    # tello.land()
 
 
     while recorder.is_alive():
         time.sleep(0.2)
 
+        
     if (keepRecording.is_set() == True):
         keepRecording.clear()
-        tello.streamoff()
 
     recorder.join()
-    
+
+
     rospy.spin()
   
 if __name__ == '__main__':
