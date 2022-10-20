@@ -143,17 +143,17 @@ def main():
                 forwardBackwardV = 0
                 yawV = 0
                 if inputChar == 'w':
-                    forwardBackwardV = 30
+                    forwardBackwardV = 100
                 elif inputChar == 's':
-                    forwardBackwardV = -30
+                    forwardBackwardV = -100
                 elif inputChar == 'a':
-                    leftRightV = -30
+                    leftRightV = -100
                 elif inputChar == 'd':
-                    leftRightV = 30
+                    leftRightV = 100
                 elif inputChar == 'z':
-                    updownV = 30
+                    updownV = 100
                 elif inputChar == 'x':
-                    updownV = -30
+                    updownV = -100
                 elif inputChar == 'q':
                     yawV = -50
                 elif inputChar == 'e':
@@ -164,9 +164,10 @@ def main():
                     keepRecording.clear()
                     recorder.join()
                     rospy.spin()
-                elif inputChar == readchar.key.ESC:          # THIS IS A DANGEROUS COMMAND. ONLY USE WHEN DRONE HAS LANDED ALREADY FOR WHATEVER REASON (auto landing, crash landing, etc.) TO EXIT THE PROGRAM.
+                elif inputChar == readchar.key.ESC:          # THIS IS A DANGEROUS COMMAND. ONLY USE WHEN DRONE HAS LANDED ALREADY FOR WHATEVER REASON (auto landing, crash landing, flew down too much, etc.) TO EXIT THE PROGRAM.
                     keepAlive.clear()
                     keepRecording.clear()
+                    recorder.join()
                     rospy.spin()
                 else:
                     print("Tello Battery Level = {}%".format(tello.get_battery()))

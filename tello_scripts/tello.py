@@ -57,14 +57,6 @@ def exit_handler(signum, frame):
     keepRecording.clear()
     keepingAlive = Thread(target=exitCatcher)
     keepingAlive.start()
-    # try:
-    #     inputChar = readchar.readchar()
-    # except KeyboardInterrupt:
-    #     print("Exiting keepAlive")
-    #     keepAlive.clear()
-    #     keepingAlive.join()
-    #     print("Killing program")
-    #     exit(1)
     
     try:
         while True:
@@ -74,17 +66,17 @@ def exit_handler(signum, frame):
             forwardBackwardV = 0
             yawV = 0
             if inputChar == 'w':
-                forwardBackwardV = 30
+                forwardBackwardV = 100
             elif inputChar == 's':
-                forwardBackwardV = -30
+                forwardBackwardV = -100
             elif inputChar == 'a':
-                leftRightV = -30
+                leftRightV = -100
             elif inputChar == 'd':
-                leftRightV = 30
+                leftRightV = 100
             elif inputChar == 'z':
-                updownV = 30
+                updownV = 100
             elif inputChar == 'x':
-                updownV = -30
+                updownV = -100
             elif inputChar == 'q':
                 yawV = -30
             elif inputChar == 'e':
@@ -114,6 +106,21 @@ signal.signal(signal.SIGINT, exit_handler)
 tello.takeoff()
 cv2.imwrite("picture.png", frame_read.frame)
 
+# try:
+#     while True:
+#         xspeed = tello.get_speed_x()
+#         yspeed = tello.get_speed_y()
+#         zspeed = tello.get_speed_z()
+#         # items = [xspeed, yspeed, zspeed, angularspeed]
+#         # index = max(enumerate(items))
+#         # if index == 0:
+#         #     tello.send_rc_control()
+#         tello.send_rc_control(-xspeed*5, -yspeed*5, -zspeed*5, 0)
+#         time.sleep(0.5)
+#         tello.send_rc_control(0,0,0,0)
+#         time.sleep(2)
+# except KeyboardInterrupt:
+#     print("Resume")
 time.sleep(3)
 
 cv2.imwrite("picture2.png", frame_read.frame)
