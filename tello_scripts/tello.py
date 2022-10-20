@@ -74,13 +74,13 @@ def exit_handler(signum, frame):
             elif inputChar == 'd':
                 leftRightV = 100
             elif inputChar == 'z':
-                updownV = 100
+                updownV = 70
             elif inputChar == 'x':
-                updownV = -100
+                updownV = -70
             elif inputChar == 'q':
-                yawV = -30
+                yawV = -50
             elif inputChar == 'e':
-                yawV = 30
+                yawV = 50
             elif inputChar == readchar.key.ENTER:
                 tello.land()
                 keepAlive.clear()

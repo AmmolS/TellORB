@@ -151,9 +151,9 @@ def main():
                 elif inputChar == 'd':
                     leftRightV = 100
                 elif inputChar == 'z':
-                    updownV = 100
+                    updownV = 70
                 elif inputChar == 'x':
-                    updownV = -100
+                    updownV = -70
                 elif inputChar == 'q':
                     yawV = -50
                 elif inputChar == 'e':
