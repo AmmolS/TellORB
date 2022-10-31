@@ -1,5 +1,21 @@
 #The video is divided into picture program sep.py
 # coding:utf-8
+#Maitreyi trying to document stuff finally
+#Step one: place your video and this script in same folder
+#2: run sep.py from that folder: normal python command
+#.before running replace by correct video name
+#also u must create rgb folder in that sub folder else it wont run correctly
+#once u run the script, u will get a rgb folder in that subfolder with a million images from the video
+#then remove this script and video from this folder
+#then copy file.py here
+#run file.py
+#at the end ur folder of interest should look like
+#folder_of_interest
+#       rgb
+#           all images/pngs
+#       times.txt
+#when running ros_mono publisher pass this as input
+
 import os
 import cv2
  
