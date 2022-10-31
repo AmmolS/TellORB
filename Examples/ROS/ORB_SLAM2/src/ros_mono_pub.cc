@@ -152,7 +152,8 @@ int main(int argc, char **argv){
 			}
 			else {
 				// Read image from file
-				im = cv::imread(vstrImageFilenames[frame_id], CV_LOAD_IMAGE_UNCHANGED);
+				im = cv::imread(string(argv[3])+"/"+vstrImageFilenames[frame_id], CV_LOAD_IMAGE_UNCHANGED);
+
 				tframe = vTimestamps[frame_id];
 			}
 			if (im.empty()){
@@ -389,9 +390,19 @@ inline bool isInteger(const std::string & s){
 }
 
 void LoadImages(const string &strPathToSequence, vector<string> &vstrImageFilenames, vector<double> &vTimestamps){
+	
+	
+    	
+
 	ifstream fTimes;
-	string strPathTimeFile = strPathToSequence + "/times.txt";
+	string strPathTimeFile = strPathToSequence;
 	fTimes.open(strPathTimeFile.c_str());
+	// skip first three lines
+    	string s0;
+    	getline(fTimes,s0);
+    	getline(fTimes,s0);
+    	getline(fTimes,s0);
+
 	while (!fTimes.eof()){
 		string s;
 		getline(fTimes, s);
@@ -401,20 +412,13 @@ void LoadImages(const string &strPathToSequence, vector<string> &vstrImageFilena
 			double t;
 			ss >> t;
 			vTimestamps.push_back(t);
+			string sRGB;
+			ss >> sRGB;
+             		vstrImageFilenames.push_back(sRGB);
 		}
 	}
 
-	string strPrefixLeft = strPathToSequence + "/image_0/";
-
-	const int nTimes = vTimestamps.size();
-	vstrImageFilenames.resize(nTimes);
-
-	for (int i = 0; i < nTimes; i++)
-	{
-		stringstream ss;
-		ss << setfill('0') << setw(6) << i;
-		vstrImageFilenames[i] = strPrefixLeft + ss.str() + ".png";
-	}
+	
 }
 
 //for more info on input parameter of this function
@@ -464,7 +468,7 @@ bool parseParams(int argc, char **argv) {
 		}
 	}
 	else {
-		LoadImages(string(argv[3]), vstrImageFilenames, vTimestamps);
+		LoadImages(string(argv[3])+"/rgb.txt", vstrImageFilenames, vTimestamps);
 	}
 	int arg_id = 4;
 	if (argc > arg_id) {
@@ -477,6 +481,7 @@ bool parseParams(int argc, char **argv) {
 	printf("show_viewer: %d\n", show_viewer);
 	return 1;
 }
+
 
 
 
