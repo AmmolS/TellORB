@@ -185,7 +185,7 @@ def main():
 
 
 
-    tello.takeoff()
+    #tello.takeoff()
     cv2.imwrite("picture.png", frame_read.frame)
 
     time.sleep(3)

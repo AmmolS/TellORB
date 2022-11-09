@@ -39,6 +39,7 @@ def videoRecorder():
         pub_img.publish(img_msg)
         cv2.imshow("Tello Camera", frame_read.frame) # Display to window
         video.write(frame_read.frame)
+        print("Ax:{} Ay:{} Az:{} Yaw:{} Pitch:{} Roll:{}".format(tello.get_acceleration_x(), tello.get_acceleration_y(), tello.get_acceleration_z(), tello.get_yaw(), tello.get_pitch(), tello.get_roll()))
         cv2.waitKey(fps_period)
 
     cv2.destroyAllWindows()

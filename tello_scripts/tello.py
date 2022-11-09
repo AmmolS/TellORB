@@ -103,8 +103,8 @@ signal.signal(signal.SIGINT, exit_handler)
 
 
 
-tello.takeoff()
-cv2.imwrite("picture.png", frame_read.frame)
+# tello.takeoff()
+# cv2.imwrite("picture.png", frame_read.frame)
 
 # try:
 #     while True:
@@ -121,33 +121,33 @@ cv2.imwrite("picture.png", frame_read.frame)
 #         time.sleep(2)
 # except KeyboardInterrupt:
 #     print("Resume")
-time.sleep(3)
+# time.sleep(3)
 
-cv2.imwrite("picture2.png", frame_read.frame)
+# cv2.imwrite("picture2.png", frame_read.frame)
 
-tello.move("up", 80)
-cv2.imwrite("picture3.png", frame_read.frame)
+# tello.move("up", 80)
+# cv2.imwrite("picture3.png", frame_read.frame)
 
-tello.move("forward", 40)
-cv2.imwrite("picture4.png", frame_read.frame)
+# tello.move("forward", 40)
+# cv2.imwrite("picture4.png", frame_read.frame)
 
-tello.move("left", 20)
-cv2.imwrite("picture5.png", frame_read.frame)
+# tello.move("left", 20)
+# cv2.imwrite("picture5.png", frame_read.frame)
 
-tello.move("right", 40)
-cv2.imwrite("picture6.png", frame_read.frame)
+# tello.move("right", 40)
+# cv2.imwrite("picture6.png", frame_read.frame)
 
-tello.move("left", 20)
-cv2.imwrite("picture7.png", frame_read.frame)
+# tello.move("left", 20)
+# cv2.imwrite("picture7.png", frame_read.frame)
 
-tello.move("up", 20)
-cv2.imwrite("picture8.png", frame_read.frame)
+# tello.move("up", 20)
+# cv2.imwrite("picture8.png", frame_read.frame)
 
-tello.move("back", 30)
-cv2.imwrite("picture9.png", frame_read.frame)
+# tello.move("back", 30)
+# cv2.imwrite("picture9.png", frame_read.frame)
 
-print("Landing drone!")
-tello.land()
+# print("Landing drone!")
+# tello.land()
 
 
 while recorder.is_alive():

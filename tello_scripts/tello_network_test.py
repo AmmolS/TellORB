@@ -1,5 +1,6 @@
 import socket
 from threading import Thread, Event
+from datetime import datetime
 
 bufferSize = 1024
 
@@ -20,6 +21,8 @@ def stateReceiver():
 
         print(clientMsg)
         print(clientIP)
+        print(datetime.now())
+        
 
 stateReceiverThread = Thread(target=stateReceiver)
 stateReceiverThread.start()
