@@ -108,25 +108,54 @@ def main():
 
         video.release()
 
-    def imuRecorder():
+    def imuReceiver():
         seq = 10001
         fps = 1.0/180
         lastYaw = 0
         lastPitch = 0
         lastRoll = 0
-        
+        Rx = 0
+        Ry = 0
+        Rz = 0
+
         while keepRecording.is_set():
             imu_msg = _Imu.Imu()
 
-            pub_img.publish(img_msg)
+            if seq % 18 == 0:
+                Rx = (tello.get_roll() - lastRoll)*math.pi/180
+                Ry = (tello.get_pitch() - lastPitch)*math.pi/180
+                Rz = (tello.get_yaw() - lastYaw)*math.pi/180
+                lastRoll = tello.get_roll()
+                lastYaw = tello.get_yaw()
+                lastPitch = tello.get_pitch()
+
+            imu_msg.header.seq = seq
+            imu_msg.header.stamp.set(math.floor(time.time()), time.time_ns() % 1000000000)
+            imu_msg.header.frame_id = "imu4"
+            imu_msg.orientation.z = 1
+            imu_msg.orientation_covariance[0] = 99999
+            imu_msg.orientation_covariance[4] = 99999
+            imu_msg.orientation_covariance[8] = 99999
+
+            imu_msg.linear_acceleration.x = tello.get_acceleration_x()/100
+            imu_msg.linear_acceleration.y = tello.get_acceleration_y()/100
+            imu_msg.linear_acceleration.z = tello.get_acceleration_z()/100
+            imu_msg.angular_velocity.x = Rx
+            imu_msg.angular_velocity.y = Ry
+            imu_msg.angular_velocity.z = Rz
+
+            pub_img.publish(imu_msg)
             seq += 1
             time.sleep(fps)
 
 
     time.sleep(2)
 
-    recorder = Thread(target=videoRecorder)
-    recorder.start()
+    imgRecorder = Thread(target=videoRecorder)
+    imuRecorder = Thread(target=imuReceiver)
+
+    imgRecorder.start()
+    imuRecorder.start()
 
     def exitCatcher():
         while keepAlive.is_set():
@@ -170,12 +199,14 @@ def main():
                     tello.land()
                     keepAlive.clear()
                     keepRecording.clear()
-                    recorder.join()
+                    imgRecorder.join()
+                    imuRecorder.join()
                     rospy.spin()
                 elif inputChar == readchar.key.ESC:          # THIS IS A DANGEROUS COMMAND. ONLY USE WHEN DRONE HAS LANDED ALREADY FOR WHATEVER REASON (auto landing, crash landing, flew down too much, etc.) TO EXIT THE PROGRAM.
                     keepAlive.clear()
                     keepRecording.clear()
-                    recorder.join()
+                    imgRecorder.join()
+                    imuRecorder.join()
                     rospy.spin()
                 else:
                     print("Tello Battery Level = {}%".format(tello.get_battery()))
@@ -185,7 +216,8 @@ def main():
             print("Exiting keepAlive")
             keepAlive.clear()
             keepRecording.clear()
-            recorder.join()
+            imgRecorder.join()
+            imuRecorder.join()
             print("Killing program")
             rospy.spin()
 
@@ -228,14 +260,15 @@ def main():
     # tello.land()
 
 
-    while recorder.is_alive():
+    while imgRecorder.is_alive():
         time.sleep(0.2)
 
         
     if (keepRecording.is_set() == True):
         keepRecording.clear()
 
-    recorder.join()
+    imgRecorder.join()
+    imuRecorder.join()
 
 
     rospy.spin()
