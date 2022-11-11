@@ -7,6 +7,13 @@ Examples/ROS/ORB_SLAM2/CMakeLists.txt.user
 Examples/ROS/ORB_SLAM2/build/
 Examples/Stereo/stereo_euroc
 Examples/Stereo/stereo_kitti
+Examples/ROS/ORB_SLAM2/Mono
+Examples/ROS/ORB_SLAM2/MonoAR
+Examples/ROS/ORB_SLAM2/Monopub
+Examples/ROS/ORB_SLAM2/Monosub
+Examples/ROS/ORB_SLAM2/Monosub2
+Examples/ROS/ORB_SLAM2/RGBD
+Examples/ROS/ORB_SLAM2/Stereo
 KeyFrameTrajectory.txt
 Thirdparty/DBoW2/build/
 Thirdparty/DBoW2/lib/
@@ -17,4 +24,3 @@ Vocabulary/ORBvoc.txt
 build/
 *~
 lib/
-

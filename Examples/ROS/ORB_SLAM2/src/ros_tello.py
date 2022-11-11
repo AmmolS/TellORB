@@ -3,7 +3,7 @@ import rospy
 from std_msgs.msg import Empty, UInt8, Bool
 from std_msgs.msg import UInt8MultiArray
 from std_msgs.msg import String
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, _Imu
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from dynamic_reconfigure.server import Server
@@ -78,42 +78,50 @@ def main():
       
     print('Currently in the main function...')
     # pub = rospy.Publisher("test/raw", String, queue_size=10)
-    pub_img = rospy.Publisher("tello/image_raw", Image, queue_size=10)
+    pub_img = rospy.Publisher("/tello/image_raw", Image, queue_size=10)
+    pub_imu = rospy.Publisher("/imu0", _Imu.Imu, queue_size=10)
       
     # initializing the subscriber node
     rospy.init_node('command_subscriber', anonymous=True)
-    
-    # the following commented code is for debugging rospy
-    # rospy.loginfo("Sending \"hello world!\"")
-    # image = Image()
-    # image.height = 100
-    # image.width = 300
-    # for i in range(10):
-    #     time.sleep(0.5)
-    #     pub.publish("hello world at {} times".format(i))
-    #     pub_img.publish(image)
 
     def videoRecorder():
         # create a VideoWrite object, recoring to ./video.avi
         height, width, _ = frame_read.frame.shape
-        
+        fps = 1.0/60
+        seq = 1
+
         print("Start recording")
         video = cv2.VideoWriter('video.avi', cv2.VideoWriter_fourcc(*'MJPG'), 30, (width, height))
 
         while keepRecording.is_set():
-            img_msg = bridge.cv2_to_imgmsg(frame_read.frame, encoding='rgb8')
+            img_msg = bridge.cv2_to_imgmsg(frame_read.frame, encoding='bgr8')
+            img_msg.header.seq = seq
+            img_msg.header.stamp.set(math.floor(time.time()), time.time_ns() % 1000000000)
+            # 1000000000 is to only the decimals for nano seconds
+            img_msg.header.frame_id = "cam0"
             pub_img.publish(img_msg)
+            seq += 1
             video.write(frame_read.frame)
-            time.sleep(1 / 60)
+            time.sleep(fps)
 
         print("Stop recording")
 
         video.release()
 
-    # we need to run the recorder in a seperate thread, otherwise blocking options
-    #  would prevent frames from getting added to the video
+    def imuRecorder():
+        seq = 10001
+        fps = 1.0/180
+        lastYaw = 0
+        lastPitch = 0
+        lastRoll = 0
+        
+        while keepRecording.is_set():
+            imu_msg = _Imu.Imu()
 
-    # this delay is for legacy testing purposes. It may be removed if it causes issues or if it doesn't cause issues to remove it down the road
+            pub_img.publish(img_msg)
+            seq += 1
+            time.sleep(fps)
+
 
     time.sleep(2)
 

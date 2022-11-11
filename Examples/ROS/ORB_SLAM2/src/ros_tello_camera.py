@@ -35,11 +35,10 @@ def videoRecorder():
     fps_period = round(1000*(1/60)) # Write to video at around 60fps - this is experimental
 
     while keepRecording.is_set():
-        img_msg = bridge.cv2_to_imgmsg(frame_read.frame, encoding='rgb8')
+        img_msg = bridge.cv2_to_imgmsg(frame_read.frame, encoding='bgr8')
         pub_img.publish(img_msg)
         cv2.imshow("Tello Camera", frame_read.frame) # Display to window
         video.write(frame_read.frame)
-        print("Ax:{} Ay:{} Az:{} Yaw:{} Pitch:{} Roll:{}".format(tello.get_acceleration_x(), tello.get_acceleration_y(), tello.get_acceleration_z(), tello.get_yaw(), tello.get_pitch(), tello.get_roll()))
         cv2.waitKey(fps_period)
 
     cv2.destroyAllWindows()

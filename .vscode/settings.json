@@ -53,5 +53,6 @@
         "typeinfo": "cpp",
         "string": "cpp",
         "random": "cpp"
-    }
+    },
+    "python.analysis.extraPaths": ["/home/alison/.local/bin/python3.8"]
 }
