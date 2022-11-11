@@ -24,3 +24,5 @@ projection_matrix:
   data: [932.3653 ,   0.     , 469.88661,   0.     ,
            0.     , 930.16351, 361.10729,   0.     ,
            0.     ,   0.     ,   1.     ,   0.     ]
+
+# Scale 1 will tend to give me better results
