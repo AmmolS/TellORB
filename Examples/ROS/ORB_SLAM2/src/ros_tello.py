@@ -133,9 +133,9 @@ def main():
             imu_msg.header.stamp.set(math.floor(time.time()), time.time_ns() % 1000000000)
             imu_msg.header.frame_id = "imu4"
             imu_msg.orientation.z = 1
-            imu_msg.orientation_covariance[0] = 99999
-            imu_msg.orientation_covariance[4] = 99999
-            imu_msg.orientation_covariance[8] = 99999
+            imu_msg.orientation_covariance[0] = 99999.9
+            imu_msg.orientation_covariance[4] = 99999.9
+            imu_msg.orientation_covariance[8] = 99999.9
 
             imu_msg.linear_acceleration.x = tello.get_acceleration_x()/100
             imu_msg.linear_acceleration.y = tello.get_acceleration_y()/100
@@ -173,6 +173,7 @@ def main():
         keepingAlive.start()
 
         try:
+            speed = 50
             while True:
                 inputChar = readchar.readchar()
                 updownV = 0
@@ -180,33 +181,39 @@ def main():
                 forwardBackwardV = 0
                 yawV = 0
                 if inputChar == 'w':
-                    forwardBackwardV = 100
+                    forwardBackwardV = speed
                 elif inputChar == 's':
-                    forwardBackwardV = -100
+                    forwardBackwardV = -speed
                 elif inputChar == 'a':
-                    leftRightV = -100
+                    leftRightV = -speed
                 elif inputChar == 'd':
-                    leftRightV = 100
+                    leftRightV = speed
                 elif inputChar == 'z':
                     updownV = 70
                 elif inputChar == 'x':
                     updownV = -70
                 elif inputChar == 'q':
-                    yawV = -50
+                    yawV = -20
                 elif inputChar == 'e':
-                    yawV = 50
+                    yawV = 20
+                elif inputChar == 'o':
+                    speed += 10
+                elif inputChar == 'p':
+                    speed -= 10
                 elif inputChar == readchar.key.ENTER:
                     tello.land()
                     keepAlive.clear()
                     keepRecording.clear()
                     imgRecorder.join()
                     imuRecorder.join()
+                    exit(1)
                     rospy.spin()
                 elif inputChar == readchar.key.ESC:          # THIS IS A DANGEROUS COMMAND. ONLY USE WHEN DRONE HAS LANDED ALREADY FOR WHATEVER REASON (auto landing, crash landing, flew down too much, etc.) TO EXIT THE PROGRAM.
                     keepAlive.clear()
                     keepRecording.clear()
                     imgRecorder.join()
                     imuRecorder.join()
+                    exit(1)
                     rospy.spin()
                 else:
                     print("Tello Battery Level = {}%".format(tello.get_battery()))
@@ -219,6 +226,7 @@ def main():
             imgRecorder.join()
             imuRecorder.join()
             print("Killing program")
+            exit(1)
             rospy.spin()
 
     signal.signal(signal.SIGINT, exit_handler)
