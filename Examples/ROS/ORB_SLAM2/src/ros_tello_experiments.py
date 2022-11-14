@@ -267,7 +267,6 @@ def main():
         tello.takeoff()
         # cv2.imwrite("picture.png", frame_read.frame)
 
-        time.sleep(3)
 
         tello.move("up", int(height - tello.get_height()))
         #next set of manouvers

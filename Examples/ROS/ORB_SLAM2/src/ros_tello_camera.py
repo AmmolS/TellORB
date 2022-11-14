@@ -19,6 +19,9 @@ tello.connect()
 keepRecording = Event()
 keepRecording.set()
 
+# tello.set_video_fps(Tello.FPS_30)
+# tello.set_video_resolution(Tello.RESOLUTION_720P)
+
 tello.streamon()
 frame_read = tello.get_frame_read()
 bridge = CvBridge()
