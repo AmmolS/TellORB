@@ -197,9 +197,9 @@ def main():
                 elif inputChar == 'x':
                     updownV = -70
                 elif inputChar == 'q':
-                    yawV = -50
+                    yawV = -40
                 elif inputChar == 'e':
-                    yawV = 50
+                    yawV = 40
                 elif inputChar == 'o':
                     flightSpeed += 10
                 elif inputChar == 'p':
