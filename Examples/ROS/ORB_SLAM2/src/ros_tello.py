@@ -144,7 +144,7 @@ def main():
             imu_msg.angular_velocity.y = Ry
             imu_msg.angular_velocity.z = Rz
 
-            pub_img.publish(imu_msg)
+            pub_imu.publish(imu_msg)
             seq += 1
             time.sleep(fps)
 

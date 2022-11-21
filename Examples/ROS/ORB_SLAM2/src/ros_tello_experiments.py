@@ -100,7 +100,7 @@ def main():
       
     print('Currently in the main function...')
     # pub = rospy.Publisher("test/raw", String, queue_size=10)
-    pub_img = rospy.Publisher("tello/image_raw", Image, queue_size=10)
+    pub_img = rospy.Publisher("camera/image_raw", Image, queue_size=10)
       
     # initializing the subscriber node
     rospy.init_node('command_subscriber', anonymous=True)
@@ -119,10 +119,12 @@ def main():
     #step one: load the json file with ideal drone parameters
     data = loadConfig()
     #step two get the drone parameter data into variables to be put into command
-    speed = int(data["speed"])
+    # tello.speed = int(data["speed"])
+    tello.set_speed(int(data["speed"]))
     rotationAngle = int(data["rotationAngle"])
     height = int(data["height"])
     sleepTime = int(data["sleep"])
+    time.sleep(sleepTime)
     numTimesExecute = 1 #number of times to execute the loop
 
     def videoRecorder():
@@ -133,7 +135,7 @@ def main():
         video = cv2.VideoWriter('video.avi', cv2.VideoWriter_fourcc(*'MJPG'), 30, (width, height))
 
         while keepRecording.is_set():
-            img_msg = bridge.cv2_to_imgmsg(frame_read.frame, encoding='rgb8')
+            img_msg = bridge.cv2_to_imgmsg(frame_read.frame, encoding='bgr8')
             pub_img.publish(img_msg)
             video.write(frame_read.frame)
             time.sleep(1 / 60)
@@ -166,71 +168,86 @@ def main():
         print(msg, flush=True)
         keepingAlive = Thread(target=exitCatcher)
         keepingAlive.start()
-        numTimesExecute=1
+        # numTimesExecute=1
+        # tello.land()
+        # keepRecording.clear()
+        # recorder.join()
+        print("Killing program")
 
         try:
+            flightSpeed = 50
             while True:
                 updownV = 0
                 leftRightV = 0
                 forwardBackwardV = 0
                 yawV = 0
                 #intial scan manouver complete, pass control to keyboard
-                if(numTimesExecute==0):
-                    inputChar = readchar.readchar()
-                    if inputChar == 'w':
-                        forwardBackwardV = 100
-                    elif inputChar == 's':
-                        forwardBackwardV = -100
-                    elif inputChar == 'a':
-                        leftRightV = -100
-                    elif inputChar == 'd':
-                        leftRightV = 100
-                    elif inputChar == 'z':
-                        updownV = 70
-                    elif inputChar == 'x':
-                        updownV = -70
-                    elif inputChar == 'q':
-                        yawV = -50
-                    elif inputChar == 'e':
-                        yawV = 50
-                    elif inputChar == readchar.key.ENTER:
-                        tello.land()
-                        keepAlive.clear()
-                        keepRecording.clear()
-                        recorder.join()
-                        rospy.spin()
-                    elif inputChar == readchar.key.ESC:          # THIS IS A DANGEROUS COMMAND. ONLY USE WHEN DRONE HAS LANDED ALREADY FOR WHATEVER REASON (auto landing, crash landing, flew down too much, etc.) TO EXIT THE PROGRAM.
-                        keepAlive.clear()
-                        keepRecording.clear()
-                        recorder.join()
-                        rospy.spin()
-                    else:
-                        print("Tello Battery Level = {}%".format(tello.get_battery()))
-                    # PRESS SPACEBAR TO HOVER-old script execution here
-                    tello.send_rc_control(leftRightV, forwardBackwardV, updownV, yawV)
-                
+                # if(numTimesExecute==0):
+                inputChar = readchar.readchar()
+                if inputChar == 'w':
+                    forwardBackwardV = flightSpeed
+                elif inputChar == 's':
+                    forwardBackwardV = -flightSpeed
+                elif inputChar == 'a':
+                    leftRightV = -flightSpeed
+                elif inputChar == 'd':
+                    leftRightV = flightSpeed
+                elif inputChar == 'z':
+                    updownV = 70
+                elif inputChar == 'x':
+                    updownV = -70
+                elif inputChar == 'q':
+                    yawV = -40
+                elif inputChar == 'e':
+                    yawV = 40
+                elif inputChar == 'o':
+                    flightSpeed += 10
+                elif inputChar == 'p':
+                    flightSpeed -= 10
+                elif inputChar == readchar.key.ENTER:
+                    tello.land()
+                    keepAlive.clear()
+                    keepRecording.clear()
+                    recorder.join()
+                    exit(1)
+                    # rospy.spin()
+                elif inputChar == readchar.key.ESC:          # THIS IS A DANGEROUS COMMAND. ONLY USE WHEN DRONE HAS LANDED ALREADY FOR WHATEVER REASON (auto landing, crash landing, flew down too much, etc.) TO EXIT THE PROGRAM.
+                    keepAlive.clear()
+                    keepRecording.clear()
+                    recorder.join()
+                    exit(1)
+                    # rospy.spin()
                 else:
+                    print("Tello Battery Level = {}%".format(tello.get_battery()))
+                # PRESS SPACEBAR TO HOVER-old script execution here
+                tello.send_rc_control(leftRightV, forwardBackwardV, updownV, yawV)
+                
+                # else:
                     #initial hard coded movements
                     #changing the command here to enable drone movement as per config file-converting to velocity from distance 
                     #for rc commands to work
                     #changing back to distance command
                     #distanceUp = int(height - tello.get_height())
                     #distanceToRC(distanceUp,speed) #function to issue appropriate rc command, speed comes from config file
-                    drone.move_up(int(height - tello.get_height()))
-                    #next set of manouvers
-                    angle = 0
-                    time.sleep(sleepTime)#from the config file
-                    #360 degree turn
-                    while angle <= (MAX_ANGLE + rotationAngle): #not sure if this will over rotate
-                        #angleToRC(rotationAngle,50)#got this from the code above
-                        #distanceToRC(20,speed) #move up
-                        #distanceToRC(20,(-speed))#move down
-                        drone.rotate_clockwise(rotationAngle)
-                        drone.move_up(20)
-                        drone.move_down(20)
-                        angle += rotationAngle
-                        time.sleep(sleepTime)#from config file
-                        numTimesExecute = numTimesExecute - 1 #one round of manouver complete
+                    # tello.move_up(int(height - tello.get_height()))
+                    # #next set of manouvers
+                    # angle = 0
+                    # time.sleep(sleepTime)#from the config file
+                    # #360 degree turn
+                    # while angle <= (MAX_ANGLE + rotationAngle): #not sure if this will over rotate
+                    #     #angleToRC(rotationAngle,50)#got this from the code above
+                    #     #distanceToRC(20,speed) #move up
+                    #     #distanceToRC(20,(-speed))#move down
+                    #     print("Rotating: " + str(rotationAngle))
+                    #     tello.rotate_clockwise(rotationAngle)
+                    #     print("Moving up:" + str(20))
+                    #     tello.move_up(20)
+                    #     print("Moving down: " + str(20))
+                    #     tello.move_down(20)
+                    #     angle += rotationAngle
+                    #     print("Rotation angle is now " + str(angle))
+                    #     time.sleep(sleepTime)#from config file
+                    #     numTimesExecute = numTimesExecute - 1 #one round of manouver complete
 
         except KeyboardInterrupt:
             print("Exiting keepAlive")
@@ -238,17 +255,42 @@ def main():
             keepRecording.clear()
             recorder.join()
             print("Killing program")
-            rospy.spin()
+            exit(1)
+            # rospy.spin()
 
     signal.signal(signal.SIGINT, exit_handler)
 
+    print("Press ENTER to initiate rotation commands.", flush=True)
+    inputChar = readchar.readchar()
 
+    if inputChar == readchar.key.ENTER:
+        tello.takeoff()
+        # cv2.imwrite("picture.png", frame_read.frame)
 
-    tello.takeoff()
-    cv2.imwrite("picture.png", frame_read.frame)
+        time.sleep(3)
 
-    time.sleep(3)
-
+        tello.move("up", int(height - tello.get_height()))
+        #next set of manouvers
+        angle = 0
+        time.sleep(sleepTime)#from the config file
+        #360 degree turn
+        while angle <= (MAX_ANGLE + rotationAngle): #not sure if this will over rotate
+            #angleToRC(rotationAngle,50)#got this from the code above
+            #distanceToRC(20,speed) #move up
+            #distanceToRC(20,(-speed))#move down
+            print("Rotating: " + str(rotationAngle))
+            tello.rotate_clockwise(rotationAngle)
+            time.sleep(sleepTime)
+            # print("Moving up:" + str(20))
+            tello.move("up", 50)
+            time.sleep(sleepTime)
+            # print("Moving down: " + str(20))
+            tello.move("down", 50)
+            angle += rotationAngle
+            print("Rotation angle is now " + str(angle))
+            time.sleep(sleepTime)#from config file
+        tello.land()
+        # numTimesExecute = numTimesExecute - 1 #one round of manouver complete
     # You can add forced commands here if you want it to run by script (though it may fail in bad lighting or other issues)
     # Most reliable way to control drone is with `send_rc` commands rather then `move` commands
 

@@ -1,0 +1,28 @@
+image_width: 960
+image_height: 720
+camera_name: narrow_stereo
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [934.77317,   0.     , 469.64314,
+           0.     , 933.90037, 361.67014,
+           0.     ,   0.     ,   1.     ]
+distortion_model: plumb_bob
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [-0.027034, 0.079271, -0.000121, 0.000887, 0.000000]
+rectification_matrix:
+  rows: 3
+  cols: 3
+  data: [1., 0., 0.,
+         0., 1., 0.,
+         0., 0., 1.]
+projection_matrix:
+  rows: 3
+  cols: 4
+  data: [932.3653 ,   0.     , 469.88661,   0.     ,
+           0.     , 930.16351, 361.10729,   0.     ,
+           0.     ,   0.     ,   1.     ,   0.     ]
+
+# Scale 1 will tend to give me better results

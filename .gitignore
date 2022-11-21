@@ -24,3 +24,4 @@ Vocabulary/ORBvoc.txt
 build/
 *~
 lib/
+*.avi
