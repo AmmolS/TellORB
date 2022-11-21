@@ -1,6 +1,6 @@
 {
-    "height": 160,
+    "height": 120,
     "speed": 50,
     "rotationAngle": 15,
-    "sleep": 3 
+    "sleep": 0.5 
 }
