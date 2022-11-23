@@ -1,0 +1,124 @@
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:78;temph:81;tof:6553;h:0;bat:90;baro:137.38;time:0;agx:2.00;agy:-1.00;agz:-998.00;\r\n'
+('192.168.10.1', 8889)
+Received response
+b'ok'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:78;temph:81;tof:6553;h:0;bat:90;baro:137.43;time:0;agx:4.00;agy:-3.00;agz:-1000.00;\r\n'
+('192.168.10.1', 8889)
+Tello Battery Level = 90%
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:78;temph:81;tof:6553;h:0;bat:90;baro:137.42;time:0;agx:3.00;agy:-1.00;agz:-1000.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:78;temph:81;tof:6553;h:0;bat:90;baro:137.45;time:0;agx:3.00;agy:-2.00;agz:-999.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:78;temph:81;tof:6553;h:0;bat:90;baro:137.51;time:0;agx:1.00;agy:-1.00;agz:-1000.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:78;temph:81;tof:6553;h:0;bat:90;baro:137.42;time:0;agx:5.00;agy:-2.00;agz:-1000.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:78;temph:81;tof:6553;h:0;bat:90;baro:137.46;time:0;agx:2.00;agy:-2.00;agz:-1000.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:79;temph:81;tof:6553;h:0;bat:90;baro:137.43;time:0;agx:1.00;agy:0.00;agz:-1000.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:79;temph:81;tof:6553;h:0;bat:90;baro:137.46;time:0;agx:3.00;agy:0.00;agz:-1002.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:79;temph:81;tof:6553;h:0;bat:90;baro:137.45;time:0;agx:4.00;agy:-2.00;agz:-999.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:79;temph:81;tof:6553;h:0;bat:90;baro:137.45;time:0;agx:0.00;agy:-4.00;agz:-1000.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:79;temph:81;tof:6553;h:0;bat:90;baro:137.51;time:0;agx:3.00;agy:0.00;agz:-1001.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:79;temph:81;tof:6553;h:0;bat:90;baro:137.46;time:0;agx:1.00;agy:-3.00;agz:-999.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:79;temph:81;tof:6553;h:0;bat:90;baro:137.45;time:0;agx:5.00;agy:-3.00;agz:-996.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:79;temph:81;tof:6553;h:0;bat:90;baro:137.44;time:0;agx:1.00;agy:-1.00;agz:-1000.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:79;temph:81;tof:6553;h:0;bat:90;baro:137.45;time:0;agx:1.00;agy:-2.00;agz:-999.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:79;temph:81;tof:6553;h:0;bat:90;baro:137.47;time:0;agx:3.00;agy:-3.00;agz:-998.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:79;temph:82;tof:6553;h:0;bat:90;baro:137.48;time:0;agx:4.00;agy:-2.00;agz:-996.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:79;temph:82;tof:6553;h:0;bat:90;baro:137.50;time:0;agx:3.00;agy:-1.00;agz:-1000.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:79;temph:82;tof:6553;h:0;bat:90;baro:137.51;time:0;agx:1.00;agy:-1.00;agz:-1003.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:79;temph:82;tof:6553;h:0;bat:89;baro:137.48;time:0;agx:3.00;agy:-2.00;agz:-999.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:79;temph:82;tof:6553;h:0;bat:89;baro:137.48;time:0;agx:2.00;agy:-2.00;agz:-996.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:79;temph:82;tof:6553;h:0;bat:89;baro:137.48;time:0;agx:4.00;agy:-1.00;agz:-1000.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:79;temph:82;tof:6553;h:0;bat:89;baro:137.49;time:0;agx:1.00;agy:-1.00;agz:-999.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:79;temph:82;tof:6553;h:0;bat:89;baro:137.47;time:0;agx:2.00;agy:-2.00;agz:-1003.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:79;temph:82;tof:6553;h:0;bat:89;baro:137.44;time:0;agx:2.00;agy:0.00;agz:-1001.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:79;temph:82;tof:6553;h:0;bat:89;baro:137.43;time:0;agx:2.00;agy:-1.00;agz:-999.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:78;temph:82;tof:6553;h:0;bat:89;baro:137.44;time:0;agx:3.00;agy:-2.00;agz:-997.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:78;temph:82;tof:6553;h:0;bat:89;baro:137.43;time:0;agx:2.00;agy:-4.00;agz:-1000.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:78;temph:82;tof:6553;h:0;bat:89;baro:137.46;time:0;agx:4.00;agy:0.00;agz:-999.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:78;temph:82;tof:6553;h:0;bat:89;baro:137.49;time:0;agx:3.00;agy:-2.00;agz:-999.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:78;temph:82;tof:6553;h:0;bat:89;baro:137.47;time:0;agx:2.00;agy:-1.00;agz:-1000.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:78;temph:82;tof:6553;h:0;bat:89;baro:137.38;time:0;agx:3.00;agy:-1.00;agz:-998.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:78;temph:82;tof:6553;h:0;bat:89;baro:137.46;time:0;agx:3.00;agy:-2.00;agz:-999.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:78;temph:82;tof:6553;h:0;bat:89;baro:137.46;time:0;agx:3.00;agy:-2.00;agz:-1000.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:78;temph:82;tof:6553;h:0;bat:89;baro:137.45;time:0;agx:3.00;agy:0.00;agz:-1002.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:78;temph:82;tof:6553;h:0;bat:89;baro:137.45;time:0;agx:3.00;agy:0.00;agz:-1001.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:79;temph:81;tof:6553;h:0;bat:89;baro:137.50;time:0;agx:3.00;agy:-2.00;agz:-1000.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:79;temph:81;tof:6553;h:0;bat:89;baro:137.45;time:0;agx:3.00;agy:-2.00;agz:-1001.00;\r\n'
+('192.168.10.1', 8889)
+Received state
+b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:79;temph:81;tof:6553;h:0;bat:89;baro:137.48;time:0;agx:3.00;agy:0.00;agz:-1001.00;\r\n'
+('192.168.10.1', 8889)

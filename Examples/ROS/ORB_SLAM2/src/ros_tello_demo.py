@@ -251,9 +251,9 @@ def main():
             elif inputChar == 'x':
                 updownV = -70
             elif inputChar == 'q':
-                yawV = -40
+                yawV = -20
             elif inputChar == 'e':
-                yawV = 40
+                yawV = 20
             elif inputChar == 'o':
                 flightSpeed += 10
             elif inputChar == 'p':
@@ -282,7 +282,11 @@ def main():
                     #distanceToRC(20,speed) #move up
                     #distanceToRC(20,(-speed))#move down
                     print("Rotating: " + str(rotationAngle))
+
+                    tello.set_speed(20)
                     tello.rotate_counter_clockwise(rotationAngle)
+                    tello.set_speed(flightSpeed)
+
                     time.sleep(sleepTime)
                     # print("Moving up:" + str(20))
                     tello.move("up", 50)
@@ -298,7 +302,7 @@ def main():
                 if(tello.get_height() < height):
                     tello.move("up", int(height - tello.get_height()))
                 time.sleep(sleepTime)#from the config file
-                while angle <= (MAX_ANGLE + rotationAngle): #not sure if this will over rotate
+                while angle <= (MAX_ANGLE): #not sure if this will over rotate
                     #angleToRC(rotationAngle,50)#got this from the code above
                     #distanceToRC(20,speed) #move up
                     #distanceToRC(20,(-speed))#move down

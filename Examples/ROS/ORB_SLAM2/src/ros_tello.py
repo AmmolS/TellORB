@@ -234,6 +234,7 @@ def main():
 
 
     #tello.takeoff()
+    tello.set_wifi_credentials("Tello-Ammol", "orange")
     cv2.imwrite("picture.png", frame_read.frame)
 
     time.sleep(3)
