@@ -277,7 +277,7 @@ def main():
                 if(tello.get_height() < height):
                     tello.move("up", int(height - tello.get_height()))
                 time.sleep(sleepTime)#from the config file
-                while angle <= (MAX_ANGLE + rotationAngle): #not sure if this will over rotate
+                while angle < (MAX_ANGLE): #not sure if this will over rotate
                     #angleToRC(rotationAngle,50)#got this from the code above
                     #distanceToRC(20,speed) #move up
                     #distanceToRC(20,(-speed))#move down
@@ -302,7 +302,7 @@ def main():
                 if(tello.get_height() < height):
                     tello.move("up", int(height - tello.get_height()))
                 time.sleep(sleepTime)#from the config file
-                while angle <= (MAX_ANGLE): #not sure if this will over rotate
+                while angle < (MAX_ANGLE): #not sure if this will over rotate
                     #angleToRC(rotationAngle,50)#got this from the code above
                     #distanceToRC(20,speed) #move up
                     #distanceToRC(20,(-speed))#move down
