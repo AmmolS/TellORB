@@ -38,6 +38,7 @@ keepAlive.set()
 tello.streamon()
 frame_read = tello.get_frame_read()
 bridge = CvBridge()
+pub_img = rospy.Publisher("tello/image_raw", Image, queue_size=10)
 
 # load the config.json file
 def loadConfig():
@@ -97,7 +98,7 @@ def angleToRC(degree,angularSpeed):
     #send another rc to stop moving-hopefully it stops when desired angle is reached
     tello.send_rc_control(0, 0, 0, 0)
 
-def videoRecorder(pub_img):
+def videoRecorder():
     # create a VideoWrite object, recoring to ./video.avi
     height, width, _ = frame_read.frame.shape
     
@@ -106,7 +107,7 @@ def videoRecorder(pub_img):
 
     while keepRecording.is_set():
         img_msg = bridge.cv2_to_imgmsg(frame_read.frame, encoding='bgr8')
-        pub_img[0].publish(img_msg)
+        pub_img.publish(img_msg)
         video.write(frame_read.frame)
         time.sleep(1 / 60)
 
@@ -235,8 +236,8 @@ def main():
                 tello.move("up", int(height - tello.get_height()))
                 time.sleep(sleepTime)
         
-        pub_img = rospy.Publisher("tello/image_raw", Image, queue_size=10)
-        recorder = Thread(target=videoRecorder, args=(pub_img,))
+  
+        recorder = Thread(target=videoRecorder)
         recorder.start()
 
         try:
