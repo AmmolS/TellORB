@@ -21,24 +21,27 @@ def main(argv):
     print('Input file is ', inputfile)
 
     bridge = CvBridge()
+    rospy.init_node('ros_video_player', anonymous=True)
     pub_img = rospy.Publisher("tello/image_raw", Image, queue_size=10)
     videocap = cv2.VideoCapture(inputfile)
 
     success, image = videocap.read()
     count = 0
     while success:
-        success, image = videocap.read()
         kernel = np.array([[0, -1, 0],
                    [-1, 5,-1],
                    [0, -1, 0]])
         image_sharp = cv2.filter2D(src=image, ddepth=-1, kernel=kernel)
         img_msg = bridge.cv2_to_imgmsg(image_sharp, encoding='bgr8')
-        pub_img(img_msg)
+        pub_img.publish(img_msg)
+        # time.sleep(1/90)
         # cv2.imwrite("picture_unsharpened.jpg", image)
         # cv2.imwrite("picture_sharpened.jpg", image_sharp)
         # if cv2.waitKey(10) == 27:                     # exit if Escape is hit
         #     break
+        success, image = videocap.read()
         count += 1
+    print("Outputted {} frames".format(count))
 
 if __name__ == "__main__":
    main(sys.argv[1:])
