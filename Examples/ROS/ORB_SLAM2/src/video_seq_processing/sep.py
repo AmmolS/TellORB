@@ -32,7 +32,7 @@ def getName(num):
     return strRes
  
  
-cap = cv2.VideoCapture('lab_video.avi')
+cap = cv2.VideoCapture('ravi_corridor2.avi')
 # Get code rate and size
 fps = cap.get(cv2.CAP_PROP_FPS)
 size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
@@ -44,8 +44,8 @@ idx = 1
 
 while cap.isOpened:
     write_success = cv2.imwrite('rgb/' + getName(idx) +'.png', frame)
-    print(write_success);
+    # print(write_success);
     success, frame = cap.read() # Get the next frame
     idx = idx + 1
     cv2.imshow('frame', frame)
-    cv2.waitKey(100)
+    cv2.waitKey(1)
