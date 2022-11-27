@@ -61,6 +61,7 @@
 #include <vector>
 
 #include "ORBextractor.h"
+#include <algorithm>
 
 
 using namespace cv;
@@ -73,6 +74,8 @@ const int PATCH_SIZE = 31;
 const int HALF_PATCH_SIZE = 15;
 const int EDGE_THRESHOLD = 19;
 
+static bool cornerComparison(pair<int,ExtractorNode*> a, pair<int,ExtractorNode*> b)
+{ return (a.second->UL.x < b.second->UL.x); }
 
 static float IC_Angle(const Mat& image, Point2f pt,  const vector<int> & u_max)
 {
@@ -680,8 +683,8 @@ vector<cv::KeyPoint> ORBextractor::DistributeOctTree(const vector<cv::KeyPoint>&
 
                 vector<pair<int,ExtractorNode*> > vPrevSizeAndPointerToNode = vSizeAndPointerToNode;
                 vSizeAndPointerToNode.clear();
-
-                sort(vPrevSizeAndPointerToNode.begin(),vPrevSizeAndPointerToNode.end());
+                std::stable_sort(vPrevSizeAndPointerToNode.begin(),vPrevSizeAndPointerToNode.end(), cornerComparison);
+                // sort(vPrevSizeAndPointerToNode.begin(),vPrevSizeAndPointerToNode.end());
                 for(int j=vPrevSizeAndPointerToNode.size()-1;j>=0;j--)
                 {
                     ExtractorNode n1,n2,n3,n4;
