@@ -39,7 +39,7 @@ if(NOT OpenCV_FOUND)
    endif()
 endif()
 
-find_package(Eigen3 3.4.0 REQUIRED NO_MODULE)
+find_package(Eigen3 REQUIRED NO_MODULE)
 find_package(Pangolin REQUIRED)
 find_package(PCL 1.7 REQUIRED)
 

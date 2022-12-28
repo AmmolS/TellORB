@@ -335,7 +335,7 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 
 	generatePath(DFSpath);//CAN RE USE
 
-        vector<std::string> command_list = returnNextCommand(DFSpath);//TO DO 
+    vector<std::string> command_list = returnNextCommand(DFSpath);//TO DO 
   	//print the commands here to see what is happening
     	for (int i = 0; i < command_list.size(); i++)  {
 		cout << command_list[i];    
@@ -393,15 +393,14 @@ vector<geometry_msgs::Point>  DFS(int init_x, int init_y){
 
 	cv::erode(img_first, img_final, element);
 
+	//running simple dfs without any path finding
 	////////////////////////////////////
     vector<geometry_msgs::Point> path; // Store path history
 	
-	
 
 	// Distance of source cell is 0 
-
 	//the current position of the drone is marked visited since it is already there
-	visited.at<int>(init_x, init_y) = 1;
+	visited.at<int>(init_y, init_x) = 1;
 
 	geometry_msgs::Point s; 
 	s.x = init_x;
@@ -410,23 +409,39 @@ vector<geometry_msgs::Point>  DFS(int init_x, int init_y){
 	dfs_stack.push(path); // push the current source node onto the stack
 
 	while (!dfs_stack.empty()) 
-	{ 
+	{ 	//we print path, visited here to understand whats happening
+	    /*
+	    int size = path.size(); 
+		cout << "iteration of while loop, path size is  " << size << ":" << endl; 
+
+    	for (int i = 0; i < size; i++)  {
+			cout << path[i].x << "," << path[i].y;    
+			int probability = (int)img_final.at<short>(path[i].y, path[i].x);
+
+			cout << " path with occ%: " << probability <<  endl;    
+		}	
+    	cout << endl; 
+		//cout << "visited array is ="<< endl << "" << visited << endl << endl;
+		*/
+
         path = dfs_stack.top();
-		geometry_msgs::Point pt = path[path.size() - 1]; //not sure what this is doing.
+		geometry_msgs::Point pt = path[path.size() - 1]; //getting the last element on the path?
         dfs_stack.pop();
 		//check if the popped node from the stack is unvisited, unoccupied
-		//this will never be true for the first iteration of the loop
-        int probability_current = (int)img_final.at<short>(pt.x, pt.y);
+        int probability_current = (int)img_final.at<short>(pt.y, pt.x);
          printf("exploring nodes for path %d, %d\n",int(pt.x),int(pt.y));
          printf("occupied %d\n",probability_current);
-         printf("visited %d\n",visited.at<int>(pt.x, pt.y));
+         printf("visited %d\n",visited.at<int>(pt.y, pt.x));
 		if (isValid(pt.x, pt.y) 
 				&& probability_current < MAX_OCCUPIED_PROB 
 				&& probability_current >= 0 
-				&& visited.at<int>(pt.x, pt.y) != 1)
+				&& visited.at<int>(pt.y, pt.x) != 1)
 			{   
-				//we have our path ready here, since this is the next node to move to
-				printf("returningpath from here, longer than 1 node\n");
+				//these are the possible candidates as destinations
+				//add these to the destination list-who picks the destination?
+				cout << "DFS TRAVERSAL PRINTS  " <<    pt.x   <<  pt.y  << endl;
+				//visited.at<int>(pt.y, pt.x) = 1;
+				//only return path if atleast 3 nodes long?
 				return path;
 				
 			}
@@ -437,15 +452,17 @@ vector<geometry_msgs::Point>  DFS(int init_x, int init_y){
 		{ 
 			int row = pt.x + rowNum[i]; 
 			int col = pt.y + colNum[i]; 
-            int probability_nearby = (int)img_final.at<short>(row, col);
+            int probability_nearby = (int)img_final.at<short>(col, row);
+			//printf("exploringnearby nodes%d, %d with probabiity-%d , visited-%d\n",row,col,probability_nearby,visited.at<int>(col, row));
+
             
 		    if (isValid(row, col) 
 				&& probability_nearby < MAX_OCCUPIED_PROB 
 				&& probability_nearby >= 0 
-				&& visited.at<int>(row, col) != 1)
+				&& visited.at<int>(col, row) != 1)
 			{ 
 				// push onto the stack
-                               printf("exploring nearby nodes %d, %d\n",row,col);
+            	printf("adding nearby nodes %d, %d\n",row,col);
 				geometry_msgs::Point newPoint;
 				newPoint.x = row;
 				newPoint.y = col;
@@ -492,6 +509,7 @@ void printPointPath(vector<geometry_msgs::Point>& path)
 void generatePath(vector<geometry_msgs::Point>& path) 
 { 
     int size = path.size();
+	printf("in gen path, the size is %d\n",size);
 
 	nav_msgs::Path local_goal_path;
     for (int i = 0; i < size; i++) {
@@ -514,13 +532,21 @@ void generatePath(vector<geometry_msgs::Point>& path)
 	goal_path.header.seq = ++curr_path_id;
 	goal_path.poses = local_goal_path.poses;
 	pub_goal_path.publish(goal_path);
+	printf("in gen path, the size is %d\n",size);
+
 } 
 
 vector<std::string> returnNextCommand(vector<geometry_msgs::Point>& path)
 {
 	vector<std::string> command_list;
+	printf(" in return next command path size is %d\n",path.size());
+	cout << "path 0 elements are " << path[0].x << "," << path[0].y;
+	cout << "path 1 elements are" << path[1].x << "," << path[1].y; 
+	
+
 	int x_diff =  path[1].x - path[0].x;
 	int y_diff =  path[1].y - path[0].y;
+	
 	
 	//Euclidean distance for now
 	//distance must be in world co ordinates that is m and then converted to cm for tello
@@ -531,11 +557,16 @@ vector<std::string> returnNextCommand(vector<geometry_msgs::Point>& path)
 	
 	int x_world_diff =  world_x1  - world_x0;
 	int y_world_diff =  world_y1 -  world_y0;
+	//need to debug why distances are always a zero
+	printf("x world diff is %d, y world diff is %d\n",x_world_diff,y_world_diff);
+	printf ("before conversion to int, the distance is  %f\n",sqrt(pow(x_world_diff,2) + pow(y_world_diff,2)));
 	
 	
 	int distance = int(sqrt(pow(x_world_diff,2) + pow(y_world_diff,2)));
+	printf ("after conversion to int, the distance is  %d\n",int(sqrt(pow(x_world_diff,2) + pow(y_world_diff,2))));
 	std::string dis = std::to_string(distance);
-	
+	printf ("string distance is %s\n",dis);
+
 	
 
 	float pt_pos_x = curr_pose.pose.position.x;
@@ -586,6 +617,11 @@ vector<std::string> returnNextCommand(vector<geometry_msgs::Point>& path)
 		}
 		//Just issue a forward after this, not really sure if this works, but lets try
 		//can we just use simple euclidean distance for now?
+		//the distance in world co ordinate is being the same for two nodes-too small
+		if(distance <= 0 ){
+			cout << " the distance to use is 0 so we move default 20 cm" << endl;
+			dis = "20" ; 
+		}
 		
 		command_list.push_back("forward " + dis); //smallest distance the tello can move is 20cm
 		//will need to do some error correction for the tello	
