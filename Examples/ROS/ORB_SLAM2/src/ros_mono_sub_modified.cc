@@ -126,7 +126,7 @@ using namespace std;
 using namespace cv;
 
 // Search functions
-vector<geometry_msgs::Point> DFS(int init_x, int init_y);
+void DFS(int init_x, int init_y);
 bool isValid(int valid_x, int valid_y);
 vector<std::string> returnNextCommand(vector<geometry_msgs::Point>& path);
 void generatePath(vector<geometry_msgs::Point>& path);
@@ -160,7 +160,8 @@ void printParams();
 //our globals for dfs stack and visited list initialized here
 bool tello_move_completed = true;
 std::stack<vector<geometry_msgs::Point> > dfs_stack;  // DFS stack this should be global
-cv::Mat visited; //this should be global too
+cv::Mat dfs_visited; //this should be global too
+vector<geometry_msgs::Point> dfs_destinations;
 
 int main(int argc, char **argv){
 	ros::init(argc, argv, "Monosub");
@@ -232,8 +233,8 @@ int main(int argc, char **argv){
 	printf("norm_factor_z: %f\n", norm_factor_z);
 	//our globals for dfs stack and visited list initialized here
 	
-	visited.create(h, w, CV_32FC1);
-	visited.setTo(cv::Scalar(0)); //set all nodes to unvisited in the start
+	dfs_visited.create(h, w, CV_32FC1);
+	dfs_visited.setTo(cv::Scalar(0)); //set all nodes to unvisited in the start
     //grid map creation stuff above
 
     //ROS stuff
@@ -329,27 +330,23 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 	cout << "Current Angle: "<< currentAngle;
 
 	/*ECE496 CODE ADDITIONS START HERE*/
-	vector<geometry_msgs::Point> DFSpath = DFS(int_pos_grid_x, int_pos_grid_z);
+	DFS(int_pos_grid_x, int_pos_grid_z); //This dfs just populates a global destination list visulaized in green
 
-	printPointPath(DFSpath);//CAN RE USE
+	//printPointPath(DFSpath);//CAN RE USE
 
-	generatePath(DFSpath);//CAN RE USE
+	//generatePath(DFSpath);//CAN RE USE
 
-    vector<std::string> command_list = returnNextCommand(DFSpath);//TO DO 
-  	//print the commands here to see what is happening
-    	for (int i = 0; i < command_list.size(); i++)  {
-		cout << command_list[i];    
-	}
-    	cout << endl; 
+   
+	//DFS exploration completed
+	//need to visualize outputs of DFS first
 
-    	//send command to tello
 	//once indication of successful navigation received, set the flag, for future call backs
 	tello_move_completed = true;
     
 
   
 
-    	/*ECE496 CODE ADDITIONS END HERE*/
+    /*ECE496 CODE ADDITIONS END HERE*/
 
 
 }
@@ -357,7 +354,7 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 
 
 
-vector<geometry_msgs::Point>  DFS(int init_x, int init_y){
+void DFS(int init_x, int init_y){
 	// int MIN_PATH_SIZE = 5;
 	int MAX_OCCUPIED_PROB = 75;
 
@@ -366,7 +363,7 @@ vector<geometry_msgs::Point>  DFS(int init_x, int init_y){
 	int rowNum[] = {-1, 0, 0, 1}; 
 	int colNum[] = {0, -1, 1, 0};
 
-	ROS_INFO("Start indexes: (%i, %i) \n", init_x, init_y);
+	ROS_INFO("Start indexes DFS exploration: (%i, %i) \n", init_x, init_y);
 
 
 	cv::Mat test_grid_map_int = cv::Mat(h, w, CV_16SC1, (char*)(grid_map_msg.data.data()));
@@ -395,54 +392,41 @@ vector<geometry_msgs::Point>  DFS(int init_x, int init_y){
 
 	//running simple dfs without any path finding
 	////////////////////////////////////
-    vector<geometry_msgs::Point> path; // Store path history
-	
+    //vector<geometry_msgs::Point> path; // Store path history
+	vector<geometry_msgs::Point> dfs_path; 
 
 	// Distance of source cell is 0 
 	//the current position of the drone is marked visited since it is already there
-	visited.at<int>(init_y, init_x) = 1;
+	dfs_visited.at<int>(init_y, init_x) = 1;
 
 	geometry_msgs::Point s; 
 	s.x = init_x;
 	s.y = init_y;
-    path.push_back(s); 	
-	dfs_stack.push(path); // push the current source node onto the stack
+    dfs_path.push_back(s); 	//dfs path is the old code, legacy
+	dfs_stack.push(dfs_path); // push the current source node onto the stack
 
 	while (!dfs_stack.empty()) 
-	{ 	//we print path, visited here to understand whats happening
-	    /*
-	    int size = path.size(); 
-		cout << "iteration of while loop, path size is  " << size << ":" << endl; 
-
-    	for (int i = 0; i < size; i++)  {
-			cout << path[i].x << "," << path[i].y;    
-			int probability = (int)img_final.at<short>(path[i].y, path[i].x);
-
-			cout << " path with occ%: " << probability <<  endl;    
-		}	
-    	cout << endl; 
-		//cout << "visited array is ="<< endl << "" << visited << endl << endl;
-		*/
-
-        path = dfs_stack.top();
-		geometry_msgs::Point pt = path[path.size() - 1]; //getting the last element on the path?
+	{ 	
+        dfs_path = dfs_stack.top();
+		geometry_msgs::Point pt = dfs_path[dfs_path.size() - 1]; //getting the last element on the path?
         dfs_stack.pop();
 		//check if the popped node from the stack is unvisited, unoccupied
         int probability_current = (int)img_final.at<short>(pt.y, pt.x);
-         printf("exploring nodes for path %d, %d\n",int(pt.x),int(pt.y));
-         printf("occupied %d\n",probability_current);
-         printf("visited %d\n",visited.at<int>(pt.y, pt.x));
+         printf(" DFS exploring nodes for path %d, %d\n",int(pt.x),int(pt.y));
+         printf("DFS occupied %d\n",probability_current);
+         printf("DFS visited %d\n",dfs_visited.at<int>(pt.y, pt.x));
 		if (isValid(pt.x, pt.y) 
 				&& probability_current < MAX_OCCUPIED_PROB 
 				&& probability_current >= 0 
-				&& visited.at<int>(pt.y, pt.x) != 1)
+				&& dfs_visited.at<int>(pt.y, pt.x) != 1)
 			{   
 				//these are the possible candidates as destinations
 				//add these to the destination list-who picks the destination?
 				cout << "DFS TRAVERSAL PRINTS  " <<    pt.x   <<  pt.y  << endl;
-				//visited.at<int>(pt.y, pt.x) = 1;
-				//only return path if atleast 3 nodes long?
-				return path;
+				//add to the destination list
+				dfs_destinations.push_back(pt); 	
+				dfs_visited.at<int>(pt.y, pt.x) = 1;
+				//return path;
 				
 			}
 		
@@ -459,15 +443,15 @@ vector<geometry_msgs::Point>  DFS(int init_x, int init_y){
 		    if (isValid(row, col) 
 				&& probability_nearby < MAX_OCCUPIED_PROB 
 				&& probability_nearby >= 0 
-				&& visited.at<int>(col, row) != 1)
+				&& dfs_visited.at<int>(col, row) != 1)
 			{ 
 				// push onto the stack
-            	printf("adding nearby nodes %d, %d\n",row,col);
+            	printf("DFS adding nearby nodes %d, %d\n",row,col);
 				geometry_msgs::Point newPoint;
 				newPoint.x = row;
 				newPoint.y = col;
 
-                vector<geometry_msgs::Point> newpath(path);
+                vector<geometry_msgs::Point> newpath(dfs_path);
                 newpath.push_back(newPoint); 
 
 				dfs_stack.push(newpath); 
@@ -478,8 +462,7 @@ vector<geometry_msgs::Point>  DFS(int init_x, int init_y){
 	} 
 
 	
-	printf("returning path from here for source node\n");
-	return path; 	 
+	printf("DFS returning list of possible destinations\n");
 }
 
 bool isValid(int valid_x, int valid_y) {
@@ -1042,9 +1025,16 @@ void getGridMap() {
 void showGridMap(unsigned int id) {
 	cv::imshow("grid_map_msg", cv::Mat(h, w, CV_8SC1, (char*)(grid_map_msg.data.data())));
 	if (show_camera_location) {
-		grid_map_thresh_resized.convertTo(grid_map_rgb, grid_map_rgb.type());
+		cv::cvtColor(grid_map_thresh_resized, grid_map_rgb, cv::COLOR_GRAY2BGR);
+		cv::Scalar destination_color(0,255,0);//color of dfs destinations 
+		for (int i = 0; i < dfs_destinations.size(); i++)  {
+				cv::circle(grid_map_rgb, cv::Point((dfs_destinations[i].x)*resize_factor, (dfs_destinations[i].y)*resize_factor),
+							1, destination_color, -1);
+		}
+		cv::Scalar line_Color(255, 0, 0);//Color of the circle
 		cv::circle(grid_map_rgb, cv::Point(kf_pos_grid_x*resize_factor, kf_pos_grid_z*resize_factor),
-			cam_radius, CV_RGB(255, 0, 0));
+			3, line_Color, -1);
+		
 		cv::imshow("grid_map_thresh_resized_rgb", grid_map_rgb);
 	}
 	else {
