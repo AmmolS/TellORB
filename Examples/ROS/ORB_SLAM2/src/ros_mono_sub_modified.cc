@@ -356,7 +356,7 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 
 void DFS(int init_x, int init_y){
 	// int MIN_PATH_SIZE = 5;
-	int MAX_OCCUPIED_PROB = 75;
+	int MAX_OCCUPIED_PROB = 10;
 
 	// These arrays are used to get row and column 
 	// numbers of 4 neighbours of a given cell 
@@ -1029,7 +1029,7 @@ void showGridMap(unsigned int id) {
 		cv::Scalar destination_color(0,255,0);//color of dfs destinations 
 		for (int i = 0; i < dfs_destinations.size(); i++)  {
 				cv::circle(grid_map_rgb, cv::Point((dfs_destinations[i].x)*resize_factor, (dfs_destinations[i].y)*resize_factor),
-							1, destination_color, -1);
+							0.05, destination_color, -1);
 		}
 		cv::Scalar line_Color(255, 0, 0);//Color of the circle
 		cv::circle(grid_map_rgb, cv::Point(kf_pos_grid_x*resize_factor, kf_pos_grid_z*resize_factor),
