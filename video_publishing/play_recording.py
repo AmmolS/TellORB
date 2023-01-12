@@ -15,11 +15,11 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv,"hi:",["ifile="])
     except getopt.GetoptError:
-        print('test.py -i <inputfile>')
+        print('play_recording.py -i <inputfile>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('test.py -i <inputfile>')
+            print('play_recording.py -i <inputfile>')
             sys.exit()
         elif opt in ("-i", "--ifile"):
             inputfile = arg
@@ -67,7 +67,7 @@ def main(argv):
         # img_msg = bridge.cv2_to_imgmsg(result, encoding='mono8')
 
         pub_img.publish(img_msg)
-        time.sleep(1/90)
+        time.sleep(1/30)
         # cv2.imwrite("picture_unsharpened.jpg", image)
         # cv2.imwrite("picture_sharpened.jpg", image_sharp)
         # cv2.imwrite("picture_final.jpg", enhanced_img)

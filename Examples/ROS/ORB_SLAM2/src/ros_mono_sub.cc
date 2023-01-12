@@ -227,6 +227,15 @@ int main(int argc, char **argv){
 	grid_map_rgb.create(h*resize_factor, w*resize_factor, CV_8UC3);
 	printf("output_size: (%d, %d)\n", grid_map_thresh_resized.rows, grid_map_thresh_resized.cols);
 
+	cv::Mat whiteMatrix(200, 200, CV_8UC3, Scalar(255, 255, 255));//Declaring a white matrix
+   	cv::Point center(100, 100);//Declaring the center point
+   	int radius = 50; //Declaring the radius
+	cv::Scalar line_Color(255, 0, 0);//Color of the circle
+	int thickness = 2;//thickens of the line
+	cv::namedWindow("whiteMatrix");//Declaring a window to show the circle
+	cv::circle(whiteMatrix, center,radius, line_Color, thickness);//Using circle()function to draw the line//
+	cv::imshow("WhiteMatrix", whiteMatrix);//Showing the circle//
+
 	local_occupied_counter.create(h, w, CV_32FC1);
 	local_visit_counter.create(h, w, CV_32FC1);
 	local_map_pt_mask.create(h, w, CV_8UC1);
@@ -715,10 +724,8 @@ void returnNextCommand(vector<geometry_msgs::Point>& path)
 
 void publishCommand(std::string command){
 	std_msgs::String msg;
-	std::stringstream ss;
-	ss << command;
-	msg.data = ss.str();
-	cout << "Publish Command: " << ss.str() << endl;
+	msg.data = command;
+	cout << "Publish Command: " << command << endl;
 	pub_command.publish(msg);
 
 	next_command_time = ros::Time::now() + ros::Duration(5);
@@ -1272,9 +1279,10 @@ void getGridMap() {
 void showGridMap(unsigned int id) {
 	cv::imshow("grid_map_msg", cv::Mat(h, w, CV_8SC1, (char*)(grid_map_msg.data.data())));
 	if (show_camera_location) {
-		grid_map_thresh_resized.convertTo(grid_map_rgb, grid_map_rgb.type());
+		cv::cvtColor(grid_map_thresh_resized, grid_map_rgb, cv::COLOR_GRAY2BGR);
+		cv::Scalar line_Color(255, 0, 0);//Color of the circle
 		cv::circle(grid_map_rgb, cv::Point(kf_pos_grid_x*resize_factor, kf_pos_grid_z*resize_factor),
-			cam_radius, CV_RGB(255, 0, 0));
+			3, line_Color, -1);
 		cv::imshow("grid_map_thresh_resized_rgb", grid_map_rgb);
 	}
 	else {
