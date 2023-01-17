@@ -1,9 +1,10 @@
 import rospy
 
+from json import load
 from std_msgs.msg import Empty, UInt8, Bool
 from std_msgs.msg import UInt8MultiArray
 from std_msgs.msg import String
-from sensor_msgs.msg import Image, _Imu
+from sensor_msgs.msg import Image
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from dynamic_reconfigure.server import Server
@@ -22,263 +23,177 @@ import time, cv2
 import signal
 import logging
 import readchar
-
-#tello = Tello()
-#Step 1 connect to Tello
-#tello.connect()
-
-#Step 2 publish images to node /camera/image_raw
-#To do 
+MAX_ANGLE = 90
 
 tello = Tello(skipAddressCheck=True)
 tello.LOGGER.setLevel(logging.INFO)
 tello.connect()
+print("Tello Battery Level = {}%".format(tello.get_battery()))
 keepRecording = Event()
 keepRecording.set()
-keepAlive = Event()
-keepAlive.set()
-
+keepHandling = Event()
+keepHandling.set()
 tello.streamon()
 frame_read = tello.get_frame_read()
 bridge = CvBridge()
 
-print("Tello Battery Level = {}%".format(tello.get_battery()))
+command = ""
+rotationAngle = 15
+height = 20
+sleepTime = 1
+flightSpeed = 50
+
+# load the config.json file
+def loadConfig():
+    with open('drone_config.json') as f:
+        data = load(f)
+        tello.set_speed(int(data["speed"]))
+        global rotationAngle, height, sleepTime, flightSpeed
+        rotationAngle = int(data["rotationAngle"])
+        height = int(data["height"])
+        sleepTime = int(data["sleep"])
+        flightSpeed = int(data["speed"])
+
+def telloHandler():
+    while True:
+        while command is Empty:
+            time.sleep(0.5)
+        
+        if command == "forward":
+            print("Moving forward")
+            tello.move_forward(20)
+        elif command == "backward":
+            print("Moving backward")
+            tello.move_back(20)
+        elif command == "left":
+            print('Moving left')
+            tello.move_left(20)
+        elif command == "right":
+            print('Moving right')
+            tello.move_right(20)
+        elif command == "turn left":
+            print("Turning left")
+            angle = 0
+            if(tello.get_height() < height):
+                tello.move("up", int(height - tello.get_height()))
+            time.sleep(sleepTime)
+            while angle < (MAX_ANGLE):
+                print("Rotating: " + str(rotationAngle))
+
+                tello.set_speed(20)
+                tello.rotate_counter_clockwise(rotationAngle)
+                tello.set_speed(flightSpeed)
+
+                time.sleep(sleepTime)
+                tello.move("up", 50)
+                time.sleep(sleepTime)
+                tello.move("down", 50)
+                angle += rotationAngle
+                print("Rotation angle is now " + str(angle))
+                time.sleep(sleepTime)
+        elif command == "turn right":
+            print("Turning right")
+            angle = 0
+            if(tello.get_height() < height):
+                tello.move("up", int(height - tello.get_height()))
+            time.sleep(sleepTime)
+            while angle < (MAX_ANGLE):
+                print("Rotating: " + str(rotationAngle))
+
+                tello.set_speed(20)
+                tello.rotate_clockwise(rotationAngle)
+                tello.set_speed(flightSpeed)
+
+                time.sleep(sleepTime)
+                tello.move("up", 50)
+                time.sleep(sleepTime)
+                tello.move("down", 50)
+                angle += rotationAngle
+                print("Rotation angle is now " + str(angle))
+                time.sleep(sleepTime)
+        elif command == "land":
+            tello.land()
+        else:
+            print('Command received through ROS is forbidden or does not exist.')
+
+        command = ""
+        print("Tello Battery Level = {}%".format(tello.get_battery()))
+telloCommandHandler = Thread(target=telloHandler)
+
 
 #Step 3 subscribe to commands published by mono_sub.cc
 #code borrowed from : https://www.geeksforgeeks.org/ros-subscribers-using-python/ 
 
 class command_subscriber:
-  
     def __init__(self):
-        # initialize the subscriber node
-        # here we deal with messages of type String which are commands coming from subscriber.
-        self.image_sub = rospy.Subscriber("tello/command", 
-                                          String, self.process_command)
+        self.image_sub = rospy.Subscriber("tello/command", String, self.process_command)
         print("Initializing the command subscriber!")
-  
-    def process_command(self, String):
-        
-        # now print what mono sub has sent.
-        #rospy.get_caller_id must return command_subscriber....
-        #http://wiki.ros.org/rospy_tutorials/Tutorials/WritingPublisherSubscriber
-        rospy.loginfo(rospy.get_caller_id() + "The commands in coming are %s",
-                      String)
-        
-        # To handle commands
-        # check if tello is busy (as a backup, in case for some reason ros_mono_sub/pub doesn't realize it is busy)
-        # Use switch case to determine which command it is
-        # Call the revelant DJITelloPy API function to have the command work
-        # Set flag to indicate tello is busy
-        # 
-  
-  
-def main():
-    # create a  command subscriber instance
-    sub = command_subscriber()
-      
-    print('Currently in the main function...')
-    # pub = rospy.Publisher("test/raw", String, queue_size=10)
-    pub_img = rospy.Publisher("/tello/image_raw", Image, queue_size=10)
-    pub_imu = rospy.Publisher("/imu0", _Imu.Imu, queue_size=10)
-      
-    # initializing the subscriber node
-    rospy.init_node('command_subscriber', anonymous=True)
+        telloCommandHandler.start()
 
+    def process_command(self, inputCommand):
+        rospy.loginfo(rospy.get_caller_id() + "The commands in coming are %s", inputCommand)
+        global command
+        command = inputCommand
+
+def main():
+    pub_img = rospy.Publisher("tello/image_raw", Image, queue_size=10)
     def videoRecorder():
         # create a VideoWrite object, recoring to ./video.avi
         height, width, _ = frame_read.frame.shape
-        fps = 1.0/60
-        seq = 1
-
+        
         print("Start recording")
         video = cv2.VideoWriter('video.avi', cv2.VideoWriter_fourcc(*'MJPG'), 30, (width, height))
 
         while keepRecording.is_set():
             img_msg = bridge.cv2_to_imgmsg(frame_read.frame, encoding='bgr8')
-            img_msg.header.seq = seq
-            img_msg.header.stamp.set(math.floor(time.time()), time.time_ns() % 1000000000)
-            # 1000000000 is to only the decimals for nano seconds
-            img_msg.header.frame_id = "cam0"
             pub_img.publish(img_msg)
-            seq += 1
             video.write(frame_read.frame)
-            time.sleep(fps)
+            time.sleep(1 / 60)
 
         print("Stop recording")
 
         video.release()
+      
+    # initializing the subscriber node
+    rospy.init_node('command_subscriber', anonymous=True)
 
-    def imuReceiver():
-        seq = 10001
-        fps = 1.0/180
-        lastYaw = 0
-        lastPitch = 0
-        lastRoll = 0
-        Rx = 0
-        Ry = 0
-        Rz = 0
+    loadConfig()
+    time.sleep(1)
 
-        while keepRecording.is_set():
-            imu_msg = _Imu.Imu()
-
-            if seq % 18 == 0:
-                Rx = (tello.get_roll() - lastRoll)*math.pi/180
-                Ry = (tello.get_pitch() - lastPitch)*math.pi/180
-                Rz = (tello.get_yaw() - lastYaw)*math.pi/180
-                lastRoll = tello.get_roll()
-                lastYaw = tello.get_yaw()
-                lastPitch = tello.get_pitch()
-
-            imu_msg.header.seq = seq
-            imu_msg.header.stamp.set(math.floor(time.time()), time.time_ns() % 1000000000)
-            imu_msg.header.frame_id = "imu4"
-            imu_msg.orientation.z = 1
-            imu_msg.orientation_covariance[0] = 99999.9
-            imu_msg.orientation_covariance[4] = 99999.9
-            imu_msg.orientation_covariance[8] = 99999.9
-
-            imu_msg.linear_acceleration.x = tello.get_acceleration_x()/100
-            imu_msg.linear_acceleration.y = tello.get_acceleration_y()/100
-            imu_msg.linear_acceleration.z = tello.get_acceleration_z()/100
-            imu_msg.angular_velocity.x = Rx
-            imu_msg.angular_velocity.y = Ry
-            imu_msg.angular_velocity.z = Rz
-
-            pub_imu.publish(imu_msg)
-            seq += 1
-            time.sleep(fps)
-
-
-    time.sleep(2)
-
-    imgRecorder = Thread(target=videoRecorder)
-    imuRecorder = Thread(target=imuReceiver)
-
-    imgRecorder.start()
-    imuRecorder.start()
-
-    def exitCatcher():
-        while keepAlive.is_set():
-            try:
-                tello.send_keepalive()
-            except Exception:
-                print("Keeping alive")
-            time.sleep(10)
-
+    recorder = Thread(target=videoRecorder)
+    recorder.start()
 
     def exit_handler(signum, frame):
-        msg = "Stopping drone. Drone will now hover.\n W = forward\nS = backwards\nA = left\nD = right\nQ = turn left\nE = turn right\nZ = ascend\nX = descend\nENTER = land\nSPACEBAR = hover\nPlease shutdown manually by pressing the button on the drone or press ENTER to land the drone."
-        print(msg, flush=True)
-        keepingAlive = Thread(target=exitCatcher)
-        keepingAlive.start()
-
-        try:
-            speed = 50
-            while True:
-                inputChar = readchar.readchar()
-                updownV = 0
-                leftRightV = 0
-                forwardBackwardV = 0
-                yawV = 0
-                if inputChar == 'w':
-                    forwardBackwardV = speed
-                elif inputChar == 's':
-                    forwardBackwardV = -speed
-                elif inputChar == 'a':
-                    leftRightV = -speed
-                elif inputChar == 'd':
-                    leftRightV = speed
-                elif inputChar == 'z':
-                    updownV = 70
-                elif inputChar == 'x':
-                    updownV = -70
-                elif inputChar == 'q':
-                    yawV = -20
-                elif inputChar == 'e':
-                    yawV = 20
-                elif inputChar == 'o':
-                    speed += 10
-                elif inputChar == 'p':
-                    speed -= 10
-                elif inputChar == readchar.key.ENTER:
-                    tello.land()
-                    keepAlive.clear()
-                    keepRecording.clear()
-                    imgRecorder.join()
-                    imuRecorder.join()
-                    exit(1)
-                    rospy.spin()
-                elif inputChar == readchar.key.ESC:          # THIS IS A DANGEROUS COMMAND. ONLY USE WHEN DRONE HAS LANDED ALREADY FOR WHATEVER REASON (auto landing, crash landing, flew down too much, etc.) TO EXIT THE PROGRAM.
-                    keepAlive.clear()
-                    keepRecording.clear()
-                    imgRecorder.join()
-                    imuRecorder.join()
-                    exit(1)
-                    rospy.spin()
-                else:
-                    print("Tello Battery Level = {}%".format(tello.get_battery()))
-                # PRESS SPACEBAR TO HOVER
-                tello.send_rc_control(leftRightV, forwardBackwardV, updownV, yawV)
-        except KeyboardInterrupt:
-            print("Exiting keepAlive")
-            keepAlive.clear()
-            keepRecording.clear()
-            imgRecorder.join()
-            imuRecorder.join()
-            print("Killing program")
-            exit(1)
-            rospy.spin()
+        tello.land()
+        keepRecording.clear()
+        recorder.join()
+        keepHandling.clear()
+        telloCommandHandler.join()
+        print("Killing program")
+        exit(1)
 
     signal.signal(signal.SIGINT, exit_handler)
 
+    print("Press ENTER to initiate rotation commands.", flush=True)
+    inputChar = readchar.readchar()
 
+    if inputChar == readchar.key.ENTER:
+        tello.takeoff()
 
-    #tello.takeoff()
-    tello.set_wifi_credentials("Tello-Ammol", "orange")
-    cv2.imwrite("picture.png", frame_read.frame)
+    # Create a command subscriber instance
+    sub = command_subscriber()
 
-    time.sleep(3)
-
-    # You can add forced commands here if you want it to run by script (though it may fail in bad lighting or other issues)
-    # Most reliable way to control drone is with `send_rc` commands rather then `move` commands
-
-    # cv2.imwrite("picture2.png", frame_read.frame)
-
-    # tello.move("up", 80)
-    # cv2.imwrite("picture3.png", frame_read.frame)
-
-    # tello.move("forward", 40)
-    # cv2.imwrite("picture4.png", frame_read.frame)
-
-    # tello.move("left", 20)
-    # cv2.imwrite("picture5.png", frame_read.frame)
-
-    # tello.move("right", 40)
-    # cv2.imwrite("picture6.png", frame_read.frame)
-
-    # tello.move("left", 20)
-    # cv2.imwrite("picture7.png", frame_read.frame)
-
-    # tello.move("up", 20)
-    # cv2.imwrite("picture8.png", frame_read.frame)
-
-    # tello.move("back", 30)
-    # cv2.imwrite("picture9.png", frame_read.frame)
-
-    # print("Landing drone!")
-    # tello.land()
-
-
-    while imgRecorder.is_alive():
+    while recorder.is_alive():
         time.sleep(0.2)
 
-        
     if (keepRecording.is_set() == True):
         keepRecording.clear()
 
-    imgRecorder.join()
-    imuRecorder.join()
+    if (keepHandling.is_set() == True):
+        keepHandling.clear()
 
+    recorder.join()
+    telloCommandHandler.join()
 
     rospy.spin()
   
