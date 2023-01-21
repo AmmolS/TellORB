@@ -19,7 +19,7 @@ def main():
     
     print('ROS Tello Camera is recording, press any key to terminate recording thread.')
 
-    url = r'http://192.168.4.1/cam-hi.jpg'
+    url = r'http://192.168.4.1:81/cam-hi.jpg'
     while True:
         img_resp = urlopen(url)
         imgnp = np.asarray(bytearray(img_resp.read()), dtype="uint8")
