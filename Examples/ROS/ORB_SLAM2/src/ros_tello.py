@@ -34,8 +34,6 @@ keepRecording = Event()
 keepRecording.set()
 keepHandling = Event()
 keepHandling.set()
-keepRunningImu = Event()
-keepRunningImu.set()
 tello.streamon()
 frame_read = tello.get_frame_read()
 bridge = CvBridge()
@@ -165,13 +163,10 @@ def main():
     # initializing the subscriber node
     rospy.init_node('command_subscriber', anonymous=True)
 
-    print('ROS IMU: Initializing ros_tello node...')
-    rospy.init_node('ros_imu', anonymous=True)
-
     def readImu():
         seq = 0
         oldTime = 0
-        while keepRunningImu.is_set():
+        while keepRecording.is_set():
             result = ws.recv()
             if(time.time() - oldTime >= 1/200):
                 # print(time.time()-oldTime)
@@ -211,7 +206,6 @@ def main():
         recorder.join()
         keepHandling.clear()
         telloCommandHandler.join()
-        keepRunningImu.clear()
         imu.join()
         print("Killing program")
         exit(1)
@@ -235,9 +229,6 @@ def main():
 
     if (keepHandling.is_set() == True):
         keepHandling.clear()
-    
-    if (keepRunningImu.is_set() == True):
-        keepRunningImu.clear()
 
     recorder.join()
     telloCommandHandler.join()

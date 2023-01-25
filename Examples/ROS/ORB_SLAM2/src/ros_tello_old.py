@@ -22,6 +22,7 @@ import time, cv2
 import signal
 import logging
 import readchar
+import websocket
 
 #tello = Tello()
 #Step 1 connect to Tello
@@ -43,6 +44,9 @@ frame_read = tello.get_frame_read()
 bridge = CvBridge()
 
 print("Tello Battery Level = {}%".format(tello.get_battery()))
+
+ws = websocket.WebSocket()
+ws.connect("ws://192.168.4.1")
 
 #Step 3 subscribe to commands published by mono_sub.cc
 #code borrowed from : https://www.geeksforgeeks.org/ros-subscribers-using-python/ 
@@ -110,43 +114,31 @@ def main():
 
     def imuReceiver():
         seq = 10001
-        fps = 1.0/180
-        lastYaw = 0
-        lastPitch = 0
-        lastRoll = 0
-        Rx = 0
-        Ry = 0
-        Rz = 0
+        rate = 1.0/200
+        oldTime = 0
 
         while keepRecording.is_set():
-            imu_msg = _Imu.Imu()
+            result = ws.recv()
+            if(time.time() - oldTime >= rate):
+                imu_msg = _Imu.Imu()
+                imu_msg.header.seq = seq
+                imu_msg.header.stamp.set(math.floor(time.time()), time.time_ns() % 1000000000)
+                imu_msg.header.frame_id = "imu4"
+                imu_msg.orientation.z = 1
+                imu_msg.orientation_covariance[0] = 99999.9
+                imu_msg.orientation_covariance[4] = 99999.9
+                imu_msg.orientation_covariance[8] = 99999.9
 
-            if seq % 18 == 0:
-                Rx = (tello.get_roll() - lastRoll)*math.pi/180
-                Ry = (tello.get_pitch() - lastPitch)*math.pi/180
-                Rz = (tello.get_yaw() - lastYaw)*math.pi/180
-                lastRoll = tello.get_roll()
-                lastYaw = tello.get_yaw()
-                lastPitch = tello.get_pitch()
+                imu_msg.linear_acceleration.x = float(result.split('Ax: ')[1][:result.split('Ax: ')[1].find(',')])
+                imu_msg.linear_acceleration.y = float(result.split('Ay: ')[1][:result.split('Ay: ')[1].find(',')])
+                imu_msg.linear_acceleration.z = float(result.split('Az: ')[1][:result.split('Az: ')[1].find(' ')])
+                imu_msg.angular_velocity.x = float(result.split('Rx: ')[1][:result.split('Rx: ')[1].find(',')])
+                imu_msg.angular_velocity.y = float(result.split('Ry: ')[1][:result.split('Ry: ')[1].find(',')])
+                imu_msg.angular_velocity.z = float(result.split('Rz: ')[1][:result.split('Rz: ')[1].find(' ')])
 
-            imu_msg.header.seq = seq
-            imu_msg.header.stamp.set(math.floor(time.time()), time.time_ns() % 1000000000)
-            imu_msg.header.frame_id = "imu4"
-            imu_msg.orientation.z = 1
-            imu_msg.orientation_covariance[0] = 99999.9
-            imu_msg.orientation_covariance[4] = 99999.9
-            imu_msg.orientation_covariance[8] = 99999.9
-
-            imu_msg.linear_acceleration.x = tello.get_acceleration_x()/100
-            imu_msg.linear_acceleration.y = tello.get_acceleration_y()/100
-            imu_msg.linear_acceleration.z = tello.get_acceleration_z()/100
-            imu_msg.angular_velocity.x = Rx
-            imu_msg.angular_velocity.y = Ry
-            imu_msg.angular_velocity.z = Rz
-
-            pub_imu.publish(imu_msg)
-            seq += 1
-            time.sleep(fps)
+                pub_imu.publish(imu_msg)
+                seq += 1
+                oldTime = time.time()
 
 
     time.sleep(2)
