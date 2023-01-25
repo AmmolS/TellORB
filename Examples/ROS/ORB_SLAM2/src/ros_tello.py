@@ -4,7 +4,7 @@ from json import load
 from std_msgs.msg import Empty, UInt8, Bool
 from std_msgs.msg import UInt8MultiArray
 from std_msgs.msg import String
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, _Imu
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from dynamic_reconfigure.server import Server
@@ -23,6 +23,7 @@ import time, cv2
 import signal
 import logging
 import readchar
+import websocket
 MAX_ANGLE = 90
 
 tello = Tello(skipAddressCheck=True)
@@ -33,6 +34,8 @@ keepRecording = Event()
 keepRecording.set()
 keepHandling = Event()
 keepHandling.set()
+keepRunningImu = Event()
+keepRunningImu.set()
 tello.streamon()
 frame_read = tello.get_frame_read()
 bridge = CvBridge()
@@ -42,6 +45,9 @@ rotationAngle = 15
 height = 20
 sleepTime = 1
 flightSpeed = 50
+
+ws = websocket.WebSocket()
+ws.connect("ws://192.168.4.1")
 
 # load the config.json file
 def loadConfig():
@@ -137,6 +143,8 @@ class command_subscriber:
 
 def main():
     pub_img = rospy.Publisher("tello/image_raw", Image, queue_size=10)
+    pub_imu = rospy.Publisher("/imu0", _Imu.Imu, queue_size=10)
+
     def videoRecorder():
         # create a VideoWrite object, recoring to ./video.avi
         height, width, _ = frame_read.frame.shape
@@ -157,11 +165,45 @@ def main():
     # initializing the subscriber node
     rospy.init_node('command_subscriber', anonymous=True)
 
+    print('ROS IMU: Initializing ros_tello node...')
+    rospy.init_node('ros_imu', anonymous=True)
+
+    def readImu():
+        seq = 0
+        oldTime = 0
+        while keepRunningImu.is_set():
+            result = ws.recv()
+            if(time.time() - oldTime >= 1/200):
+                # print(time.time()-oldTime)
+                imu_msg = _Imu.Imu()
+                imu_msg.header.seq = seq
+                imu_msg.header.stamp.set(math.floor(time.time()), time.time_ns() % 1000000000)
+                imu_msg.header.frame_id = "imu4"
+                imu_msg.orientation.z = 1
+                imu_msg.orientation_covariance[0] = 99999.9
+                imu_msg.orientation_covariance[4] = 99999.9
+                imu_msg.orientation_covariance[8] = 99999.9
+
+                imu_msg.linear_acceleration.x = float(result.split('Ax: ')[1][:result.split('Ax: ')[1].find(',')])
+                imu_msg.linear_acceleration.y = float(result.split('Ay: ')[1][:result.split('Ay: ')[1].find(',')])
+                imu_msg.linear_acceleration.z = float(result.split('Az: ')[1][:result.split('Az: ')[1].find(' ')])
+                imu_msg.angular_velocity.x = float(result.split('Rx: ')[1][:result.split('Rx: ')[1].find(',')])
+                imu_msg.angular_velocity.y = float(result.split('Ry: ')[1][:result.split('Ry: ')[1].find(',')])
+                imu_msg.angular_velocity.z = float(result.split('Rz: ')[1][:result.split('Rz: ')[1].find(' ')])
+                # print(imu_msg)
+
+                pub_imu.publish(imu_msg)
+                seq += 1
+                oldTime = time.time()
+
     loadConfig()
     time.sleep(1)
 
     recorder = Thread(target=videoRecorder)
     recorder.start()
+
+    imu = Thread(target=readImu)
+    imu.start()
 
     def exit_handler(signum, frame):
         tello.land()
@@ -169,6 +211,8 @@ def main():
         recorder.join()
         keepHandling.clear()
         telloCommandHandler.join()
+        keepRunningImu.clear()
+        imu.join()
         print("Killing program")
         exit(1)
 
@@ -191,9 +235,13 @@ def main():
 
     if (keepHandling.is_set() == True):
         keepHandling.clear()
+    
+    if (keepRunningImu.is_set() == True):
+        keepRunningImu.clear()
 
     recorder.join()
     telloCommandHandler.join()
+    imu.join()
 
     rospy.spin()
   
