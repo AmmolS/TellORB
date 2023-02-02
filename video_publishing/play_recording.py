@@ -11,7 +11,7 @@ def exit_handler(signum, frame):
 signal.signal(signal.SIGINT, exit_handler)
 
 def main(argv):
-    inputfile = ''
+    inputfile = 'latest.avi'
     try:
         opts, args = getopt.getopt(argv,"hi:",["ifile="])
     except getopt.GetoptError:
@@ -67,7 +67,7 @@ def main(argv):
         # img_msg = bridge.cv2_to_imgmsg(result, encoding='mono8')
 
         pub_img.publish(img_msg)
-        time.sleep(1/30)
+        time.sleep(1/50)
         # cv2.imwrite("picture_unsharpened.jpg", image)
         # cv2.imwrite("picture_sharpened.jpg", image_sharp)
         # cv2.imwrite("picture_final.jpg", enhanced_img)

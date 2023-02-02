@@ -3,7 +3,8 @@
 import os
 import rospy
 import time
-import websocket
+#import websocket
+import socket
 import math
 
 
@@ -15,8 +16,34 @@ import cv2
 from urllib.request import urlopen
 import numpy as np
 
-ws = websocket.WebSocket()
-ws.connect("ws://192.168.4.1")
+#ws = websocket.WebSocket()
+#ws.connect("ws://192.168.4.1")
+
+
+HOST = "192.168.4.1"
+PORT = 63000
+
+avg = []
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect((HOST, PORT))
+
+for i in range(1000):
+    lastTime = time.time()
+    s.sendall(b"p")
+    data = s.recv(128)
+    newTime = time.time()
+    diff = (newTime - lastTime) * 1000
+    avg.append(diff)
+    #print(f"{diff} ms\n")
+    #print(f"{data.decode('utf-8')}\n")
+    time.sleep(0.001)
+
+print(f"avg delay: {sum(avg) / 1000}")
+print(sorted(avg))
+
+
+
 
 # bridge = CvBridge()
 pub_imu = rospy.Publisher("/imu0", _Imu.Imu, queue_size=10)
@@ -25,11 +52,13 @@ def main():
     print('ROS IMU: Initializing ros_tello node...')
     rospy.init_node('ros_imu')
 
-    seq = 0
+    seq = 10001
     oldTime = 0
     while True:
-        result = ws.recv()
-        if(time.time() - oldTime >= 1/200):
+        if(time.time() - oldTime >= 1/100):
+            s.sendall(b"p")
+            result = s.recv(128)
+            result = f"{result.decode('utf-8')}"
             # print(time.time()-oldTime)
             imu_msg = _Imu.Imu()
             imu_msg.header.seq = seq
@@ -40,13 +69,13 @@ def main():
             imu_msg.orientation_covariance[4] = 99999.9
             imu_msg.orientation_covariance[8] = 99999.9
 
-            imu_msg.linear_acceleration.x = float(result.split('Ax: ')[1][:result.split('Ax: ')[1].find(',')])
-            imu_msg.linear_acceleration.y = float(result.split('Ay: ')[1][:result.split('Ay: ')[1].find(',')])
-            imu_msg.linear_acceleration.z = float(result.split('Az: ')[1][:result.split('Az: ')[1].find(' ')])
-            imu_msg.angular_velocity.x = float(result.split('Rx: ')[1][:result.split('Rx: ')[1].find(',')])
-            imu_msg.angular_velocity.y = float(result.split('Ry: ')[1][:result.split('Ry: ')[1].find(',')])
-            imu_msg.angular_velocity.z = float(result.split('Rz: ')[1][:result.split('Rz: ')[1].find(' ')])
-            print(imu_msg)
+            imu_msg.linear_acceleration.x = float(result.split(";")[0])
+            imu_msg.linear_acceleration.y = float(result.split(";")[1])
+            imu_msg.linear_acceleration.z = float(result.split(";")[2])
+            imu_msg.angular_velocity.x = float(result.split(";")[3])
+            imu_msg.angular_velocity.y = float(result.split(";")[4])
+            imu_msg.angular_velocity.z = float(result.split(";")[5])
+            # print(imu_msg)
 
             pub_imu.publish(imu_msg)
             seq += 1

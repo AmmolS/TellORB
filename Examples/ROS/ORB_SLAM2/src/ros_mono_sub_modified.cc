@@ -127,6 +127,7 @@ using namespace cv;
 
 // Search functions
 void DFS(int init_x, int init_y);
+vector<geometry_msgs::Point> BFS(int init_x, int init_y, int final_x, int final_y); //bfs for shortest path
 bool isValid(int valid_x, int valid_y);
 vector<std::string> returnNextCommand(vector<geometry_msgs::Point>& path);
 void generatePath(vector<geometry_msgs::Point>& path);
@@ -162,6 +163,9 @@ bool tello_move_completed = true;
 std::stack<vector<geometry_msgs::Point> > dfs_stack;  // DFS stack this should be global
 cv::Mat dfs_visited; //this should be global too
 vector<geometry_msgs::Point> dfs_destinations;
+int MIN_DISTANCE = 50;
+int dest_x, dest_y;
+bool destination_found;
 
 int main(int argc, char **argv){
 	ros::init(argc, argv, "Monosub");
@@ -332,25 +336,126 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 	/*ECE496 CODE ADDITIONS START HERE*/
 	DFS(int_pos_grid_x, int_pos_grid_z); //This dfs just populates a global destination list visulaized in green
 
-	//printPointPath(DFSpath);//CAN RE USE
-
-	//generatePath(DFSpath);//CAN RE USE
-
-   
 	//DFS exploration completed
-	//need to visualize outputs of DFS first
 
-	//once indication of successful navigation received, set the flag, for future call backs
+	//iterate through destination list, calling BFS trying to find something with at least 20 cm apart
+	for (int i = 0; i < dfs_destinations.size(); i++) {
+		vector<geometry_msgs::Point> bfs_path = BFS(int_pos_grid_x, int_pos_grid_z, dfs_destinations[i].x, dfs_destinations[i].y);
+		printPointPath(bfs_path);
+		generatePath(bfs_path);
+		vector<std::string> command_list = returnNextCommand(bfs_path);
+  		//print the commands here to see what is happening ; empty command list will not be printed
+    	for (int i = 0; i < command_list.size(); i++){
+			cout << command_list[i];  
+		}
+		//if correct destination is selected, set the global for visualization and break 
+		if(command_list.size() > 0){
+			dest_x = dfs_destinations[i].x;
+			dest_y = dfs_destinations[i].y;
+			destination_found = true;
+			break;
+		}
+	
+	}
 	tello_move_completed = true;
-    
-
-  
-
     /*ECE496 CODE ADDITIONS END HERE*/
-
-
 }
 
+vector<geometry_msgs::Point>  BFS(int init_x, int init_y, int final_x, int final_y){
+	// int MIN_PATH_SIZE = 5;
+	int MAX_OCCUPIED_PROB = 75;
+
+	// These arrays are used to get row and column 
+	// numbers of 4 neighbours of a given cell 
+	int rowNum[] = {-1, 0, 0, 1}; 
+	int colNum[] = {0, -1, 1, 0};
+
+	ROS_INFO("Start/end indexes: (%i, %i) end (%i, %i)\n", init_x, init_y,final_x, final_y );
+
+
+	cv::Mat test_grid_map_int = cv::Mat(h, w, CV_16SC1, (char*)(grid_map_msg.data.data()));
+	// cv::Mat test_grid_map_int;
+
+    cv::Mat img_first;
+
+
+	double minval,maxval;
+	cv::minMaxLoc(grid_map_int, &minval, &maxval, NULL, NULL);
+
+
+	// cout << grid_map_int.type() << endl; // 1
+
+	// cout << grid_map_int.rowRange(final_y, init_y) << endl;
+
+	int erodeSize = 1;
+
+	grid_map_int.convertTo(img_first, CV_16SC1);
+
+	cv::Mat element = cv::getStructuringElement( cv::MORPH_RECT,
+								cv::Size( 2*erodeSize + 1, 2*erodeSize+1 ),
+								cv::Point( erodeSize, erodeSize ) );
+
+	cv::erode(img_first, img_final, element);
+
+	////////////////////////////////////
+    vector<geometry_msgs::Point> path; // Store path history
+	std::queue<vector<geometry_msgs::Point> > q;  // BFS queue
+	cv::Mat visited;
+	visited.create(h, w, CV_32FC1);
+	visited.setTo(cv::Scalar(0));
+	
+	visited.at<int>(init_x, init_y) = 1;
+
+	// Distance of source cell is 0 
+	geometry_msgs::Point s; 
+	s.x = init_x;
+	s.y = init_y;
+    path.push_back(s); 	
+	q.push(path); // Enqueue source cell 
+
+	while (!q.empty()) 
+	{ 
+        path = q.front();
+
+
+		geometry_msgs::Point pt = path[path.size() - 1]; 
+
+        if (pt.x == final_x && pt.y == final_y ) 
+        {
+            return path; 
+        }
+
+        q.pop();
+
+		for (int i = 0; i < 4; i++) 
+		{ 
+			int col = pt.x + rowNum[i]; 
+			int row = pt.y + colNum[i]; 
+
+			int probability = (int)img_final.at<short>(row, col);
+			if (isValid(row, col) 
+				&& probability < MAX_OCCUPIED_PROB 
+				&& probability >= 0 
+				&& visited.at<int>(row, col) != 1)
+			{ 
+				// mark cell as visited and enqueue it 
+				visited.at<int>(row, col) = 1;
+				geometry_msgs::Point newPoint;
+				newPoint.x = col;
+				newPoint.y = row;
+
+                vector<geometry_msgs::Point> newpath(path);
+                newpath.push_back(newPoint); 
+
+				q.push(newpath); 
+			} 
+		} 
+	} 
+
+	// Return blank vector if destination cannot be reached 
+    // vector<geometry_msgs::Point> noPath; 
+	return path; 	 
+}
 
 
 
@@ -522,6 +627,7 @@ void generatePath(vector<geometry_msgs::Point>& path)
 vector<std::string> returnNextCommand(vector<geometry_msgs::Point>& path)
 {
 	vector<std::string> command_list;
+	vector<std::string> empty_command_list;
 	printf(" in return next command path size is %d\n",path.size());
 	cout << "path 0 elements are " << path[0].x << "," << path[0].y;
 	cout << "path 1 elements are" << path[1].x << "," << path[1].y; 
@@ -590,7 +696,7 @@ vector<std::string> returnNextCommand(vector<geometry_msgs::Point>& path)
 	if(path.size() < 2){
 		//hover or drift correct //no command as map not complete yet
 		command_list.push_back("still exploring");
-	  
+		return command_list;
 	}else{
 		//Rotate first
 		if (AngleDiff >= 90) {
@@ -598,25 +704,19 @@ vector<std::string> returnNextCommand(vector<geometry_msgs::Point>& path)
 		} else if (AngleDiff <= -90) {
 			command_list.push_back("cw "+ angle);
 		}
+		command_list.push_back("forward " + dis); 
+
 		//Just issue a forward after this, not really sure if this works, but lets try
 		//can we just use simple euclidean distance for now?
 		//the distance in world co ordinate is being the same for two nodes-too small
-		if(distance <= 0 ){
-			cout << " the distance to use is 0 so we move default 20 cm" << endl;
-			dis = "20" ; 
-		}
-		
-		command_list.push_back("forward " + dis); //smallest distance the tello can move is 20cm
-		//will need to do some error correction for the tello	
+		if(distance < MIN_DISTANCE ){
+			cout << " the distance to use is less than the default set up " << endl;
+			return empty_command_list;
+		}else{
+			return command_list;
+		}	
 	
-	}
-	
-
-
-	
-	return command_list;
-
-	
+	}	
 }
 
 void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
@@ -1029,6 +1129,12 @@ void showGridMap(unsigned int id) {
 		cv::Scalar destination_color(0,255,0);//color of dfs destinations 
 		for (int i = 0; i < dfs_destinations.size(); i++)  {
 				cv::circle(grid_map_rgb, cv::Point((dfs_destinations[i].x)*resize_factor, (dfs_destinations[i].y)*resize_factor),
+							0.05, destination_color, -1);
+		}
+		//also highlight the selected destination
+		if(destination_found){
+			cv::Scalar final_destination_color(0,210,255);//color of dfs destinations 
+			cv::circle(grid_map_rgb, cv::Point((dest_x)*resize_factor, (dest_y)*resize_factor),
 							0.05, destination_color, -1);
 		}
 		cv::Scalar line_Color(255, 0, 0);//Color of the circle
