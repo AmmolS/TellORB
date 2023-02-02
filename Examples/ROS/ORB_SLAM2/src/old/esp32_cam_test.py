@@ -1,3 +1,5 @@
+#PURE CAMERA TEST
+
 import cv2
 from urllib.request import urlopen
 import numpy as np

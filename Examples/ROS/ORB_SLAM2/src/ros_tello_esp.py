@@ -1,3 +1,5 @@
+# esp32-cam with camera published to ROS
+
 import os
 import rospy
 

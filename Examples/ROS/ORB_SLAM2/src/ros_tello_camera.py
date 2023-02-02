@@ -1,3 +1,4 @@
+# Tello - no flight - publish camera to ros topic
 import os
 import rospy
 

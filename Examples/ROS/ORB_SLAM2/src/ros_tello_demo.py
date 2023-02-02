@@ -1,3 +1,5 @@
+# Tello - with flight controls - camera published - has turn maneuver 
+
 import rospy
 
 from json import load
@@ -25,8 +27,6 @@ import logging
 import readchar
 MAX_ANGLE = 90
 
-
-
 tello = Tello(skipAddressCheck=True)
 tello.LOGGER.setLevel(logging.INFO)
 tello.connect()
@@ -38,7 +38,6 @@ keepAlive.set()
 tello.streamon()
 frame_read = tello.get_frame_read()
 bridge = CvBridge()
-
 
 print("Tello Battery Level = {}%".format(tello.get_battery()))
 

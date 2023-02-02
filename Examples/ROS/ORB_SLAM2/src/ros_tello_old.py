@@ -1,3 +1,5 @@
+# tello controlled flight with camera and IMU publishing (IMU untested) ROS publishing without maneuver
+
 import rospy
 
 from std_msgs.msg import Empty, UInt8, Bool
@@ -114,7 +116,7 @@ def main():
 
     def imuReceiver():
         seq = 10001
-        rate = 1.0/200
+        rate = 1.0/20
         oldTime = 0
 
         while keepRecording.is_set():

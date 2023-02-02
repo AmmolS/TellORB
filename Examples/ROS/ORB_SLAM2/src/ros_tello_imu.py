@@ -1,3 +1,5 @@
+# esp32-cam IMU data published to ROS
+
 import os
 import rospy
 import time

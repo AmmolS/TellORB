@@ -1,3 +1,6 @@
+# tello receives commands from SLAM, has camera and IMU publishing. IMU publishing not working
+# no ability to override drone controls
+
 import rospy
 
 from json import load
@@ -60,6 +63,7 @@ def loadConfig():
 
 def telloHandler():
     while True:
+        global command
         while command is Empty:
             time.sleep(0.5)
         
