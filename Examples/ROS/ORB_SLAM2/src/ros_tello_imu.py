@@ -6,7 +6,7 @@ import time
 #import websocket
 import socket
 import math
-
+from threading import Thread, Event
 
 from sensor_msgs.msg import _Imu
 
@@ -47,18 +47,20 @@ print(sorted(avg))
 
 # bridge = CvBridge()
 pub_imu = rospy.Publisher("/imu0", _Imu.Imu, queue_size=10)
+result = ""
 
-def main():
-    print('ROS IMU: Initializing ros_tello node...')
-    rospy.init_node('ros_imu')
+def readImu():
+    while True:
+        s.sendall(b"p")
+        result = s.recv(128)
+        result = f"{result.decode('utf-8')}"
 
+def pubImuData():
     seq = 10001
     oldTime = 0
     while True:
         if(time.time() - oldTime >= 1/100):
-            s.sendall(b"p")
-            result = s.recv(128)
-            result = f"{result.decode('utf-8')}"
+            dataCopy = result
             # print(time.time()-oldTime)
             imu_msg = _Imu.Imu()
             imu_msg.header.seq = seq
@@ -69,12 +71,12 @@ def main():
             imu_msg.orientation_covariance[4] = 99999.9
             imu_msg.orientation_covariance[8] = 99999.9
 
-            imu_msg.linear_acceleration.x = float(result.split(";")[0])
-            imu_msg.linear_acceleration.y = float(result.split(";")[1])
-            imu_msg.linear_acceleration.z = float(result.split(";")[2])
-            imu_msg.angular_velocity.x = float(result.split(";")[3])
-            imu_msg.angular_velocity.y = float(result.split(";")[4])
-            imu_msg.angular_velocity.z = float(result.split(";")[5])
+            imu_msg.linear_acceleration.x = float(dataCopy.split(";")[0])
+            imu_msg.linear_acceleration.y = float(dataCopy.split(";")[1])
+            imu_msg.linear_acceleration.z = float(dataCopy.split(";")[2])
+            imu_msg.angular_velocity.x = float(dataCopy.split(";")[3])
+            imu_msg.angular_velocity.y = float(dataCopy.split(";")[4])
+            imu_msg.angular_velocity.z = float(dataCopy.split(";")[5])
             # print(imu_msg)
 
             pub_imu.publish(imu_msg)
@@ -82,6 +84,52 @@ def main():
             oldTime = time.time()
             # time.sleep(fps)
             # print(result)
+
+def main():
+    print('ROS IMU: Initializing ros_tello node...')
+    rospy.init_node('ros_imu')
+
+    readImuThread = Thread(target=readImu)
+    readImuThread.start()
+    publishThread = Thread(target=pubImuData)
+    publishThread.start()
+
+    print('IMU data is being published on /imu0')
+
+    readImuThread.join()
+    publishThread.join()
+
+
+    # seq = 10001
+    # oldTime = 0
+    # while True:
+    #     if(time.time() - oldTime >= 1/100):
+    #         s.sendall(b"p")
+    #         result = s.recv(128)
+    #         result = f"{result.decode('utf-8')}"
+    #         # print(time.time()-oldTime)
+    #         imu_msg = _Imu.Imu()
+    #         imu_msg.header.seq = seq
+    #         imu_msg.header.stamp.set(math.floor(time.time()), time.time_ns() % 1000000000)
+    #         imu_msg.header.frame_id = "imu4"
+    #         imu_msg.orientation.z = 1
+    #         imu_msg.orientation_covariance[0] = 99999.9
+    #         imu_msg.orientation_covariance[4] = 99999.9
+    #         imu_msg.orientation_covariance[8] = 99999.9
+
+    #         imu_msg.linear_acceleration.x = float(result.split(";")[0])
+    #         imu_msg.linear_acceleration.y = float(result.split(";")[1])
+    #         imu_msg.linear_acceleration.z = float(result.split(";")[2])
+    #         imu_msg.angular_velocity.x = float(result.split(";")[3])
+    #         imu_msg.angular_velocity.y = float(result.split(";")[4])
+    #         imu_msg.angular_velocity.z = float(result.split(";")[5])
+    #         # print(imu_msg)
+
+    #         pub_imu.publish(imu_msg)
+    #         seq += 1
+    #         oldTime = time.time()
+    #         # time.sleep(fps)
+    #         # print(result)
 
     # with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     #     s.connect((HOST, PORT))
@@ -93,9 +141,6 @@ def main():
     #         count += 1
     #         time.sleep(1/100)
 
-    
-    
-    print('ROS Tello Camera is recording, press any key to terminate recording thread.')
 
     # url = r'http://192.168.4.1/imu.txt'
     # while True:
