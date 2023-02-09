@@ -137,6 +137,8 @@ void printPointPath(vector<geometry_msgs::Point>& path);
 void publishCommand(std::string command);
 ros::Time next_command_time;
 
+vector<geometry_msgs::Point> DFS(int init_x, int init_y);
+
 // ORBSLAM functions
 void updateGridMap(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose);
 void resetGridMap(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose);
@@ -145,7 +147,7 @@ void kfCallback(const geometry_msgs::PoseStamped::ConstPtr& camera_pose);
 void saveMap(unsigned int id = 0);
 void imageCallback(const sensor_msgs::ImageConstPtr& msg);
 void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose);
-void goalCallback(const geometry_msgs::PoseStamped new_goal);
+// void goalCallback(const geometry_msgs::PoseStamped new_goal);
 void initialPoseCallback(const geometry_msgs::PoseWithCovarianceStamped initial_pose);
 void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped curr_pose);
 void loopClosingCallback(const geometry_msgs::PoseArray::ConstPtr& all_kf_and_pts);
@@ -242,7 +244,7 @@ int main(int argc, char **argv){
 
 	ros::NodeHandle nodeHandler;
 	ros::Subscriber sub_pts_and_pose = nodeHandler.subscribe("pts_and_pose", 1000, ptCallback);
-	ros::Subscriber sub_goal = nodeHandler.subscribe("move_base_simple/goal", 1000, goalCallback);
+	// ros::Subscriber sub_goal = nodeHandler.subscribe("move_base_simple/goal", 1000, goalCallback);
 	ros::Subscriber sub_initial_pose = nodeHandler.subscribe("initialpose", 1000, initialPoseCallback);
 	ros::Subscriber sub_current_pose = nodeHandler.subscribe("robot_pose", 1000, currentPoseCallback);
 	ros::Subscriber sub_all_kf_and_pts = nodeHandler.subscribe("all_kf_and_pts", 1000, loopClosingCallback);
@@ -360,11 +362,23 @@ void initialPoseCallback(const geometry_msgs::PoseWithCovarianceStamped initial_
 void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_pose) {
 	curr_pose = current_pose.pose;
 
+	std::cout << "Current pose x: " << curr_pose.pose.position.x << std::endl;
+	std::cout << "Current pose y: " << curr_pose.pose.position.y << std::endl;
+
 	float pt_pos_x = curr_pose.pose.position.x*scale_factor;
 	float pt_pos_z = curr_pose.pose.position.y*scale_factor;
 
+	std::cout << "pt_pos_x: " << pt_pos_x << std::endl;
+	std::cout << "pt_pos_z: " << pt_pos_z << std::endl;
+
 	int_pos_grid_x = int(floor((pt_pos_x) * norm_factor_x));
 	int_pos_grid_z = int(floor((pt_pos_z) * norm_factor_z));
+
+	std::cout << "int_pos_grid_x: " << int_pos_grid_x << std::endl;
+	std::cout << "int_pos_grid_z: " << int_pos_grid_z << std::endl;
+
+	std::cout << "norm_factor_x: " << norm_factor_x << std::endl;
+	std::cout << "norm_factor_z: " << norm_factor_z << std::endl;
 
 	cout << "Current index: " << int_pos_grid_x << ", " << int_pos_grid_z << endl;
 	double currentAngle = tf::getYaw(curr_pose.pose.orientation);
@@ -398,43 +412,91 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 
 }
 
-void goalCallback(const geometry_msgs::PoseStamped new_goal){
-	goal.pose = new_goal.pose;
+// void goalCallback(const geometry_msgs::PoseStamped new_goal){
+// 	goal.pose = new_goal.pose;
 
-	// ROS_INFO("current DFS pose: (%i, %i)\n", kf_pos_grid_x, kf_pos_grid_z);
-	// cv::Size s = grid_map.size();
-	// ROS_INFO("current map size: (%i, %i)\n", s.height, s.width);
+// 	// ROS_INFO("current DFS pose: (%i, %i)\n", kf_pos_grid_x, kf_pos_grid_z);
+// 	// cv::Size s = grid_map.size();
+// 	// ROS_INFO("current map size: (%i, %i)\n", s.height, s.width);
 
-	// ROS_INFO("current map value: (%f)\n", grid_map.at<float>(kf_pos_grid_x, kf_pos_grid_z));
+// 	// ROS_INFO("current map value: (%f)\n", grid_map.at<float>(kf_pos_grid_x, kf_pos_grid_z));
 
-	float goal_pos_x =  goal.pose.position.x*scale_factor;
-	float goal_pos_z =  goal.pose.position.y*scale_factor;
+// 	float goal_pos_x =  goal.pose.position.x*scale_factor;
+// 	float goal_pos_z =  goal.pose.position.y*scale_factor;
 
 
 	
-	int kf_goal_pos_x = int(floor((goal_pos_x) * norm_factor_x));
-	int kf_goal_pos_z = int(floor((goal_pos_z) * norm_factor_z));
+// 	int kf_goal_pos_x = int(floor((goal_pos_x) * norm_factor_x));
+// 	int kf_goal_pos_z = int(floor((goal_pos_z) * norm_factor_z));
 
-	ROS_INFO("DFS goal index: (%i, %i)\n", kf_goal_pos_x, kf_goal_pos_z);
+// 	ROS_INFO("DFS goal index: (%i, %i)\n", kf_goal_pos_x, kf_goal_pos_z);
 
-	if ((kf_goal_pos_x < 0 || kf_goal_pos_x >= w) || (kf_goal_pos_z < 0 || kf_goal_pos_z >= h)) 
-	{
-		ROS_INFO("Invalid Indices: (%i, %i)\n", kf_goal_pos_x, kf_goal_pos_z);
-		return;
-	}
+// 	if ((kf_goal_pos_x < 0 || kf_goal_pos_x >= w) || (kf_goal_pos_z < 0 || kf_goal_pos_z >= h)) 
+// 	{
+// 		ROS_INFO("Invalid Indices: (%i, %i)\n", kf_goal_pos_x, kf_goal_pos_z);
+// 		return;
+// 	}
 	
-	// vector<geometry_msgs::Point> BFSpath =  BFS(kf_pos_grid_x, kf_pos_grid_z, kf_goal_pos_x, kf_goal_pos_z);
-	vector<geometry_msgs::Point> BFSpath = BFS(int_pos_grid_x, int_pos_grid_z, kf_goal_pos_x, kf_goal_pos_z);
+// 	// vector<geometry_msgs::Point> BFSpath =  BFS(kf_pos_grid_x, kf_pos_grid_z, kf_goal_pos_x, kf_goal_pos_z);
+// 	vector<geometry_msgs::Point> BFSpath = BFS(int_pos_grid_x, int_pos_grid_z, kf_goal_pos_x, kf_goal_pos_z);
 
-	printPointPath(BFSpath);
+// 	printPointPath(BFSpath);
 
-	generatePath(BFSpath);
+// 	generatePath(BFSpath);
 
-    returnNextCommand(BFSpath);
+//     returnNextCommand(BFSpath);
 
 
-	// ROS_INFO("current map value: (%f)\n", grid_map.at<float>(kf_goal_pos_x, kf_goal_pos_z));
-	// ROS_INFO("DFS goal changed!: (%f, %f)\n", goal.pose.position.x, goal.pose.position.y);
+// 	// ROS_INFO("current map value: (%f)\n", grid_map.at<float>(kf_goal_pos_x, kf_goal_pos_z));
+// 	// ROS_INFO("DFS goal changed!: (%f, %f)\n", goal.pose.position.x, goal.pose.position.y);
+// }
+
+vector<geometry_msgs::Point> DFS(int init_x, int init_y){
+	// int MIN_PATH_SIZE = 5;
+	int MAX_OCCUPIED_PROB = 75;
+
+	// These arrays are used to get row and column 
+	// numbers of 4 neighbours of a given cell 
+	int rowNum[] = {-1, 0, 0, 1}; 
+	int colNum[] = {0, -1, 1, 0};
+
+	ROS_INFO("Start/end indexes: (%i, %i) end (%i, %i)\n", init_x, init_y);
+
+
+	cv::Mat test_grid_map_int = cv::Mat(h, w, CV_16SC1, (char*)(grid_map_msg.data.data()));
+	// cv::Mat test_grid_map_int;
+
+    cv::Mat img_first;
+
+
+	double minval,maxval;
+	cv::minMaxLoc(grid_map_int, &minval, &maxval, NULL, NULL);
+
+
+	// cout << grid_map_int.type() << endl; // 1
+
+	// cout << grid_map_int.rowRange(final_y, init_y) << endl;
+
+	int erodeSize = 1;
+
+	grid_map_int.convertTo(img_first, CV_16SC1);
+
+	cv::Mat element = cv::getStructuringElement( cv::MORPH_RECT,
+								cv::Size( 2*erodeSize + 1, 2*erodeSize+1 ),
+								cv::Point( erodeSize, erodeSize ) );
+
+	cv::erode(img_first, img_final, element);
+
+	vector<geometry_msgs::Point> path; // Store path history
+	std::queue<vector<geometry_msgs::Point> > q;  // BFS queue
+	cv::Mat visited;
+	visited.create(h, w, CV_32FC1);
+	visited.setTo(cv::Scalar(0));
+	
+	visited.at<int>(init_x, init_y) = 1;
+	// grid_map
+	// for()
+
 }
 
 vector<geometry_msgs::Point>  BFS(int init_x, int init_y, int final_x, int final_y){
@@ -678,26 +740,14 @@ void publishCommand(std::string command){
 }
 
 void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
-	//ROS_INFO("Received points and pose: [%s]{%d}", pts_and_pose->header.frame_id.c_str(),
-	//	pts_and_pose->header.seq);
-	//if (pts_and_pose->header.seq==0) {
-	//	cv::destroyAllWindows();
-	//	saveMap();
-	//	printf("Received exit message\n");
-	//	ros::shutdown();
-	//	exit(0);
-	//}
-//	if (!got_start_time) {
-//#ifdef COMPILEDWITHC11
-//		start_time = std::chrono::steady_clock::now();
-//#else
-//		start_time = std::chrono::monotonic_clock::now();
-//#endif
-//		got_start_time = true;
-//	}
+	void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
+	
 	if (loop_closure_being_processed){ return; }
 
-	updateGridMap(pts_and_pose);
+	updateGridMap(pts_and_pose); //use the info from publisher to construct the grid map
+    //unless we publish it, it wont't update the map.
+
+    //not sure what this section does, maybe it transforms from ORB slam to navigation worthy coordinates
 
 	tf::TransformBroadcaster br;
 	tf::Transform odom_to_map_transform;
@@ -705,35 +755,27 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
 	tf::Quaternion q;
 	q.setRPY(0, 0, 0);
 	odom_to_map_transform.setRotation(q);
-	//br.sendTransform(tf::StampedTransform(odom_to_map_transform, ros::Time::now(), "base_footprint", "map"));
 	ros::Time tf_time = ros::Time::now();
-    //br.sendTransform(tf::StampedTransform(odom_to_map_transform, tf_time, "map", "base_footprint"));
 	br.sendTransform(tf::StampedTransform(odom_to_map_transform, tf_time, "map", "odom"));
 
-//#ifdef COMPILEDWITHC11
-//	end_time = std::chrono::steady_clock::now();
-//#else
-//	end_time = std::chrono::monotonic_clock::now();
-//#endif
-//	double curr_time = std::chrono::duration_cast<std::chrono::duration<double>>(start_time - end_time).count();
-
 	grid_map_msg.info.map_load_time = ros::Time::now();
+
+    /*ECE496 CODE ADDITIONS START HERE*/
+    // if(tello_move_completed)
+    // {
 	float kf_pos_grid_x_us = (kf_location.x - cloud_min_x) ;
-	// float kf_pos_grid_x_us = (kf_location.x) * norm_factor_x_us;
 	float kf_pos_grid_z_us = (kf_location.z - cloud_min_z) ;
-	// float kf_pos_grid_z_us = (kf_location.z) * norm_factor_z_us;
 
 
+	//current pose's x and y is set here
 	curr_pose.pose.position.x = kf_pos_grid_x_us;
 	curr_pose.pose.position.y = kf_pos_grid_z_us;
 
-	// curr_pose.pose.position.x  = kf_pos_grid_x*resize_factor;
-	// curr_pose.pose.position.y = kf_pos_grid_z*resize_factor;
+
 	ROS_INFO("Publishing current pose: (%f, %f)\n", kf_pos_grid_x_us, kf_pos_grid_z_us);
 	ROS_INFO("Publishing current pose: (%f, %f)\n", kf_location.x , kf_location.z);
 	ROS_INFO("Publishing new current pose: (%f, %f)\n", kf_pos_grid_x*resize_factor, kf_pos_grid_z*resize_factor);
 	curr_pose.pose.position.z = 0;
-	// curr_pose.pose.orientation = kf_orientation;
 	curr_pose.pose.orientation.x = kf_orientation.x;
 	curr_pose.pose.orientation.y = kf_orientation.z;
 	curr_pose.pose.orientation.z = kf_orientation.y;
@@ -744,83 +786,13 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
 	curr_pose_stamped.header.seq = ++curr_pose_id;
 	curr_pose_stamped.pose = curr_pose;
 
-	pub_current_pose.publish(curr_pose_stamped);
+	pub_current_pose.publish(curr_pose_stamped);//used by current pose call back
+    // }
+    /*ECE496 CODE ADDITIONS END HERE*/
+	
 
 
-	//temp stuff for meeting
-
-	// init_pose.pose.position.x = kf_pos_grid_x_us;
-	// init_pose.pose.position.y = kf_pos_grid_z_us;
-	// // ROS_INFO("Publishing current pose: (%f, %f)\n", kf_pos_grid_x_us, kf_pos_grid_z_us);
-	// init_pose.pose.position.z = 0;
-	// // curr_pose.pose.orientation = kf_orientation;
-	// init_pose.pose.orientation.x = kf_orientation.x;
-	// init_pose.pose.orientation.y = kf_orientation.z;
-	// init_pose.pose.orientation.z = kf_orientation.y;
-	// init_pose.pose.orientation.w = -kf_orientation.w;
-	// cv::Mat(6, 6, CV_64FC1, curr_pose.covariance.elems).setTo(0);
-	// init_pose_stamped.header.frame_id = "map";
-	// init_pose_stamped.header.stamp = ros::Time::now();
-	// init_pose_stamped.header.seq = ++init_pose_id;
-	// init_pose_stamped.pose = init_pose;
-
-	// pub_initial_pose.publish(init_pose_stamped);
-
-	if (enable_goal_publishing) {
-		if (kf_id == 0) {
-			init_pose.pose.position.x = kf_pos_grid_x_us;
-			init_pose.pose.position.y = kf_pos_grid_z_us;
-			ROS_INFO("Publishing initial pose: (%f, %f)\n", kf_pos_grid_x_us, kf_pos_grid_z_us);
-			init_pose.pose.position.z = 0;
-			//init_pose.pose.orientation = kf_orientation;
-			init_pose.pose.orientation.x = 0;
-			init_pose.pose.orientation.y = 0;
-			init_pose.pose.orientation.z = 0;
-			init_pose.pose.orientation.w = 1;
-			cv::Mat(6, 6, CV_64FC1, init_pose.covariance.elems).setTo(0);
-			init_pose_stamped.header.frame_id = "map";
-			init_pose_stamped.header.stamp = ros::Time::now();
-			init_pose_stamped.header.seq = ++init_pose_id;
-			init_pose_stamped.pose = init_pose;
-			pub_initial_pose.publish(init_pose_stamped);
-			// pub_current_pose.publish(init_pose.pose);
-			geometry_msgs::PoseArray curr_particles;
-			curr_particles.header = init_pose_stamped.header;
-			curr_particles.poses.push_back(init_pose.pose);
-			pub_current_particles.publish(curr_particles);
-		}
-		else if (kf_id % goal_gap == 0) {
-			if (goal_id>0){
-				curr_pose.pose = goal.pose;
-				// ROS_INFO("Publishing current pose: (%f, %f)\n",curr_pose.pose.position.x, curr_pose.pose.position.y);
-				//curr_pose.pose.position.z = 0;
-				////init_pose.pose.orientation = kf_orientation;
-				//cv::Mat(6, 6, CV_64FC1, curr_pose.covariance.elems).setTo(0);
-
-
-
-				// pub_current_pose.publish(curr_pose.pose);
-				geometry_msgs::PoseArray curr_particles;
-				curr_particles.header = curr_pose_stamped.header;
-				curr_particles.poses.push_back(curr_pose.pose);
-				pub_current_particles.publish(curr_particles);
-			}
-
-			ROS_INFO("Publishing goal: (%f, %f)\n", kf_pos_grid_x_us, kf_pos_grid_z_us);
-			// goal.pose.position.x = kf_pos_grid_x_us;
-			// goal.pose.position.y = kf_pos_grid_z_us;
-			// goal.pose.orientation.x = kf_orientation.x;
-			// goal.pose.orientation.y = kf_orientation.z;
-			// goal.pose.orientation.z = kf_orientation.y;
-			// goal.pose.orientation.w = 1;
-			goal.header.frame_id = "map";
-			goal.header.stamp = ros::Time::now();
-			goal.header.seq = ++goal_id;
-			// pub_goal.publish(goal);
-		}
-		//	
-		//::ros::console::print();
-	}
+	
 	nav_msgs::MapMetaData map_metadata;
 	map_metadata.width = w;
 	map_metadata.height = h;
@@ -831,19 +803,10 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
 	map_metadata.origin.position.z = 0;
 	pub_grid_map.publish(grid_map_msg);
 	pub_grid_map_metadata.publish(map_metadata);
-	++kf_id;
+	++kf_id; //advance to the next key frame
 		
-	//goal.target_pose.header.stamp = ros::Time::now();
-	//goal.target_pose.pose.position.x = kf_pos_grid_x;
-	//goal.target_pose.pose.position.y = kf_pos_grid_z;
-	//goal.target_pose.pose.orientation = pts_and_pose->poses[0].orientation;
-	//ROS_INFO("Sending goal");
-	//ac.sendGoal(goal);
-	//ac.waitForResult();
-	//if (ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
-	//	ROS_INFO("Hooray, the base moved 1 meter forward");
-	//else
-	//	ROS_INFO("The base failed to move forward 1 meter for some reason");
+	
+}
 }
 void loopClosingCallback(const geometry_msgs::PoseArray::ConstPtr& all_kf_and_pts){
 	//ROS_INFO("Received points and pose: [%s]{%d}", pts_and_pose->header.frame_id.c_str(),
