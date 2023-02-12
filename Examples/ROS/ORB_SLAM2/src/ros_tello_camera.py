@@ -33,6 +33,7 @@ print("Tello Battery Level = {}%".format(tello.get_battery()))
 def videoRecorder():
     # create a VideoWrite object, recoring to ./video.avi
     height, width, _ = frame_read.frame.shape
+    seq = 1
     
     print("Start video recording")
     video = cv2.VideoWriter('video4.avi', cv2.VideoWriter_fourcc(*'MJPG'), 30, (width, height))
@@ -40,7 +41,12 @@ def videoRecorder():
 
     while keepRecording.is_set():
         img_msg = bridge.cv2_to_imgmsg(frame_read.frame, encoding='bgr8')
+        img_msg.header.seq = seq
+        img_msg.header.stamp.set(math.floor(time.time()), time.time_ns() % 1000000000)
+        # 1000000000 is to only the decimals for nano seconds
+        img_msg.header.frame_id = "cam0"
         pub_img.publish(img_msg)
+        seq += 1
         cv2.imshow("Tello Camera", frame_read.frame) # Display to window
         video.write(frame_read.frame)
         cv2.waitKey(fps_period)

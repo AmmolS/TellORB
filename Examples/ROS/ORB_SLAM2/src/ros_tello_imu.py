@@ -50,6 +50,7 @@ pub_imu = rospy.Publisher("/imu0", _Imu.Imu, queue_size=10)
 result = ""
 
 def readImu():
+    global result
     while True:
         s.sendall(b"p")
         result = s.recv(128)

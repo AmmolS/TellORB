@@ -99,7 +99,7 @@ def main():
       
     print('Currently in the main function...')
     # pub = rospy.Publisher("test/raw", String, queue_size=10)
-    pub_img = rospy.Publisher("tello/image_raw", Image, queue_size=10)
+    pub_img = rospy.Publisher("/tello/image_raw", Image, queue_size=10)
       
     # initializing the subscriber node
     rospy.init_node('command_subscriber', anonymous=True)
@@ -129,13 +129,19 @@ def main():
     def videoRecorder():
         # create a VideoWrite object, recoring to ./video.avi
         height, width, _ = frame_read.frame.shape
+        seq = 1
         
         print("Start recording")
         video = cv2.VideoWriter('video.avi', cv2.VideoWriter_fourcc(*'MJPG'), 30, (width, height))
 
         while keepRecording.is_set():
             img_msg = bridge.cv2_to_imgmsg(frame_read.frame, encoding='bgr8')
+            img_msg.header.seq = seq
+            img_msg.header.stamp.set(math.floor(time.time()), time.time_ns() % 1000000000)
+            # 1000000000 is to only the decimals for nano seconds
+            img_msg.header.frame_id = "cam0"
             pub_img.publish(img_msg)
+            seq += 1
             video.write(frame_read.frame)
             time.sleep(1 / 60)
 
@@ -148,7 +154,7 @@ def main():
 
     # this delay is for legacy testing purposes. It may be removed if it causes issues or if it doesn't cause issues to remove it down the road
 
-    time.sleep(2)
+    # time.sleep(2)
 
     recorder = Thread(target=videoRecorder)
     recorder.start()
@@ -221,7 +227,7 @@ def main():
         tello.takeoff()
         # cv2.imwrite("picture.png", frame_read.frame)
 
-        time.sleep(3)
+        time.sleep(0.5)
         if(tello.get_height() < height):
             tello.move("up", int(height - tello.get_height()))
         #next set of manouvers
