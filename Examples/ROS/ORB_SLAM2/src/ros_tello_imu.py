@@ -47,7 +47,7 @@ print(sorted(avg))
 
 # bridge = CvBridge()
 pub_imu = rospy.Publisher("/imu0", _Imu.Imu, queue_size=10)
-result = ""
+result = "0;0;0;0;0;0"
 
 def readImu():
     global result
