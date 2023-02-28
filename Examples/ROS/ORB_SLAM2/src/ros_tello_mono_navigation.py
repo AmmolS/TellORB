@@ -172,7 +172,7 @@ def main():
 
 
         time.sleep(3)
-        pub_initial_pose.publish(True);
+        pub_initialize_scale.publish(True);
 
         if(tello.get_height() < height):
             tello.move("up", int(height - tello.get_height()))
@@ -267,7 +267,7 @@ def main():
                     time.sleep(sleepTime)#from config file
             elif inputChar == 'p':
                 tello.move_forward(20)
-                pub_initial_pose.publish(True);
+                pub_initialize_scale.publish(True);
             else:
                 print("Tello Battery Level = {}%".format(tello.get_battery()))
             # PRESS SPACEBAR TO HOVER-old script execution here

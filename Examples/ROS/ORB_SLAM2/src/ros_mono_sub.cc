@@ -14,6 +14,7 @@
 #include "nav_msgs/OccupancyGrid.h"
 #include "nav_msgs/Path.h"
 #include "std_msgs/String.h"
+#include "std_msgs/Bool.h"
 
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
@@ -166,7 +167,7 @@ bool got_tello_initial_pose = false;
 double scale = 1;
 geometry_msgs::PoseWithCovariance initialPose;
 geometry_msgs::PoseWithCovariance newPose;
-void initializeScaleCallback();
+void initializeScaleCallback(const std_msgs::Bool::ConstPtr& value);
 
 int main(int argc, char **argv){
 	ros::init(argc, argv, "Monosub");
@@ -739,9 +740,7 @@ void publishCommand(std::string command){
 	next_command_time = ros::Time::now() + ros::Duration(5);
 }
 
-void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
-	void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
-	
+void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){	
 	if (loop_closure_being_processed){ return; }
 
 	updateGridMap(pts_and_pose); //use the info from publisher to construct the grid map
@@ -807,7 +806,6 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
 		
 	
 }
-}
 void loopClosingCallback(const geometry_msgs::PoseArray::ConstPtr& all_kf_and_pts){
 	//ROS_INFO("Received points and pose: [%s]{%d}", pts_and_pose->header.frame_id.c_str(),
 	//	pts_and_pose->header.seq);
@@ -822,7 +820,7 @@ void loopClosingCallback(const geometry_msgs::PoseArray::ConstPtr& all_kf_and_pt
 	loop_closure_being_processed = false;
 }
 
-void initializeScaleCallback(){
+void initializeScaleCallback(const std_msgs::Bool::ConstPtr& value){
 	initialPose = curr_pose;
 	if(got_tello_initial_pose){
 		newPose = curr_pose;
@@ -1196,21 +1194,21 @@ void showGridMap(unsigned int id) {
 	if (show_camera_location) {
 		cv::cvtColor(grid_map_thresh_resized, grid_map_rgb, cv::COLOR_GRAY2BGR);
 		cv::Scalar destination_color(0,255,0);//color of dfs destinations 
-		for (int i = 0; i < dfs_destinations.size(); i++)  {
-				cv::circle(grid_map_rgb, cv::Point((dfs_destinations[i].x)*resize_factor, (dfs_destinations[i].y)*resize_factor),
-							0.05, destination_color, -1);
-		}
+		// for (int i = 0; i < dfs_destinations.size(); i++)  {
+		// 		cv::circle(grid_map_rgb, cv::Point((dfs_destinations[i].x)*resize_factor, (dfs_destinations[i].y)*resize_factor),
+		// 					0.05, destination_color, -1);
+		// }
 		//also highlight the selected destination
 		
 		cv::Scalar line_Color(255, 0, 0);//Color of the circle
 		cv::circle(grid_map_rgb, cv::Point(kf_pos_grid_x*resize_factor, kf_pos_grid_z*resize_factor),
 			3, line_Color, -1);
-		if(destination_found){
-			cout<<"drawing\n" <<endl;
-			cv::Scalar final_destination_color(255,0,255);//color of dfs destinations 
-			cv::circle(grid_map_rgb, cv::Point((dest_x)*resize_factor, (dest_y)*resize_factor),
-							3, final_destination_color, -1);
-		}
+		// if(destination_found){
+		// 	cout<<"drawing\n" <<endl;
+		// 	cv::Scalar final_destination_color(255,0,255);//color of dfs destinations 
+		// 	cv::circle(grid_map_rgb, cv::Point((dest_x)*resize_factor, (dest_y)*resize_factor),
+		// 					3, final_destination_color, -1);
+		// }
 
 		cv::imshow("grid_map_thresh_resized_rgb", grid_map_rgb);
 	}
