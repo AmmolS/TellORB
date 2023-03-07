@@ -171,11 +171,10 @@ def main():
         # cv2.imwrite("picture.png", frame_read.frame)
 
 
-        time.sleep(3)
         pub_initialize_scale.publish(True);
 
-        if(tello.get_height() < height):
-            tello.move("up", int(height - tello.get_height()))
+        # if(tello.get_height() < height):
+        #     tello.move("up", int(height - tello.get_height()))
         #next set of manouvers
         angle = 0
         time.sleep(sleepTime)#from the config file
@@ -186,6 +185,7 @@ def main():
             leftRightV = 0
             forwardBackwardV = 0
             yawV = 0
+            print("Ready for command")
             #intial scan manouver complete, pass control to keyboard
             # if(numTimesExecute==0):
             inputChar = readchar.readchar()
@@ -265,8 +265,9 @@ def main():
                     angle += rotationAngle
                     print("Rotation angle is now " + str(angle))
                     time.sleep(sleepTime)#from config file
-            elif inputChar == 'p':
-                tello.move_forward(20)
+            elif inputChar == 'l':
+                tello.move_forward(100)
+                time.sleep(2)
                 pub_initialize_scale.publish(True);
             else:
                 print("Tello Battery Level = {}%".format(tello.get_battery()))
