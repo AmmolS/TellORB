@@ -163,6 +163,12 @@ void showGridMap(unsigned int id = 0);
 void parseParams(int argc, char **argv);
 void printParams();
 
+//our globals for dfs stack and visited list initialized here
+bool tello_move_completed = true;
+std::stack<vector<geometry_msgs::Point> > dfs_stack;  // DFS stack this should be global
+cv::Mat dfs_visited; //this should be global too
+vector<geometry_msgs::Point> dfs_destinations;
+
 bool got_tello_initial_pose = false;
 double scale = 1;
 geometry_msgs::PoseWithCovariance initialPose;
@@ -497,6 +503,81 @@ vector<geometry_msgs::Point> DFS(int init_x, int init_y){
 	visited.at<int>(init_x, init_y) = 1;
 	// grid_map
 	// for()
+
+	// Copied from old commit - 226d986
+	//running simple dfs without any path finding
+	////////////////////////////////////
+    //vector<geometry_msgs::Point> path; // Store path history
+	vector<geometry_msgs::Point> dfs_path; 
+
+	// Distance of source cell is 0 
+	//the current position of the drone is marked visited since it is already there
+	dfs_visited.at<int>(init_y, init_x) = 1;
+
+	geometry_msgs::Point s; 
+	s.x = init_x;
+	s.y = init_y;
+    dfs_path.push_back(s); 	//dfs path is the old code, legacy
+	dfs_stack.push(dfs_path); // push the current source node onto the stack
+
+	while (!dfs_stack.empty()) 
+	{ 	
+        dfs_path = dfs_stack.top();
+		geometry_msgs::Point pt = dfs_path[dfs_path.size() - 1]; //getting the last element on the path?
+        dfs_stack.pop();
+		//check if the popped node from the stack is unvisited, unoccupied
+        int probability_current = (int)img_final.at<short>(pt.y, pt.x);
+         printf(" DFS exploring nodes for path %d, %d\n",int(pt.x),int(pt.y));
+         printf("DFS occupied %d\n",probability_current);
+         printf("DFS visited %d\n",dfs_visited.at<int>(pt.y, pt.x));
+		if (isValid(pt.x, pt.y) 
+				&& probability_current < MAX_OCCUPIED_PROB 
+				&& probability_current >= 0 
+				&& dfs_visited.at<int>(pt.y, pt.x) != 1)
+			{   
+				//these are the possible candidates as destinations
+				//add these to the destination list-who picks the destination?
+				cout << "DFS TRAVERSAL PRINTS  " <<    pt.x   <<  pt.y  << endl;
+				//add to the destination list
+				dfs_destinations.push_back(pt); 	
+				dfs_visited.at<int>(pt.y, pt.x) = 1;
+				//return path;
+				
+			}
+		
+        //get the adjacent vertices of the current source, if they are not visited,unoccupied
+		//push it on the stack
+		for (int i = 0; i < 4; i++) 
+		{ 
+			int row = pt.x + rowNum[i]; 
+			int col = pt.y + colNum[i]; 
+            int probability_nearby = (int)img_final.at<short>(col, row);
+			//printf("exploringnearby nodes%d, %d with probabiity-%d , visited-%d\n",row,col,probability_nearby,visited.at<int>(col, row));
+
+            
+		    if (isValid(row, col) 
+				&& probability_nearby < MAX_OCCUPIED_PROB 
+				&& probability_nearby >= 0 
+				&& dfs_visited.at<int>(col, row) != 1)
+			{ 
+				// push onto the stack
+            	printf("DFS adding nearby nodes %d, %d\n",row,col);
+				geometry_msgs::Point newPoint;
+				newPoint.x = row;
+				newPoint.y = col;
+
+                vector<geometry_msgs::Point> newpath(dfs_path);
+                newpath.push_back(newPoint); 
+
+				dfs_stack.push(newpath); 
+			} 
+			
+			
+		} 
+	} 
+
+	
+	printf("DFS returning list of possible destinations\n");
 
 }
 
