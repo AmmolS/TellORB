@@ -3,7 +3,7 @@
 import rospy
 
 from json import load
-from std_msgs.msg import Empty, UInt8, Bool
+from std_msgs.msg import Empty, UInt8, Bool, UInt32
 from std_msgs.msg import UInt8MultiArray
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
@@ -45,7 +45,7 @@ keepAlive.set()
 tello.streamon()
 frame_read = tello.get_frame_read()
 bridge = CvBridge()
-pub_move_complete = rospy.Publisher("tello/move_complete",int,queue_size=1)
+pub_move_complete = rospy.Publisher("tello/move_complete",UInt32,queue_size=1)
 
 
 print("Tello Battery Level = {}%".format(tello.get_battery()))
@@ -59,7 +59,7 @@ class command_subscriber:
         # initialize the subscriber node
         # here we deal with messages of type String which are commands coming from subscriber.
         self.image_sub = rospy.Subscriber("tello/command", 
-                                          int, self.process_command)
+                                          UInt32, self.process_command)
         print("Initializing the command subscriber!")
   
     def process_command(self, data):

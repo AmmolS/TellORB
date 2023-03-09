@@ -14,7 +14,7 @@
 #include "nav_msgs/OccupancyGrid.h"
 #include "nav_msgs/Path.h"
 #include "std_msgs/String.h"
-#include <std_msgs/Int32.h>
+#include <std_msgs/UInt32.h>
 
 #include "std_msgs/Bool.h"
 
@@ -179,7 +179,7 @@ double scale = 1;
 geometry_msgs::PoseWithCovariance initialPose;
 geometry_msgs::PoseWithCovariance newPose;
 void initializeScaleCallback(const std_msgs::Bool::ConstPtr& value);
-void telloMoveComplete(const std_msgs::Bool::ConstPtr& value);
+void telloMoveComplete(const std_msgs::UInt32::ConstPtr& value);
 
 int main(int argc, char **argv){
 	ros::init(argc, argv, "Monosub");
@@ -272,7 +272,7 @@ int main(int argc, char **argv){
 	pub_grid_map_metadata = nodeHandler.advertise<nav_msgs::MapMetaData>("map_metadata", 1000);
 	pub_current_pose = nodeHandler.advertise<geometry_msgs::PoseWithCovarianceStamped>("robot_pose", 1000);
 	pub_goal_path = nodeHandler.advertise<nav_msgs::Path>("goal_path", 1000);
-	pub_command = nodeHandler.advertise<std_msgs::String>("tello/command", 1000);
+	pub_command = nodeHandler.advertise<std_msgs::UInt32>("tello/command", 1000);
     
 
 	
@@ -365,6 +365,7 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 		//dfs will populate dfs_destinations with the choosen destination, which will be our final position
 
 		//generating the commands list
+		if(dfs_destinations.size() !=  0){
 		vector<std::string> command_list = returnNextCommand(int_pos_grid_x,int_pos_grid_z);
   		//print the commands here to see what is happening
 		cout << "the commands generated are" << endl;
@@ -376,6 +377,7 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 		//for now marking this as visited, since we do not want to risk sending commands
 		//but eventually we will get the tello to mark it visited
 		dfs_visited.at<int>(dfs_destinations[0].y, dfs_destinations[1].x) = 1;
+		}
 
 
 		cout<<"setting the mode to moving the tello now" << endl;
@@ -692,7 +694,7 @@ vector<std::string> returnNextCommand(int init_x, int init_y)
 //communication to tello from here
 //publishing commands/mode from here
 void publishCommand(int tello_mode){
-	std_msgs::Int32 msg;
+	std_msgs::UInt32 msg;
 	msg.data = tello_mode;
 	cout << "Transmitting tello mode: " << tello_mode << endl;
 	pub_command.publish(msg);
@@ -793,7 +795,7 @@ void initializeScaleCallback(const std_msgs::Bool::ConstPtr& value){
 	got_tello_initial_pose = true;
 }
 
-void telloMoveComplete(const std_msgs::Bool::ConstPtr& value){
+void telloMoveComplete(const std_msgs::UInt32::ConstPtr& value){
 	cout << "tello has completed moving, setting the mode back to dfs" << endl;
 	sent_command = false;
 	TELLO_MODE = dfs;
