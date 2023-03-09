@@ -133,10 +133,11 @@ using namespace cv;
 // Search functions
 void DFS(int init_x, int init_y);
 bool isValid(int valid_x, int valid_y);
-vector<std::string> returnNextCommand(vector<geometry_msgs::Point>& path);
+vector<std::string> returnNextCommand(int init_x, int init_y);
 void generatePath(vector<geometry_msgs::Point>& path);
 void printPointPath(vector<geometry_msgs::Point>& path);
 void publishCommand(int tello_mode);
+bool within_distance(int init_x, int init_y, int final_x,int final_y);
 ros::Time next_command_time;
 
 // ORBSLAM functions
@@ -169,6 +170,7 @@ bool sent_command = false;
 bool dfs_started = false;
 std::stack<vector<geometry_msgs::Point> > dfs_stack;  // DFS stack this should be global
 cv::Mat dfs_visited; //this should be global too
+double distance_threshold = 30;
 vector<geometry_msgs::Point> dfs_destinations;
 
 //scale stuff
@@ -358,15 +360,23 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 		cout << "Current Angle: "<< currentAngle;
 
 		/*ECE496 CODE ADDITIONS START HERE*/
-		DFS(int_pos_grid_x, int_pos_grid_z); //This dfs just populates a global destination list visulaized in green
+		DFS(int_pos_grid_x, int_pos_grid_z); 
 
-		//printPointPath(DFSpath);//CAN RE USE
+		//dfs will populate dfs_destinations with the choosen destination, which will be our final position
 
-		//generatePath(DFSpath);//CAN RE USE
+		//generating the commands list
+		vector<std::string> command_list = returnNextCommand(int_pos_grid_x,int_pos_grid_z);
+  		//print the commands here to see what is happening
+		cout << "the commands generated are" << endl;
+    	for (int i = 0; i < command_list.size(); i++)  {
+		cout << command_list[i];    
+		}
+    	cout << endl; 
 
-	
-		//DFS exploration completed
-		//need to visualize outputs of DFS first
+		//for now marking this as visited, since we do not want to risk sending commands
+		//but eventually we will get the tello to mark it visited
+		dfs_visited.at<int>(dfs_destinations[0].y, dfs_destinations[1].x) = 1;
+
 
 		cout<<"setting the mode to moving the tello now" << endl;
 		TELLO_MODE = moving;
@@ -445,21 +455,31 @@ void DFS(int init_x, int init_y){
         dfs_stack.pop();
 		//check if the popped node from the stack is unvisited, unoccupied
         int probability_current = (int)img_final.at<short>(pt.y, pt.x);
-         printf(" DFS exploring nodes for path %d, %d\n",int(pt.x),int(pt.y));
-         printf("DFS occupied %d\n",probability_current);
-         printf("DFS visited %d\n",dfs_visited.at<int>(pt.y, pt.x));
+        printf(" DFS exploring nodes for path %d, %d\n",int(pt.x),int(pt.y));
+        printf("DFS occupied %d\n",probability_current);
+        printf("DFS visited %d\n",dfs_visited.at<int>(pt.y, pt.x));
 		if (isValid(pt.x, pt.y) 
 				&& probability_current < MAX_OCCUPIED_PROB 
 				&& probability_current >= 0 
 				&& dfs_visited.at<int>(pt.y, pt.x) != 1)
 			{   
 				//these are the possible candidates as destinations
-				//add these to the destination list-who picks the destination?
 				cout << "DFS TRAVERSAL PRINTS  " <<    pt.x   <<  pt.y  << endl;
-				//add to the destination list
-				dfs_destinations.push_back(pt); 	
-				dfs_visited.at<int>(pt.y, pt.x) = 1;
-				//return path;
+				//check if these candidates are within x (threshold cm), if so mark it visited
+				//if not, add it to the destination list
+				if(within_distance(init_x,init_y,pt.x,pt.y))
+					dfs_visited.at<int>(pt.y, pt.x) = 1;
+				else
+					dfs_destinations.push_back(pt); 	
+				
+				//return once destination list has the first node
+				if(dfs_destinations.size() == 1)
+					{
+						cout << "dfs returning, destination found" << pt.x << "," << pt.y<< endl;
+						return;
+					}
+					
+
 				
 			}
 		
@@ -495,7 +515,7 @@ void DFS(int init_x, int init_y){
 	} 
 
 	
-	printf("DFS returning list of possible destinations\n");
+	
 }
 
 bool isValid(int valid_x, int valid_y) {
@@ -508,88 +528,124 @@ bool isValid(int valid_x, int valid_y) {
 	return true;
 }
 
-void printPointPath(vector<geometry_msgs::Point>& path) 
-{ 
-    int size = path.size(); 
-	cout << "Path of size " << size << ":" << endl; 
+//function that checks if two points on the grid are less than threshold cm apart, if so it returns true
+//if not, it returns false
 
-    for (int i = 0; i < size; i++)  {
-		cout << path[i].x << "," << path[i].y;    
-		int probability = (int)img_final.at<short>(path[i].y, path[i].x);
+bool within_distance(int init_x, int init_y, int final_x,int final_y){
+	//step 1: go from grid co ordinates to orb slam co ordinates
 
-		cout << " occ%: " << probability <<  endl;    
-	}
-    cout << endl; 
-} 
-
-void generatePath(vector<geometry_msgs::Point>& path) 
-{ 
-    int size = path.size();
-	printf("in gen path, the size is %d\n",size);
-
-	nav_msgs::Path local_goal_path;
-    for (int i = 0; i < size; i++) {
-		geometry_msgs::PoseStamped path_pose_stamped;
-		path_pose_stamped.header.frame_id = "map";
-		path_pose_stamped.header.stamp = ros::Time::now();
-		path_pose_stamped.header.seq = i;
-
-
-		path_pose_stamped.pose.position.x = float((path[i].x) / (norm_factor_x * scale_factor));
-		path_pose_stamped.pose.position.y = float((path[i].y) / (norm_factor_z * scale_factor));
-
-	
-		local_goal_path.poses.push_back(path_pose_stamped);
-	}
-
-
-	goal_path.header.frame_id = "map";
-	goal_path.header.stamp = ros::Time::now();
-	goal_path.header.seq = ++curr_path_id;
-	goal_path.poses = local_goal_path.poses;
-	pub_goal_path.publish(goal_path);
-	printf("in gen path, the size is %d\n",size);
-
-} 
-
-vector<std::string> returnNextCommand(vector<geometry_msgs::Point>& path)
-{
-	vector<std::string> command_list;
-	printf(" in return next command path size is %d\n",path.size());
-	cout << "path 0 elements are " << path[0].x << "," << path[0].y;
-	cout << "path 1 elements are" << path[1].x << "," << path[1].y; 
-	
-
-	int x_diff =  path[1].x - path[0].x;
-	int y_diff =  path[1].y - path[0].y;
+	int x_diff =  final_x - init_x;
+	int y_diff =  final_y- init_y;
 	
 	
-	//Euclidean distance for now
 	//distance must be in world co ordinates that is m and then converted to cm for tello
-	float world_x1 = (path[1].x) / (norm_factor_x * scale_factor); 
-	float world_y1 = (path[1].y) / (norm_factor_z * scale_factor);
-	float world_x0 = (path[0].x) / (norm_factor_x * scale_factor); 
-	float world_y0 = (path[0].y) / (norm_factor_z * scale_factor);
+	float world_x1 = (final_x) / (norm_factor_x * scale_factor); 
+	float world_y1 = (final_y) / (norm_factor_z * scale_factor);
+	float world_x0 = (init_x) / (norm_factor_x * scale_factor); 
+	float world_y0 = (init_y) / (norm_factor_z * scale_factor);
 	
 	int x_world_diff =  world_x1  - world_x0;
 	int y_world_diff =  world_y1 -  world_y0;
-	//need to debug why distances are always a zero
-	printf("x world diff is %d, y world diff is %d\n",x_world_diff,y_world_diff);
-	printf ("before conversion to int, the distance is  %f\n",sqrt(pow(x_world_diff,2) + pow(y_world_diff,2)));
-	
-	
-	int distance = int(sqrt(pow(x_world_diff,2) + pow(y_world_diff,2)));
-	printf ("after conversion to int, the distance is  %d\n",int(sqrt(pow(x_world_diff,2) + pow(y_world_diff,2))));
-	std::string dis = std::to_string(distance);
-	printf ("string distance is %s\n",dis);
+
+	cout << "x world diff is %d, y world diff is %d" << x_world_diff << y_world_diff << endl;	
+	float slam_distance = (sqrt(pow(x_world_diff,2) + pow(y_world_diff,2)));
+	cout << "slam distance in float is  %f" << sqrt(pow(x_world_diff,2) + pow(y_world_diff,2)) << endl;
+
+
+	//step 2: use scale to get distance from orb slam coordinates
+	double tello_distance = slam_distance/scale;
+	cout<<"tello distance between the two points is %f" << tello_distance << endl;
+
+	//step 3: compare to threshold and return true or false
+	if(tello_distance <= distance_threshold)
+		return true;
+	else 
+		return false;
+}
+
+
+// void printPointPath(vector<geometry_msgs::Point>& path) 
+// { 
+//     int size = path.size(); 
+// 	cout << "Path of size " << size << ":" << endl; 
+
+//     for (int i = 0; i < size; i++)  {
+// 		cout << path[i].x << "," << path[i].y;    
+// 		int probability = (int)img_final.at<short>(path[i].y, path[i].x);
+
+// 		cout << " occ%: " << probability <<  endl;    
+// 	}
+//     cout << endl; 
+// } 
+
+// void generatePath() 
+// { 
+//     int size = path.size();
+// 	printf("in gen path, the size is %d\n",size);
+
+// 	nav_msgs::Path local_goal_path;
+//     for (int i = 0; i < size; i++) {
+// 		geometry_msgs::PoseStamped path_pose_stamped;
+// 		path_pose_stamped.header.frame_id = "map";
+// 		path_pose_stamped.header.stamp = ros::Time::now();
+// 		path_pose_stamped.header.seq = i;
+
+
+// 		path_pose_stamped.pose.position.x = float((path[i].x) / (norm_factor_x * scale_factor));
+// 		path_pose_stamped.pose.position.y = float((path[i].y) / (norm_factor_z * scale_factor));
 
 	
+// 		local_goal_path.poses.push_back(path_pose_stamped);
+// 	}
+
+
+// 	goal_path.header.frame_id = "map";
+// 	goal_path.header.stamp = ros::Time::now();
+// 	goal_path.header.seq = ++curr_path_id;
+// 	goal_path.poses = local_goal_path.poses;
+// 	pub_goal_path.publish(goal_path);
+// 	printf("in gen path, the size is %d\n",size);
+
+// } 
+
+vector<std::string> returnNextCommand(int init_x, int init_y)
+{
+	vector<std::string> command_list;
+	cout << "starting from " << init_x << "," << init_x << endl;
+	cout << "moving to" << dfs_destinations[0].x << "," << dfs_destinations[0].y << endl;
+	int final_x = dfs_destinations[0].x;
+	int final_y = dfs_destinations[0].y;
+	
+
+	int x_diff =  final_x - init_x;
+	int y_diff =  final_y- init_y;
+	
+	
+	//distance must be in world co ordinates that is m and then converted to cm for tello
+	float world_x1 = (final_x) / (norm_factor_x * scale_factor); 
+	float world_y1 = (final_y) / (norm_factor_z * scale_factor);
+	float world_x0 = (init_x) / (norm_factor_x * scale_factor); 
+	float world_y0 = (init_y) / (norm_factor_z * scale_factor);
+	
+	int x_world_diff =  world_x1  - world_x0;
+	int y_world_diff =  world_y1 -  world_y0;
+
+	float slam_distance = (sqrt(pow(x_world_diff,2) + pow(y_world_diff,2)));
+
+
+	//step 2: use scale to get distance from orb slam coordinates
+	double tello_distance = slam_distance/scale;
+	cout<<"tello distance  to move between the two points is %f" << tello_distance << endl;
+
+	//cast it as an int, as tello only accepts int cm ?
+	int tello_distance_int = int(tello_distance);
+	
+
+	//what is more valid using current pose or  world co ordinates, I am not sure of this angle computation here ?
 
 	float pt_pos_x = curr_pose.pose.position.x;
 	float pt_pos_z = curr_pose.pose.position.y;
-
 	
-
 	double currentAngle = tf::getYaw(curr_pose.pose.orientation);
 
 
@@ -613,42 +669,23 @@ vector<std::string> returnNextCommand(vector<geometry_msgs::Point>& path)
 	std::string angle = std::to_string(AngleDiff);
 
 	cout << "angle_diff wrap: " << AngleDiff << endl; 
-	cout << "path size: " << path.size() << endl; 
 	
 	//Based on the angle difference, we rotate first
 	//then we go forward by x cm.
 	
 	//We return an array of 2 sets of strings with our commands
 	//Then in current pose call back we send both the commands.
-	if(path.size() < 2){
-		//hover or drift correct //no command as map not complete yet
-		command_list.push_back("still exploring");
-	  
-	}else{
-		//Rotate first
-		if (AngleDiff >= 90) {
-			command_list.push_back("ccw "+ angle);
-		} else if (AngleDiff <= -90) {
-			command_list.push_back("cw "+ angle);
-		}
-		//Just issue a forward after this, not really sure if this works, but lets try
-		//can we just use simple euclidean distance for now?
-		//the distance in world co ordinate is being the same for two nodes-too small
-		if(distance <= 0 ){
-			cout << " the distance to use is 0 so we move default 20 cm" << endl;
-			dis = "20" ; 
-		}
-		
-		command_list.push_back("forward " + dis); //smallest distance the tello can move is 20cm
-		//will need to do some error correction for the tello	
-	
+
+	//Rotate first
+	if (AngleDiff >= 90) {
+		command_list.push_back("ccw "+ angle);
+	} else if (AngleDiff <= -90) {
+		command_list.push_back("cw "+ angle);
 	}
 	
-
-
-	
+		
+	command_list.push_back("forward " + tello_distance_int); 
 	return command_list;
-
 	
 }
 
