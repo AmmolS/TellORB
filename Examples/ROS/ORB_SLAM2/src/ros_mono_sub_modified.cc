@@ -166,6 +166,7 @@ void printParams();
 enum tello_modes {scale_computing,dfs,moving};
 enum tello_modes TELLO_MODE = scale_computing;
 bool sent_command = false;
+bool dfs_started = false;
 std::stack<vector<geometry_msgs::Point> > dfs_stack;  // DFS stack this should be global
 cv::Mat dfs_visited; //this should be global too
 vector<geometry_msgs::Point> dfs_destinations;
@@ -343,6 +344,9 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 
 	if(TELLO_MODE == dfs){
 
+		//pause all callbacks
+		dfs_started = true;
+
 		float pt_pos_x = curr_pose.pose.position.x*scale_factor;
 		float pt_pos_z = curr_pose.pose.position.y*scale_factor;
 
@@ -366,6 +370,7 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 
 		cout<<"setting the mode to moving the tello now" << endl;
 		TELLO_MODE = moving;
+		dfs_started = false;
 		//need to publish this to tello script, so it know its time to move the tello
 		//once the script moves the tello, it will set TELLO_MODE back to dfs.
 
@@ -679,7 +684,7 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
 	grid_map_msg.info.map_load_time = ros::Time::now();
 
     /*ECE496 CODE ADDITIONS START HERE*/
-    if(TELLO_MODE == scale_computing || TELLO_MODE == moving) //we pause callbacks in dfs mode
+    if(TELLO_MODE == scale_computing || TELLO_MODE == moving || (!dfs_started)) //we pause callbacks in dfs mode
     {
         float kf_pos_grid_x_us = (kf_location.x - cloud_min_x) ;
 	    float kf_pos_grid_z_us = (kf_location.z - cloud_min_z) ;
@@ -710,6 +715,7 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
 			publishCommand(TELLO_MODE);
 			sent_command = true;
 		}
+		
     }
     /*ECE496 CODE ADDITIONS END HERE*/
 	
