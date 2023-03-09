@@ -25,7 +25,14 @@ import time, cv2
 import signal
 import logging
 import readchar
+from enum import Enum
+class Tello_Modes(Enum):
+    scale_computing = 1
+    dfs = 2
+    moving = 3
+    
 MAX_ANGLE = 90
+
 
 tello = Tello(skipAddressCheck=True)
 tello.LOGGER.setLevel(logging.INFO)
@@ -38,6 +45,8 @@ keepAlive.set()
 tello.streamon()
 frame_read = tello.get_frame_read()
 bridge = CvBridge()
+pub_move_complete = rospy.Publisher("tello/move_complete",int,queue_size=1)
+
 
 print("Tello Battery Level = {}%".format(tello.get_battery()))
 
@@ -50,16 +59,21 @@ class command_subscriber:
         # initialize the subscriber node
         # here we deal with messages of type String which are commands coming from subscriber.
         self.image_sub = rospy.Subscriber("tello/command", 
-                                          String, self.process_command)
+                                          int, self.process_command)
         print("Initializing the command subscriber!")
   
-    def process_command(self, String):
+    def process_command(self, data):
         
         # now print what mono sub has sent.
         #rospy.get_caller_id must return command_subscriber....
         #http://wiki.ros.org/rospy_tutorials/Tutorials/WritingPublisherSubscriber
-        rospy.loginfo(rospy.get_caller_id() + "The commands in coming are %s",
-                      String)
+        rospy.loginfo(rospy.get_caller_id() + "The tello mode is %d",
+                      data.data)
+        if(data.data == Tello_Modes.moving):
+            print("received tello mode as moving, setting mode back to dfs")
+            pub_move_complete.publish(Tello_Modes.dfs)
+
+        
         
         # To handle commands
         # check if tello is busy (as a backup, in case for some reason ros_mono_sub/pub doesn't realize it is busy)

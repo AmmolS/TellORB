@@ -14,6 +14,7 @@
 #include "nav_msgs/OccupancyGrid.h"
 #include "nav_msgs/Path.h"
 #include "std_msgs/String.h"
+#include <std_msgs/Int32.h>
 
 #include "std_msgs/Bool.h"
 
@@ -135,7 +136,7 @@ bool isValid(int valid_x, int valid_y);
 vector<std::string> returnNextCommand(vector<geometry_msgs::Point>& path);
 void generatePath(vector<geometry_msgs::Point>& path);
 void printPointPath(vector<geometry_msgs::Point>& path);
-void publishCommand(std::string command);
+void publishCommand(int tello_mode);
 ros::Time next_command_time;
 
 // ORBSLAM functions
@@ -164,6 +165,7 @@ void printParams();
 //our globals for dfs stack and visited list initialized here
 enum tello_modes {scale_computing,dfs,moving};
 enum tello_modes TELLO_MODE = scale_computing;
+bool sent_command = false;
 std::stack<vector<geometry_msgs::Point> > dfs_stack;  // DFS stack this should be global
 cv::Mat dfs_visited; //this should be global too
 vector<geometry_msgs::Point> dfs_destinations;
@@ -174,7 +176,7 @@ double scale = 1;
 geometry_msgs::PoseWithCovariance initialPose;
 geometry_msgs::PoseWithCovariance newPose;
 void initializeScaleCallback(const std_msgs::Bool::ConstPtr& value);
-
+void telloMoveComplete(const std_msgs::Bool::ConstPtr& value);
 
 int main(int argc, char **argv){
 	ros::init(argc, argv, "Monosub");
@@ -260,6 +262,8 @@ int main(int argc, char **argv){
 
 	//scale stuff
 	ros::Subscriber sub_tello_initialize_scale = nodeHandler.subscribe("tello/initialize_scale", 1000, initializeScaleCallback);
+	//tello completing move code
+	ros::Subscriber sub_tello_move_complete = nodeHandler.subscribe("tello/move_complete",1000,telloMoveComplete);
 
 	pub_grid_map = nodeHandler.advertise<nav_msgs::OccupancyGrid>("map", 1000);
 	pub_grid_map_metadata = nodeHandler.advertise<nav_msgs::MapMetaData>("map_metadata", 1000);
@@ -646,7 +650,7 @@ vector<std::string> returnNextCommand(vector<geometry_msgs::Point>& path)
 //communication to tello from here
 //publishing commands/mode from here
 void publishCommand(int tello_mode){
-	std_msgs::int msg;
+	std_msgs::Int32 msg;
 	msg.data = tello_mode;
 	cout << "Transmitting tello mode: " << tello_mode << endl;
 	pub_command.publish(msg);
@@ -702,8 +706,9 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
 
 	    pub_current_pose.publish(curr_pose_stamped);//used by current pose call back
 		//also publish dummy commands in moving mode to make connection to tello script
-		if(TELLO_MODE == moving){
+		if(TELLO_MODE == moving && (!sent_command)){
 			publishCommand(TELLO_MODE);
+			sent_command = true;
 		}
     }
     /*ECE496 CODE ADDITIONS END HERE*/
@@ -744,6 +749,13 @@ void initializeScaleCallback(const std_msgs::Bool::ConstPtr& value){
 	}
 	got_tello_initial_pose = true;
 }
+
+void telloMoveComplete(const std_msgs::Bool::ConstPtr& value){
+	cout << "tello has completed moving, setting the mode back to dfs" << endl;
+	sent_command = false;
+	TELLO_MODE = dfs;
+}
+
 
 
 void getMixMax(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose,
