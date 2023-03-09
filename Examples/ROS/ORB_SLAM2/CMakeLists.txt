@@ -69,6 +69,11 @@ ${PROJECT_SOURCE_DIR}/../../../lib/libORB_SLAM2.so
 rosbuild_add_executable(Monosub
 src/ros_mono_sub.cc
 )
+rosbuild_add_executable(MonosubModified
+src/ros_mono_sub_modified.cc
+)
+
+
 find_package(FLANN)
 if(FLANN_FOUND)
 include_directories(${FLANN_INCLUDE_DIRS})
@@ -81,7 +86,9 @@ endif()
 target_link_libraries(Monosub
 ${LIBS}
 )
-
+target_link_libraries(MonosubModified
+${LIBS}
+)
 
 # Node for monocular camera
 rosbuild_add_executable(Mono

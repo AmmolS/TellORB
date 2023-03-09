@@ -15,6 +15,9 @@
 #include "nav_msgs/Path.h"
 #include "std_msgs/String.h"
 
+#include "std_msgs/Bool.h"
+
+
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
@@ -26,6 +29,7 @@
 #include <opencv2/highgui/highgui_c.h>
 #include <opencv2/highgui/highgui.hpp>
 #include <Converter.h>
+
 
 // #include <boost/algorithm/string/split.hpp>
 
@@ -158,10 +162,19 @@ void printParams();
 
 
 //our globals for dfs stack and visited list initialized here
-bool tello_move_completed = true;
+enum tello_modes {scale_computing,dfs,moving};
+enum tello_modes TELLO_MODE = scale_computing;
 std::stack<vector<geometry_msgs::Point> > dfs_stack;  // DFS stack this should be global
 cv::Mat dfs_visited; //this should be global too
 vector<geometry_msgs::Point> dfs_destinations;
+
+//scale stuff
+bool got_tello_initial_pose = false;
+double scale = 1;
+geometry_msgs::PoseWithCovariance initialPose;
+geometry_msgs::PoseWithCovariance newPose;
+void initializeScaleCallback(const std_msgs::Bool::ConstPtr& value);
+
 
 int main(int argc, char **argv){
 	ros::init(argc, argv, "Monosub");
@@ -245,6 +258,9 @@ int main(int argc, char **argv){
 	ros::Subscriber sub_current_pose = nodeHandler.subscribe("robot_pose", 1000, currentPoseCallback);
 	ros::Subscriber sub_all_kf_and_pts = nodeHandler.subscribe("all_kf_and_pts", 1000, loopClosingCallback);
 
+	//scale stuff
+	ros::Subscriber sub_tello_initialize_scale = nodeHandler.subscribe("tello/initialize_scale", 1000, initializeScaleCallback);
+
 	pub_grid_map = nodeHandler.advertise<nav_msgs::OccupancyGrid>("map", 1000);
 	pub_grid_map_metadata = nodeHandler.advertise<nav_msgs::MapMetaData>("map_metadata", 1000);
 	pub_current_pose = nodeHandler.advertise<geometry_msgs::PoseWithCovarianceStamped>("robot_pose", 1000);
@@ -316,33 +332,40 @@ void saveMap(unsigned int id) {
 }
 
 void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_pose) {
-	tello_move_completed = false ;// pause all call backs until we are done executing
+	
 	curr_pose = current_pose.pose;
 
-	float pt_pos_x = curr_pose.pose.position.x*scale_factor;
-	float pt_pos_z = curr_pose.pose.position.y*scale_factor;
+	//only when mode is dfs, we run dfs, else we just set the global curr pose and exit
 
-	int_pos_grid_x = int(floor((pt_pos_x) * norm_factor_x));
-	int_pos_grid_z = int(floor((pt_pos_z) * norm_factor_z));
+	if(TELLO_MODE == dfs){
 
-	cout << "Current index: " << int_pos_grid_x << ", " << int_pos_grid_z << endl;
-	double currentAngle = tf::getYaw(curr_pose.pose.orientation);
-	cout << "Current Angle: "<< currentAngle;
+		float pt_pos_x = curr_pose.pose.position.x*scale_factor;
+		float pt_pos_z = curr_pose.pose.position.y*scale_factor;
 
-	/*ECE496 CODE ADDITIONS START HERE*/
-	DFS(int_pos_grid_x, int_pos_grid_z); //This dfs just populates a global destination list visulaized in green
+		int_pos_grid_x = int(floor((pt_pos_x) * norm_factor_x));
+		int_pos_grid_z = int(floor((pt_pos_z) * norm_factor_z));
 
-	//printPointPath(DFSpath);//CAN RE USE
+		cout << "Current index: " << int_pos_grid_x << ", " << int_pos_grid_z << endl;
+		double currentAngle = tf::getYaw(curr_pose.pose.orientation);
+		cout << "Current Angle: "<< currentAngle;
 
-	//generatePath(DFSpath);//CAN RE USE
+		/*ECE496 CODE ADDITIONS START HERE*/
+		DFS(int_pos_grid_x, int_pos_grid_z); //This dfs just populates a global destination list visulaized in green
 
-   
-	//DFS exploration completed
-	//need to visualize outputs of DFS first
+		//printPointPath(DFSpath);//CAN RE USE
 
-	//once indication of successful navigation received, set the flag, for future call backs
-	tello_move_completed = true;
-    
+		//generatePath(DFSpath);//CAN RE USE
+
+	
+		//DFS exploration completed
+		//need to visualize outputs of DFS first
+
+		cout<<"setting the mode to moving the tello now" << endl;
+		TELLO_MODE = moving;
+		//need to publish this to tello script, so it know its time to move the tello
+		//once the script moves the tello, it will set TELLO_MODE back to dfs.
+
+	}    
 
   
 
@@ -409,6 +432,7 @@ void DFS(int init_x, int init_y){
 	{ 	
         dfs_path = dfs_stack.top();
 		geometry_msgs::Point pt = dfs_path[dfs_path.size() - 1]; //getting the last element on the path?
+		cout<<"size of dfs path is" <<dfs_path.size();
         dfs_stack.pop();
 		//check if the popped node from the stack is unvisited, unoccupied
         int probability_current = (int)img_final.at<short>(pt.y, pt.x);
@@ -619,6 +643,17 @@ vector<std::string> returnNextCommand(vector<geometry_msgs::Point>& path)
 	
 }
 
+//communication to tello from here
+//publishing commands/mode from here
+void publishCommand(int tello_mode){
+	std_msgs::int msg;
+	msg.data = tello_mode;
+	cout << "Transmitting tello mode: " << tello_mode << endl;
+	pub_command.publish(msg);
+
+}
+
+
 void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
 	
 	if (loop_closure_being_processed){ return; }
@@ -640,7 +675,7 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
 	grid_map_msg.info.map_load_time = ros::Time::now();
 
     /*ECE496 CODE ADDITIONS START HERE*/
-    if(tello_move_completed)
+    if(TELLO_MODE == scale_computing || TELLO_MODE == moving) //we pause callbacks in dfs mode
     {
         float kf_pos_grid_x_us = (kf_location.x - cloud_min_x) ;
 	    float kf_pos_grid_z_us = (kf_location.z - cloud_min_z) ;
@@ -666,6 +701,10 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
 	    curr_pose_stamped.pose = curr_pose;
 
 	    pub_current_pose.publish(curr_pose_stamped);//used by current pose call back
+		//also publish dummy commands in moving mode to make connection to tello script
+		if(TELLO_MODE == moving){
+			publishCommand(TELLO_MODE);
+		}
     }
     /*ECE496 CODE ADDITIONS END HERE*/
 	
@@ -692,6 +731,20 @@ void loopClosingCallback(const geometry_msgs::PoseArray::ConstPtr& all_kf_and_pt
 	resetGridMap(all_kf_and_pts);
 	loop_closure_being_processed = false;
 }
+
+
+void initializeScaleCallback(const std_msgs::Bool::ConstPtr& value){
+	initialPose = curr_pose;
+	if(got_tello_initial_pose){
+		newPose = curr_pose;
+		scale = (sqrt(pow((newPose.pose.position.x - initialPose.pose.position.x), 2) + pow((newPose.pose.position.y - initialPose.pose.position.y), 2)))/20;
+		std::cout << "Calculated scale: " << scale << std::endl;
+		std::cout<<"setting the mode to dfs now" << endl;
+		TELLO_MODE = dfs;
+	}
+	got_tello_initial_pose = true;
+}
+
 
 void getMixMax(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose,
 	geometry_msgs::Point& min_pt, geometry_msgs::Point& max_pt) {
