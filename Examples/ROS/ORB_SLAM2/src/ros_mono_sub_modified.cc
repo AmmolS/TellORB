@@ -366,13 +366,13 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 
 		//generating the commands list
 		if(dfs_destinations.size() !=  0){
-		vector<std::string> command_list = returnNextCommand(int_pos_grid_x,int_pos_grid_z);
-  		//print the commands here to see what is happening
-		cout << "the commands generated are" << endl;
-    	for (int i = 0; i < command_list.size(); i++)  {
-		cout << command_list[i];    
-		}
-    	cout << endl; 
+		// vector<std::string> command_list = returnNextCommand(int_pos_grid_x,int_pos_grid_z);
+  		// //print the commands here to see what is happening
+		// cout << "the commands generated are" << endl;
+    	// for (int i = 0; i < command_list.size(); i++)  {
+		// cout << command_list[i];    
+		// }
+    	// cout << endl; 
 
 		//for now marking this as visited, since we do not want to risk sending commands
 		//but eventually we will get the tello to mark it visited
@@ -534,29 +534,24 @@ bool isValid(int valid_x, int valid_y) {
 //if not, it returns false
 
 bool within_distance(int init_x, int init_y, int final_x,int final_y){
-	//step 1: go from grid co ordinates to orb slam co ordinates
-
-	int x_diff =  final_x - init_x;
-	int y_diff =  final_y- init_y;
-	
 	
 	//distance must be in world co ordinates that is m and then converted to cm for tello
-	float world_x1 = (final_x) / (norm_factor_x * scale_factor); 
-	float world_y1 = (final_y) / (norm_factor_z * scale_factor);
-	float world_x0 = (init_x) / (norm_factor_x * scale_factor); 
-	float world_y0 = (init_y) / (norm_factor_z * scale_factor);
+	double world_x1 = (final_x) / (norm_factor_x * scale_factor); 
+	double world_y1 = (final_y) / (norm_factor_z * scale_factor);
+	double world_x0 = (init_x) / (norm_factor_x * scale_factor); 
+	double world_y0 = (init_y) / (norm_factor_z * scale_factor);
 	
-	int x_world_diff =  world_x1  - world_x0;
-	int y_world_diff =  world_y1 -  world_y0;
+	double x_world_diff =  world_x1  - world_x0;
+	double y_world_diff =  world_y1 -  world_y0;
 
-	cout << "x world diff is %d, y world diff is %d" << x_world_diff << y_world_diff << endl;	
-	float slam_distance = (sqrt(pow(x_world_diff,2) + pow(y_world_diff,2)));
-	cout << "slam distance in float is  %f" << sqrt(pow(x_world_diff,2) + pow(y_world_diff,2)) << endl;
+	cout << "x world diff is " << x_world_diff << ", y world diff is " << y_world_diff << endl;	
+	double slam_distance = (sqrt(pow(x_world_diff,2) + pow(y_world_diff,2)));
+	cout << "slam distance in float is " << sqrt(pow(x_world_diff,2) + pow(y_world_diff,2)) << endl;
 
 
 	//step 2: use scale to get distance from orb slam coordinates
 	double tello_distance = slam_distance/scale;
-	cout<<"tello distance between the two points is %f" << tello_distance << endl;
+	cout<<"tello distance between the two points is " << tello_distance << endl;
 
 	//step 3: compare to threshold and return true or false
 	if(tello_distance <= distance_threshold)
@@ -784,14 +779,22 @@ void loopClosingCallback(const geometry_msgs::PoseArray::ConstPtr& all_kf_and_pt
 
 
 void initializeScaleCallback(const std_msgs::Bool::ConstPtr& value){
-	initialPose = curr_pose;
+	
 	if(got_tello_initial_pose){
 		newPose = curr_pose;
-		scale = (sqrt(pow((newPose.pose.position.x - initialPose.pose.position.x), 2) + pow((newPose.pose.position.y - initialPose.pose.position.y), 2)))/20;
+		std::cout << "newPose x: " << newPose.pose.position.x << std::endl;
+		std::cout << "newPose y: " << newPose.pose.position.y << std::endl;
+		scale = (sqrt(pow((newPose.pose.position.x - initialPose.pose.position.x), 2) + pow((newPose.pose.position.y - initialPose.pose.position.y), 2)))/100;
 		std::cout << "Calculated scale: " << scale << std::endl;
 		std::cout<<"setting the mode to dfs now" << endl;
 		TELLO_MODE = dfs;
 	}
+	else{
+		initialPose = curr_pose;
+		std::cout << "initialPose x: " << initialPose.pose.position.x << std::endl;
+		std::cout << "initialPose y: " << initialPose.pose.position.y << std::endl;
+	}
+	
 	got_tello_initial_pose = true;
 }
 

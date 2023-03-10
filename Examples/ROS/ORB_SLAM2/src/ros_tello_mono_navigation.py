@@ -27,9 +27,9 @@ import logging
 import readchar
 from enum import Enum
 class Tello_Modes(Enum):
-    scale_computing = 1
-    dfs = 2
-    moving = 3
+    scale_computing = 0
+    dfs = 1
+    moving = 2
     
 MAX_ANGLE = 90
 
@@ -69,9 +69,9 @@ class command_subscriber:
         #http://wiki.ros.org/rospy_tutorials/Tutorials/WritingPublisherSubscriber
         rospy.loginfo(rospy.get_caller_id() + "The tello mode is %d",
                       data.data)
-        if(data.data == Tello_Modes.moving):
+        if(data.data == 2):
             print("received tello mode as moving, setting mode back to dfs")
-            pub_move_complete.publish(Tello_Modes.dfs)
+            pub_move_complete.publish(1)
 
         
         
