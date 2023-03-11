@@ -376,7 +376,9 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 
 		//for now marking this as visited, since we do not want to risk sending commands
 		//but eventually we will get the tello to mark it visited
-		dfs_visited.at<int>(dfs_destinations[0].y, dfs_destinations[1].x) = 1;
+		cout << "dfs destination size is" << dfs_destinations.size();
+		dfs_visited.at<int>(dfs_destinations[0].y, dfs_destinations[0].x) = 1;
+
 		}
 
 
@@ -1142,11 +1144,14 @@ void showGridMap(unsigned int id) {
 		cv::Scalar destination_color(0,255,0);//color of dfs destinations 
 		for (int i = 0; i < dfs_destinations.size(); i++)  {
 				cv::circle(grid_map_rgb, cv::Point((dfs_destinations[i].x)*resize_factor, (dfs_destinations[i].y)*resize_factor),
-							1, destination_color, -1);
+							3, destination_color, -1);
 		}
-		cv::Scalar line_Color(255, 0, 0);//Color of the circle
-		cv::circle(grid_map_rgb, cv::Point(kf_pos_grid_x*resize_factor, kf_pos_grid_z*resize_factor),
-			3, line_Color, -1);
+		//once we visualize dfs_destinations, we need to clear it!
+		dfs_destinations.clear();
+		
+		// cv::Scalar line_Color(255, 0, 0);//Color of the circle
+		// cv::circle(grid_map_rgb, cv::Point(kf_pos_grid_x*resize_factor, kf_pos_grid_z*resize_factor),
+		// 	3, line_Color, -1);
 		
 		cv::imshow("grid_map_thresh_resized_rgb", grid_map_rgb);
 	}
