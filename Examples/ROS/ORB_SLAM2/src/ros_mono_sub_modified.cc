@@ -555,8 +555,32 @@ bool within_distance(int init_x, int init_y, int final_x,int final_y){
 	double tello_distance = slam_distance/scale;
 	cout<<"tello distance between the two points is " << tello_distance << endl;
 
-	//step 3: compare to threshold and return true or false
-	if(tello_distance <= distance_threshold)
+	//step 3: determine how many degrees drone would turn. Angle is believed to be from cartesian angle between x and y axes
+	double currentAngle = tf::getYaw(curr_pose.pose.orientation);
+
+	double desiredAngle = atan(world_y1/world_x1);
+
+
+	//not sure why they use pi/2 angles
+	// if(y_diff == 1){
+	// 	desiredAngle = M_PI / 2;
+	// } 
+	// else if(x_diff == 1){
+	// 	desiredAngle = 0;
+	// } else if(x_diff == -1){
+	// 	desiredAngle = M_PI;
+	// } else if(y_diff == -1){
+	// 	desiredAngle = - M_PI / 2;
+	// }
+
+	//get angle difference in degrees as an integer. CCW angle is positive 
+	int AngleDiff = int((desiredAngle - currentAngle) * 180 / M_PI);
+	
+	//convert angle difference to -180 to +180 degree range
+	AngleDiff -= 360. * std::floor((AngleDiff + 180.) * (1. / 360.));
+
+	//step 4: compare to threshold and determine whether point is ahead of drone, and return true or false
+	if(tello_distance <= distance_threshold && abs(AngleDiff) <= 90)
 		return true;
 	else 
 		return false;
