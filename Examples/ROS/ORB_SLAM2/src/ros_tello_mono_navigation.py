@@ -3,7 +3,7 @@
 import rospy
 
 from json import load
-from std_msgs.msg import Empty, UInt8, Bool, UInt32
+from std_msgs.msg import Empty, UInt8, Bool, UInt32, String
 from std_msgs.msg import UInt8MultiArray
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
@@ -46,6 +46,7 @@ tello.streamon()
 frame_read = tello.get_frame_read()
 bridge = CvBridge()
 pub_move_complete = rospy.Publisher("tello/move_complete",UInt32,queue_size=1)
+commands_array=[]
 
 
 print("Tello Battery Level = {}%".format(tello.get_battery()))
@@ -59,7 +60,7 @@ class command_subscriber:
         # initialize the subscriber node
         # here we deal with messages of type String which are commands coming from subscriber.
         self.image_sub = rospy.Subscriber("tello/command", 
-                                          UInt32, self.process_command)
+                                          String, self.process_command)
         print("Initializing the command subscriber!")
   
     def process_command(self, data):
@@ -67,14 +68,15 @@ class command_subscriber:
         # now print what mono sub has sent.
         #rospy.get_caller_id must return command_subscriber....
         #http://wiki.ros.org/rospy_tutorials/Tutorials/WritingPublisherSubscriber
-        rospy.loginfo(rospy.get_caller_id() + "The tello mode is %d",
+        rospy.loginfo(rospy.get_caller_id() + "Received command %s",
                       data.data)
-        if(data.data == 2):
-            print("received tello mode as moving, setting mode back to dfs")
+        #buffer commands till done is received, don't set mode until done is received
+        if(data.data == "done"):
+            print("received tello commands, setting mode back to dfs")
             pub_move_complete.publish(1)
+        else:
+            commands_array.append(data.data)
 
-        
-        
         # To handle commands
         # check if tello is busy (as a backup, in case for some reason ros_mono_sub/pub doesn't realize it is busy)
         # Use switch case to determine which command it is
