@@ -172,6 +172,8 @@ std::stack<vector<geometry_msgs::Point> > dfs_stack;  // DFS stack this should b
 cv::Mat dfs_visited; //this should be global too
 double distance_threshold = 30;
 vector<geometry_msgs::Point> dfs_destinations;
+vector<geometry_msgs::Point> dfs_destinations_visual;
+
 
 //scale stuff
 bool got_tello_initial_pose = false;
@@ -366,13 +368,13 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 
 		//generating the commands list
 		if(dfs_destinations.size() !=  0){
-		// vector<std::string> command_list = returnNextCommand(int_pos_grid_x,int_pos_grid_z);
-  		// //print the commands here to see what is happening
-		// cout << "the commands generated are" << endl;
-    	// for (int i = 0; i < command_list.size(); i++)  {
-		// cout << command_list[i];    
-		// }
-    	// cout << endl; 
+		vector<std::string> command_list = returnNextCommand(int_pos_grid_x,int_pos_grid_z);
+  		//print the commands here to see what is happening
+		cout << "the commands generated are" << endl;
+    	for (int i = 0; i < command_list.size(); i++)  {
+		cout << command_list[i];    
+		}
+    	cout << endl; 
 
 		//for now marking this as visited, since we do not want to risk sending commands
 		//but eventually we will get the tello to mark it visited
@@ -385,6 +387,8 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 		cout<<"setting the mode to moving the tello now" << endl;
 		TELLO_MODE = moving;
 		dfs_started = false;
+		//clearing the destination list once we successfully generate a command
+		dfs_destinations.clear();
 		//need to publish this to tello script, so it know its time to move the tello
 		//once the script moves the tello, it will set TELLO_MODE back to dfs.
 
@@ -480,6 +484,8 @@ void DFS(int init_x, int init_y){
 				if(dfs_destinations.size() == 1)
 					{
 						cout << "dfs returning, destination found" << pt.x << "," << pt.y<< endl;
+						//add to a temp array for visualization !
+						dfs_destinations_visual.push_back(pt);
 						return;
 					}
 					
@@ -557,8 +563,10 @@ bool within_distance(int init_x, int init_y, int final_x,int final_y){
 
 	//step 3: determine how many degrees drone would turn. Angle is believed to be from cartesian angle between x and y axes
 	double currentAngle = tf::getYaw(curr_pose.pose.orientation);
+	cout << "the current angle is" << currentAngle << endl;
 
 	double desiredAngle = atan(world_y1/world_x1);
+	cout<<"the desired angle is" << desiredAngle << endl;
 
 
 	//not sure why they use pi/2 angles
@@ -575,9 +583,11 @@ bool within_distance(int init_x, int init_y, int final_x,int final_y){
 
 	//get angle difference in degrees as an integer. CCW angle is positive 
 	int AngleDiff = int((desiredAngle - currentAngle) * 180 / M_PI);
+	cout << "The angle difference is" << AngleDiff << endl;
 	
 	//convert angle difference to -180 to +180 degree range
 	AngleDiff -= 360. * std::floor((AngleDiff + 180.) * (1. / 360.));
+	cout << "The angle difference after conversion is" << AngleDiff << endl;
 
 	//step 4: compare to threshold and determine whether point is ahead of drone, and return true or false
 	if(tello_distance <= distance_threshold && abs(AngleDiff) <= 90)
@@ -586,50 +596,6 @@ bool within_distance(int init_x, int init_y, int final_x,int final_y){
 		return false;
 }
 
-
-// void printPointPath(vector<geometry_msgs::Point>& path) 
-// { 
-//     int size = path.size(); 
-// 	cout << "Path of size " << size << ":" << endl; 
-
-//     for (int i = 0; i < size; i++)  {
-// 		cout << path[i].x << "," << path[i].y;    
-// 		int probability = (int)img_final.at<short>(path[i].y, path[i].x);
-
-// 		cout << " occ%: " << probability <<  endl;    
-// 	}
-//     cout << endl; 
-// } 
-
-// void generatePath() 
-// { 
-//     int size = path.size();
-// 	printf("in gen path, the size is %d\n",size);
-
-// 	nav_msgs::Path local_goal_path;
-//     for (int i = 0; i < size; i++) {
-// 		geometry_msgs::PoseStamped path_pose_stamped;
-// 		path_pose_stamped.header.frame_id = "map";
-// 		path_pose_stamped.header.stamp = ros::Time::now();
-// 		path_pose_stamped.header.seq = i;
-
-
-// 		path_pose_stamped.pose.position.x = float((path[i].x) / (norm_factor_x * scale_factor));
-// 		path_pose_stamped.pose.position.y = float((path[i].y) / (norm_factor_z * scale_factor));
-
-	
-// 		local_goal_path.poses.push_back(path_pose_stamped);
-// 	}
-
-
-// 	goal_path.header.frame_id = "map";
-// 	goal_path.header.stamp = ros::Time::now();
-// 	goal_path.header.seq = ++curr_path_id;
-// 	goal_path.poses = local_goal_path.poses;
-// 	pub_goal_path.publish(goal_path);
-// 	printf("in gen path, the size is %d\n",size);
-
-// } 
 
 vector<std::string> returnNextCommand(int init_x, int init_y)
 {
@@ -640,58 +606,60 @@ vector<std::string> returnNextCommand(int init_x, int init_y)
 	int final_y = dfs_destinations[0].y;
 	
 
-	int x_diff =  final_x - init_x;
-	int y_diff =  final_y- init_y;
-	
-	
 	//distance must be in world co ordinates that is m and then converted to cm for tello
-	float world_x1 = (final_x) / (norm_factor_x * scale_factor); 
-	float world_y1 = (final_y) / (norm_factor_z * scale_factor);
-	float world_x0 = (init_x) / (norm_factor_x * scale_factor); 
-	float world_y0 = (init_y) / (norm_factor_z * scale_factor);
+	double world_x1 = (final_x) / (norm_factor_x * scale_factor); 
+	double world_y1 = (final_y) / (norm_factor_z * scale_factor);
+	double world_x0 = (init_x) / (norm_factor_x * scale_factor); 
+	double world_y0 = (init_y) / (norm_factor_z * scale_factor);
 	
-	int x_world_diff =  world_x1  - world_x0;
-	int y_world_diff =  world_y1 -  world_y0;
+	double x_world_diff =  world_x1  - world_x0;
+	double y_world_diff =  world_y1 -  world_y0;
 
-	float slam_distance = (sqrt(pow(x_world_diff,2) + pow(y_world_diff,2)));
+	cout << "x world diff is " << x_world_diff << ", y world diff is " << y_world_diff << endl;	
+	double slam_distance = (sqrt(pow(x_world_diff,2) + pow(y_world_diff,2)));
+	cout << "slam distance in float is " << sqrt(pow(x_world_diff,2) + pow(y_world_diff,2)) << endl;
 
 
 	//step 2: use scale to get distance from orb slam coordinates
 	double tello_distance = slam_distance/scale;
-	cout<<"tello distance  to move between the two points is %f" << tello_distance << endl;
+	cout<<"tello distance between the two points is " << tello_distance << endl;
 
-	//cast it as an int, as tello only accepts int cm ?
-	int tello_distance_int = int(tello_distance);
-	
-
-	//what is more valid using current pose or  world co ordinates, I am not sure of this angle computation here ?
-
-	float pt_pos_x = curr_pose.pose.position.x;
-	float pt_pos_z = curr_pose.pose.position.y;
-	
+	//step 3: determine how many degrees drone would turn. Angle is believed to be from cartesian angle between x and y axes
 	double currentAngle = tf::getYaw(curr_pose.pose.orientation);
+	cout << "the current angle is" << currentAngle << endl;
 
+	double desiredAngle = atan(world_y1/world_x1);
+	cout<<"the desired angle is" << desiredAngle << endl;
 
-	double desiredAngle = currentAngle;
-	if(y_diff == 1){
-		desiredAngle = M_PI / 2;
-	} 
-	else if(x_diff == 1){
-		desiredAngle = 0;
-	} else if(x_diff == -1){
-		desiredAngle = M_PI;
-	} else if(y_diff == -1){
-		desiredAngle = - M_PI / 2;
-	}
-
-	// CCW angle is positive 
+	//get angle difference in degrees as an integer. CCW angle is positive 
 	int AngleDiff = int((desiredAngle - currentAngle) * 180 / M_PI);
-
-
+	cout << "The angle difference is" << AngleDiff << endl;
+	
+	//convert angle difference to -180 to +180 degree range
 	AngleDiff -= 360. * std::floor((AngleDiff + 180.) * (1. / 360.));
-	std::string angle = std::to_string(AngleDiff);
+	cout << "The angle difference after conversion is" << AngleDiff << endl;
 
-	cout << "angle_diff wrap: " << AngleDiff << endl; 
+
+	// double desiredAngle = currentAngle;
+	// if(y_diff == 1){
+	// 	desiredAngle = M_PI / 2;
+	// } 
+	// else if(x_diff == 1){
+	// 	desiredAngle = 0;
+	// } else if(x_diff == -1){
+	// 	desiredAngle = M_PI;
+	// } else if(y_diff == -1){
+	// 	desiredAngle = - M_PI / 2;
+	// }
+
+	// // CCW angle is positive 
+	// int AngleDiff = int((desiredAngle - currentAngle) * 180 / M_PI);
+
+
+	// AngleDiff -= 360. * std::floor((AngleDiff + 180.) * (1. / 360.));
+	// std::string angle = std::to_string(AngleDiff);
+
+	// cout << "angle_diff wrap: " << AngleDiff << endl; 
 	
 	//Based on the angle difference, we rotate first
 	//then we go forward by x cm.
@@ -700,14 +668,16 @@ vector<std::string> returnNextCommand(int init_x, int init_y)
 	//Then in current pose call back we send both the commands.
 
 	//Rotate first
-	if (AngleDiff >= 90) {
-		command_list.push_back("ccw "+ angle);
-	} else if (AngleDiff <= -90) {
-		command_list.push_back("cw "+ angle);
+	//convert to string based, for printing now 
+	std::string angle = std::to_string(AngleDiff);
+	if (AngleDiff > 0) {
+		command_list.push_back("ccw "+ angle + "");
+	} else if (AngleDiff < 0) {
+		command_list.push_back("cw "+ angle + "");
 	}
 	
 		
-	command_list.push_back("forward " + tello_distance_int); 
+	command_list.push_back("forward " + std::to_string(tello_distance) + ""); 
 	return command_list;
 	
 }
@@ -1166,16 +1136,14 @@ void showGridMap(unsigned int id) {
 	if (show_camera_location) {
 		cv::cvtColor(grid_map_thresh_resized, grid_map_rgb, cv::COLOR_GRAY2BGR);
 		cv::Scalar destination_color(0,255,0);//color of dfs destinations 
-		for (int i = 0; i < dfs_destinations.size(); i++)  {
-				cv::circle(grid_map_rgb, cv::Point((dfs_destinations[i].x)*resize_factor, (dfs_destinations[i].y)*resize_factor),
+		for (int i = 0; i < dfs_destinations_visual.size(); i++)  {
+				cv::circle(grid_map_rgb, cv::Point((dfs_destinations_visual[i].x)*resize_factor, (dfs_destinations_visual[i].y)*resize_factor),
 							3, destination_color, -1);
 		}
-		//once we visualize dfs_destinations, we need to clear it!
-		dfs_destinations.clear();
 		
-		// cv::Scalar line_Color(255, 0, 0);//Color of the circle
-		// cv::circle(grid_map_rgb, cv::Point(kf_pos_grid_x*resize_factor, kf_pos_grid_z*resize_factor),
-		// 	3, line_Color, -1);
+		cv::Scalar line_Color(255, 0, 0);//Color of the circle
+		cv::circle(grid_map_rgb, cv::Point(kf_pos_grid_x*resize_factor, kf_pos_grid_z*resize_factor),
+					3, line_Color, -1);
 		
 		cv::imshow("grid_map_thresh_resized_rgb", grid_map_rgb);
 	}
