@@ -47,6 +47,7 @@ frame_read = tello.get_frame_read()
 bridge = CvBridge()
 pub_move_complete = rospy.Publisher("tello/move_complete",UInt32,queue_size=1)
 commands_array=[]
+all_commands_received = False
 
 
 print("Tello Battery Level = {}%".format(tello.get_battery()))
@@ -72,8 +73,13 @@ class command_subscriber:
                       data.data)
         #buffer commands till done is received, don't set mode until done is received
         if(data.data == "done"):
-            print("received tello commands, setting mode back to dfs")
-            pub_move_complete.publish(1)
+            print("received tello commands, ready to execute")
+            if(len(commands_array) != 0):
+                global all_commands_received
+                all_commands_received = True
+            else:
+                print("Commands array is empty, setting mode back to dfs")
+                pub_move_complete.publish(1)
         else:
             commands_array.append(data.data)
 
@@ -107,7 +113,8 @@ def angleToRC(degree,angularSpeed):
     #send another rc to stop moving-hopefully it stops when desired angle is reached
     tello.send_rc_control(0, 0, 0, 0)
     
-
+# def convertToCommand(command_string):
+#     if(command_string == command_string.split(";")[3])
   
 def main():
     # create a  command subscriber instance
@@ -285,6 +292,44 @@ def main():
                 tello.move_forward(100)
                 time.sleep(2)
                 pub_initialize_scale.publish(True);
+            elif inputChar == 'b':
+                global all_commands_received
+                if all_commands_received:
+                    print("This is your commands list: ")
+                    print(commands_array)
+                    print("Press c to continue with list, press 0 to escape")
+                    inputChar = readchar.readchar()
+                    while(inputChar != 'c' and inputChar != '0'):
+                        print("Press c to continue with list, press 0 to escape")
+                        inputChar = readchar.readchar()
+                    if(inputChar == 'c'):
+                        for i in commands_array:
+                            print("Executing " + i + ", press c to execute, 0 to exit list entirely")
+                            inputChar = readchar.readchar()
+                            while(inputChar != 'c' and inputChar != '0'):
+                                print("Executing " + i + ", press c to execute, 0 to exit list entirely")
+                                inputChar = readchar.readchar()
+                            if(inputChar == 'c'):
+                                command = i.split(" ")
+                                if(command[0] == "forward"):
+                                    tello.move("forward", int(command[1]))
+                                elif(command[0] == "ccw"):
+                                    tello.rotate_counter_clockwise(int(command[1]))
+                                elif(command[0] == "cw"):
+                                    tello.rotate_clockwise(int(command[1]))
+                                time.sleep(sleepTime)
+                            elif(inputChar == '0'):
+                                print("Exiting commands list...")
+                                break
+                        print("Completed commands list")
+                    commands_array.clear()
+                    all_commands_received = False
+                    print("Setting mode back to dfs")
+                    pub_move_complete.publish(1)
+
+
+
+
             else:
                 print("Tello Battery Level = {}%".format(tello.get_battery()))
             # PRESS SPACEBAR TO HOVER-old script execution here

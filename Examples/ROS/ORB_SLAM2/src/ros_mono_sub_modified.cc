@@ -672,13 +672,13 @@ vector<std::string> returnNextCommand(int init_x, int init_y)
 	//convert to string based, for printing now 
 	std::string angle = std::to_string(AngleDiff);
 	if (AngleDiff > 0) {
-		command_list.push_back("ccw "+ angle + "");
+		command_list.push_back("ccw "+ angle);
 	} else if (AngleDiff < 0) {
-		command_list.push_back("cw "+ angle + "");
+		command_list.push_back("cw "+ angle);
 	}
 	
 		
-	command_list.push_back("forward " + std::to_string(tello_distance) + ""); 
+	command_list.push_back("forward " + std::to_string((int)tello_distance) ); 
 	return command_list;
 	
 }
