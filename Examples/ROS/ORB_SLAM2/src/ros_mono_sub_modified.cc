@@ -136,7 +136,7 @@ bool isValid(int valid_x, int valid_y);
 vector<std::string> returnNextCommand(int init_x, int init_y);
 void generatePath(vector<geometry_msgs::Point>& path);
 void printPointPath(vector<geometry_msgs::Point>& path);
-void publishCommand(int tello_mode);
+void publishCommand(std::string tello_mode);
 bool within_distance(int init_x, int init_y, int final_x,int final_y);
 ros::Time next_command_time;
 
@@ -169,6 +169,7 @@ enum tello_modes TELLO_MODE = scale_computing;
 bool sent_command = false;
 bool dfs_started = false;
 std::stack<vector<geometry_msgs::Point> > dfs_stack;  // DFS stack this should be global
+vector<std::string> command_list;
 cv::Mat dfs_visited; //this should be global too
 double distance_threshold = 30;
 vector<geometry_msgs::Point> dfs_destinations;
@@ -274,7 +275,7 @@ int main(int argc, char **argv){
 	pub_grid_map_metadata = nodeHandler.advertise<nav_msgs::MapMetaData>("map_metadata", 1000);
 	pub_current_pose = nodeHandler.advertise<geometry_msgs::PoseWithCovarianceStamped>("robot_pose", 1000);
 	pub_goal_path = nodeHandler.advertise<nav_msgs::Path>("goal_path", 1000);
-	pub_command = nodeHandler.advertise<std_msgs::UInt32>("tello/command", 1000);
+	pub_command = nodeHandler.advertise<std_msgs::String>("tello/command", 1000);
     
 
 	
@@ -368,18 +369,18 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 
 		//generating the commands list
 		if(dfs_destinations.size() !=  0){
-		vector<std::string> command_list = returnNextCommand(int_pos_grid_x,int_pos_grid_z);
-  		//print the commands here to see what is happening
-		cout << "the commands generated are" << endl;
-    	for (int i = 0; i < command_list.size(); i++)  {
-		cout << command_list[i];    
-		}
-    	cout << endl; 
+			command_list = returnNextCommand(int_pos_grid_x,int_pos_grid_z);
+			//print the commands here to see what is happening
+			cout << "the commands generated are" << endl;
+			for (int i = 0; i < command_list.size(); i++)  {
+				cout << command_list[i];    
+			}
+			cout << endl; 
 
-		//for now marking this as visited, since we do not want to risk sending commands
-		//but eventually we will get the tello to mark it visited
-		cout << "dfs destination size is" << dfs_destinations.size();
-		dfs_visited.at<int>(dfs_destinations[0].y, dfs_destinations[0].x) = 1;
+			//for now marking this as visited, since we do not want to risk sending commands
+			//but eventually we will get the tello to mark it visited
+			cout << "dfs destination size is" << dfs_destinations.size();
+			dfs_visited.at<int>(dfs_destinations[0].y, dfs_destinations[0].x) = 1;
 
 		}
 
@@ -684,10 +685,10 @@ vector<std::string> returnNextCommand(int init_x, int init_y)
 
 //communication to tello from here
 //publishing commands/mode from here
-void publishCommand(int tello_mode){
-	std_msgs::UInt32 msg;
-	msg.data = tello_mode;
-	cout << "Transmitting tello mode: " << tello_mode << endl;
+void publishCommand(std::string tello_command){
+	std_msgs::String msg;
+	msg.data = tello_command;
+	cout << "Transmitting tello command: " << tello_command << endl;
 	pub_command.publish(msg);
 
 }
@@ -742,7 +743,11 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
 	    pub_current_pose.publish(curr_pose_stamped);//used by current pose call back
 		//also publish dummy commands in moving mode to make connection to tello script
 		if(TELLO_MODE == moving && (!sent_command)){
-			publishCommand(TELLO_MODE);
+			for (int i = 0; i < command_list.size(); i++)  {
+				publishCommand(command_list[i]);
+				//maybe we need a dalay after each command? test first
+			}
+			publishCommand("done"); //some silly placeholder to indicate end
 			sent_command = true;
 		}
 		
