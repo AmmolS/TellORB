@@ -563,10 +563,13 @@ bool within_distance(int init_x, int init_y, int final_x,int final_y){
 	cout<<"tello distance between the two points is " << tello_distance << endl;
 
 	//step 3: determine how many degrees drone would turn. Angle is believed to be from cartesian angle between x and y axes
-	double currentAngle = tf::getYaw(curr_pose.pose.orientation);
+	// double currentAngle = tf::getYaw(curr_pose.pose.orientation);
+	double currentAngle = atan2(init_y, init_x);
+	cout << "init_x is" << init_x << ", init_y is " << init_y <<  endl;
 	cout << "the current angle is" << currentAngle << endl;
 
-	double desiredAngle = atan(world_y1/world_x1);
+	double desiredAngle = atan2(final_y, final_x);
+	cout << "final_x is" << final_x << ", final_y is " << final_y <<  endl;
 	cout<<"the desired angle is" << desiredAngle << endl;
 
 
@@ -591,7 +594,7 @@ bool within_distance(int init_x, int init_y, int final_x,int final_y){
 	cout << "The angle difference after conversion is" << AngleDiff << endl;
 
 	//step 4: compare to threshold and determine whether point is ahead of drone, and return true or false
-	if(tello_distance <= distance_threshold && abs(AngleDiff) <= 90)
+	if(tello_distance <= distance_threshold || abs(AngleDiff) >= 90)
 		return true;
 	else 
 		return false;
@@ -601,7 +604,7 @@ bool within_distance(int init_x, int init_y, int final_x,int final_y){
 vector<std::string> returnNextCommand(int init_x, int init_y)
 {
 	vector<std::string> command_list;
-	cout << "starting from " << init_x << "," << init_x << endl;
+	cout << "starting from " << init_x << "," << init_y << endl;
 	cout << "moving to" << dfs_destinations[0].x << "," << dfs_destinations[0].y << endl;
 	int final_x = dfs_destinations[0].x;
 	int final_y = dfs_destinations[0].y;
@@ -626,10 +629,11 @@ vector<std::string> returnNextCommand(int init_x, int init_y)
 	cout<<"tello distance between the two points is " << tello_distance << endl;
 
 	//step 3: determine how many degrees drone would turn. Angle is believed to be from cartesian angle between x and y axes
-	double currentAngle = tf::getYaw(curr_pose.pose.orientation);
+	// double currentAngle = tf::getYaw(curr_pose.pose.orientation);
+	double currentAngle = atan2(init_y, init_x);
 	cout << "the current angle is" << currentAngle << endl;
 
-	double desiredAngle = atan(world_y1/world_x1);
+	double desiredAngle = atan2(final_y, final_x);
 	cout<<"the desired angle is" << desiredAngle << endl;
 
 	//get angle difference in degrees as an integer. CCW angle is positive 
