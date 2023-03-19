@@ -183,6 +183,7 @@ geometry_msgs::PoseWithCovariance initialPose;
 geometry_msgs::PoseWithCovariance newPose;
 void initializeScaleCallback(const std_msgs::Bool::ConstPtr& value);
 void telloMoveComplete(const std_msgs::UInt32::ConstPtr& value);
+void annotateMapCallback(const std_msgs::Bool::ConstPtr& value);
 
 int main(int argc, char **argv){
 	ros::init(argc, argv, "Monosub");
@@ -270,6 +271,8 @@ int main(int argc, char **argv){
 	ros::Subscriber sub_tello_initialize_scale = nodeHandler.subscribe("tello/initialize_scale", 1000, initializeScaleCallback);
 	//tello completing move code
 	ros::Subscriber sub_tello_move_complete = nodeHandler.subscribe("tello/move_complete",1000,telloMoveComplete);
+	// annotate map
+	ros::Subscriber sub_map_annotate = nodeHandler.subscribe("map/annotate", 1000, annotateMapCallback);
 
 	pub_grid_map = nodeHandler.advertise<nav_msgs::OccupancyGrid>("map", 1000);
 	pub_grid_map_metadata = nodeHandler.advertise<nav_msgs::MapMetaData>("map_metadata", 1000);
@@ -809,7 +812,11 @@ void telloMoveComplete(const std_msgs::UInt32::ConstPtr& value){
 	TELLO_MODE = dfs;
 }
 
-
+void annotateMapCallback(const std_msgs::Bool::ConstPtr& value) {
+	cv::Scalar line_Color(255, 255, 0);
+	cv::circle(grid_map_rgb, cv::Point(kf_pos_grid_x*resize_factor, kf_pos_grid_z*resize_factor),
+		3, line_Color, -1);
+}
 
 void getMixMax(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose,
 	geometry_msgs::Point& min_pt, geometry_msgs::Point& max_pt) {
