@@ -355,12 +355,14 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 		float pt_pos_x = curr_pose.pose.position.x*scale_factor;
 		float pt_pos_z = curr_pose.pose.position.y*scale_factor;
 
+		
+
 		int_pos_grid_x = int(floor((pt_pos_x) * norm_factor_x));
 		int_pos_grid_z = int(floor((pt_pos_z) * norm_factor_z));
 
 		cout << "Current index: " << int_pos_grid_x << ", " << int_pos_grid_z << endl;
-		double currentAngle = tf::getYaw(curr_pose.pose.orientation);
-		cout << "Current Angle: "<< currentAngle;
+		// double currentAngle = tf::getYaw(curr_pose.pose.orientation);
+		// cout << "Current Angle: "<< currentAngle;
 
 		/*ECE496 CODE ADDITIONS START HERE*/
 		DFS(int_pos_grid_x, int_pos_grid_z); 
@@ -377,10 +379,7 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 			}
 			cout << endl; 
 
-			//for now marking this as visited, since we do not want to risk sending commands
-			//but eventually we will get the tello to mark it visited
-			cout << "dfs destination size is" << dfs_destinations.size();
-			dfs_visited.at<int>(dfs_destinations[0].y, dfs_destinations[0].x) = 1;
+			
 
 		}
 
@@ -388,8 +387,6 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 		cout<<"setting the mode to moving the tello now" << endl;
 		TELLO_MODE = moving;
 		dfs_started = false;
-		//clearing the destination list once we successfully generate a command
-		dfs_destinations.clear();
 		//need to publish this to tello script, so it know its time to move the tello
 		//once the script moves the tello, it will set TELLO_MODE back to dfs.
 
@@ -407,7 +404,7 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 
 void DFS(int init_x, int init_y){
 	// int MIN_PATH_SIZE = 5;
-	int MAX_OCCUPIED_PROB = 75;
+	int MAX_OCCUPIED_PROB = 55;
 
 	// These arrays are used to get row and column 
 	// numbers of 4 neighbours of a given cell 
@@ -719,6 +716,9 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
 	grid_map_msg.info.map_load_time = ros::Time::now();
 
     /*ECE496 CODE ADDITIONS START HERE*/
+	
+	
+
     if(TELLO_MODE == scale_computing || TELLO_MODE == moving || (!dfs_started)) //we pause callbacks in dfs mode
     {
         float kf_pos_grid_x_us = (kf_location.x - cloud_min_x) ;
@@ -805,6 +805,13 @@ void initializeScaleCallback(const std_msgs::Bool::ConstPtr& value){
 
 void telloMoveComplete(const std_msgs::UInt32::ConstPtr& value){
 	cout << "tello has completed moving, setting the mode back to dfs" << endl;
+
+	//important - mark visited here! and clear the destination list for next iteration of dfs
+	cout << "dfs destination size is" << dfs_destinations.size();
+	dfs_visited.at<int>(dfs_destinations[0].y, dfs_destinations[0].x) = 1;
+	//clearing the destination list once we successfully generate a command and complete moving to that destination
+	dfs_destinations.clear();
+
 	sent_command = false;
 	TELLO_MODE = dfs;
 }
@@ -1151,6 +1158,8 @@ void showGridMap(unsigned int id) {
 		}
 		
 		cv::Scalar line_Color(255, 0, 0);//Color of the circle
+		//printing out the blue dot position:
+		cout << "The blue dot is" << kf_pos_grid_x << kf_pos_grid_z << endl;
 		cv::circle(grid_map_rgb, cv::Point(kf_pos_grid_x*resize_factor, kf_pos_grid_z*resize_factor),
 					3, line_Color, -1);
 		

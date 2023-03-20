@@ -297,31 +297,31 @@ def main():
                 if all_commands_received:
                     print("This is your commands list: ")
                     print(commands_array)
-                    print("Press c to continue with list, press 0 to escape")
-                    inputChar = readchar.readchar()
-                    while(inputChar != 'c' and inputChar != '0'):
-                        print("Press c to continue with list, press 0 to escape")
+                    # print("Press c to continue with list, press 0 to escape")
+                    # inputChar = readchar.readchar()
+                    # while(inputChar != 'c' and inputChar != '0'):
+                        # print("Press c to continue with list, press 0 to escape")
+                        # inputChar = readchar.readchar()
+                    # if(inputChar == 'c'):
+                    for i in commands_array:
+                        print("Executing " + i + ", press c to execute, 0 to stop")
                         inputChar = readchar.readchar()
-                    if(inputChar == 'c'):
-                        for i in commands_array:
-                            print("Executing " + i + ", press c to execute, 0 to exit list entirely")
+                        while(inputChar != 'c' and inputChar != '0'):
+                            print("Executing " + i + ", press c to execute, 0 to stop")
                             inputChar = readchar.readchar()
-                            while(inputChar != 'c' and inputChar != '0'):
-                                print("Executing " + i + ", press c to execute, 0 to exit list entirely")
-                                inputChar = readchar.readchar()
-                            if(inputChar == 'c'):
-                                command = i.split(" ")
-                                if(command[0] == "forward"):
-                                    tello.move("forward", int(command[1]))
-                                elif(command[0] == "ccw"):
-                                    tello.rotate_counter_clockwise(int(command[1]))
-                                elif(command[0] == "cw"):
-                                    tello.rotate_clockwise(int(command[1]))
-                                time.sleep(sleepTime)
-                            elif(inputChar == '0'):
-                                print("Exiting commands list...")
-                                break
-                        print("Completed commands list")
+                        if(inputChar == 'c'):
+                            command = i.split(" ")
+                            if(command[0] == "forward"):
+                                tello.move("forward", int(command[1]))
+                            elif(command[0] == "ccw"):
+                                tello.rotate_counter_clockwise(int(command[1]))
+                            elif(command[0] == "cw"):
+                                tello.rotate_clockwise(int(command[1]))
+                            time.sleep(sleepTime)
+                        elif(inputChar == '0'):
+                            print("Exiting commands list...")
+                            break
+                    print("Completed commands list")
                     commands_array.clear()
                     all_commands_received = False
                     print("Setting mode back to dfs")
