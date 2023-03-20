@@ -813,8 +813,14 @@ void telloMoveComplete(const std_msgs::UInt32::ConstPtr& value){
 }
 
 void annotateMapCallback(const std_msgs::Bool::ConstPtr& value) {
+	double curr_angle = atan2(int_pos_grid_x, int_pos_grid_z);
+	
+	int dist_factor = 2; // TODO: use IoU from ML
+	float x = kf_pos_grid_x + dist_factor * cos(curr_angle);
+	float y = kf_pos_grid_x + dist_factor * sin(curr_angle);
+
 	cv::Scalar line_Color(255, 255, 0);
-	cv::circle(grid_map_rgb, cv::Point(kf_pos_grid_x*resize_factor, kf_pos_grid_z*resize_factor),
+	cv::circle(grid_map_rgb, cv::Point(x*resize_factor, y*resize_factor),
 		3, line_Color, -1);
 }
 
