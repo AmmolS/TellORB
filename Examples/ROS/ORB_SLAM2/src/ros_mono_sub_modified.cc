@@ -684,9 +684,9 @@ vector<std::string> returnNextCommand(int init_x, int init_y)
 	//convert to string based, for printing now 
 	std::string angle = std::to_string(AngleDiff);
 	if (AngleDiff > 0) {
-		command_list.push_back("ccw "+ angle);
-	} else if (AngleDiff < 0) {
 		command_list.push_back("cw "+ angle);
+	} else if (AngleDiff < 0) {
+		command_list.push_back("ccw "+ angle);
 	}
 	
 		
@@ -837,6 +837,8 @@ void annotateMapCallback(const std_msgs::Bool::ConstPtr& value) {
 	cv::Scalar line_Color(255, 255, 0);
 	cv::circle(grid_map_rgb, cv::Point(x*resize_factor, y*resize_factor),
 		3, line_Color, -1);
+	std::cout << "printing something now " << std::endl;
+	cv::imshow("grid_map_thresh_resized_rgb", grid_map_rgb);
 }
 
 void getMixMax(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose,
