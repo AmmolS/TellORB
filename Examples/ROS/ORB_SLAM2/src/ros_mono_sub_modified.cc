@@ -563,14 +563,19 @@ bool within_distance(int init_x, int init_y, int final_x,int final_y){
 	cout<<"tello distance between the two points is " << tello_distance << endl;
 
 	//step 3: determine how many degrees drone would turn. Angle is believed to be from cartesian angle between x and y axes
-	// double currentAngle = tf::getYaw(curr_pose.pose.orientation);
-	double currentAngle = atan2(init_y, init_x);
+	double currentAngleFromYaw = tf::getYaw(curr_pose.pose.orientation);
+	cout << "the current angle from yaw function in degrees is " << int((currentAngleFromYaw) * 180 / M_PI) << endl;
+
+	// double currentAngle = atan2(init_y, init_x);
 	cout << "init_x is" << init_x << ", init_y is " << init_y <<  endl;
-	cout << "the current angle is" << currentAngle << endl;
+	// cout << "the current angle  init in degrees is" << int((currentAngle) * 180 / M_PI) <<endl;
 
 	double desiredAngle = atan2(final_y, final_x);
 	cout << "final_x is" << final_x << ", final_y is " << final_y <<  endl;
-	cout<<"the desired angle is" << desiredAngle << endl;
+	cout<<"the desired angle on grid in degrees" <<  int((desiredAngle) * 180 / M_PI) << endl;
+
+	// double desiredAngleFromYaw = atan2(world_y1,world_x1);
+	// cout << "the desired angle from world is" << int((desiredAngleFromYaw) * 180 / M_PI)  << endl;
 
 
 	//not sure why they use pi/2 angles
@@ -586,7 +591,7 @@ bool within_distance(int init_x, int init_y, int final_x,int final_y){
 	// }
 
 	//get angle difference in degrees as an integer. CCW angle is positive 
-	int AngleDiff = int((desiredAngle - currentAngle) * 180 / M_PI);
+	int AngleDiff = int((desiredAngle - currentAngleFromYaw) * 180 / M_PI);
 	cout << "The angle difference is" << AngleDiff << endl;
 	
 	//convert angle difference to -180 to +180 degree range
@@ -630,14 +635,17 @@ vector<std::string> returnNextCommand(int init_x, int init_y)
 
 	//step 3: determine how many degrees drone would turn. Angle is believed to be from cartesian angle between x and y axes
 	// double currentAngle = tf::getYaw(curr_pose.pose.orientation);
-	double currentAngle = atan2(init_y, init_x);
-	cout << "the current angle is" << currentAngle << endl;
+	// double currentAngle = atan2(init_y, init_x);
+	// cout << "the current angle is" << currentAngle << endl;
+	//step 3: determine how many degrees drone would turn. Angle is believed to be from cartesian angle between x and y axes
+	double currentAngleFromYaw = tf::getYaw(curr_pose.pose.orientation);
+	cout << "the current angle from yaw function in degrees is " << int((currentAngleFromYaw) * 180 / M_PI) << endl;
 
 	double desiredAngle = atan2(final_y, final_x);
 	cout<<"the desired angle is" << desiredAngle << endl;
 
 	//get angle difference in degrees as an integer. CCW angle is positive 
-	int AngleDiff = int((desiredAngle - currentAngle) * 180 / M_PI);
+	int AngleDiff = int((desiredAngle - currentAngleFromYaw) * 180 / M_PI);
 	cout << "The angle difference is" << AngleDiff << endl;
 	
 	//convert angle difference to -180 to +180 degree range

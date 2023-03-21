@@ -238,7 +238,6 @@ int main(int argc, char **argv){
 	local_map_pt_mask.create(h, w, CV_8UC1);
 
 	gauss_kernel = cv::getGaussianKernel(gaussian_kernel_size, -1);
-
 	norm_factor_x_us = float(cloud_max_x - cloud_min_x - 1) / float(cloud_max_x - cloud_min_x);
 	norm_factor_z_us = float(cloud_max_z - cloud_min_z - 1) / float(cloud_max_z - cloud_min_z);
 	printf("norm_factor_x_us: %f\n", norm_factor_x_us);
@@ -389,7 +388,10 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 
 	cout << "Current index: " << int_pos_grid_x << ", " << int_pos_grid_z << endl;
 	double currentAngle = tf::getYaw(curr_pose.pose.orientation);
-	cout << "Current Angle: "<< currentAngle;
+	cout << "Current Angle from get yaw function, in currentposecallback is : "<< currentAngle;
+	int AngleDiff = int((currentAngle) * 180 / M_PI);
+	cout << "Current Angle from get yaw function, in currentposecallback in degrees is : "<< AngleDiff;
+
 
 	float goal_pos_x =  goal.pose.position.x*scale_factor;
 	float goal_pos_z =  goal.pose.position.y*scale_factor;
@@ -756,6 +758,7 @@ void returnNextCommand(vector<geometry_msgs::Point>& path)
 
 
 	double currentAngle = tf::getYaw(curr_pose.pose.orientation);
+	cout << "The current angle from yaw function" << currentAngle <<endl;
 
 
 	double desiredAngle = currentAngle;
@@ -850,6 +853,8 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
 	//current pose's x and y is set here
 	curr_pose.pose.position.x = kf_pos_grid_x_us;
 	curr_pose.pose.position.y = kf_pos_grid_z_us;
+
+
 
 
 	ROS_INFO("Publishing current pose: (%f, %f)\n", kf_pos_grid_x_us, kf_pos_grid_z_us);
@@ -1274,16 +1279,38 @@ void showGridMap(unsigned int id) {
 	cv::imshow("grid_map_msg", cv::Mat(h, w, CV_8SC1, (char*)(grid_map_msg.data.data())));
 	if (show_camera_location) {
 		cv::cvtColor(grid_map_thresh_resized, grid_map_rgb, cv::COLOR_GRAY2BGR);
-		cv::Scalar destination_color(0,255,0);//color of dfs destinations 
+		//cv::Scalar destination_color(0,255,0);//color of dfs destinations 
 		// for (int i = 0; i < dfs_destinations.size(); i++)  {
 		// 		cv::circle(grid_map_rgb, cv::Point((dfs_destinations[i].x)*resize_factor, (dfs_destinations[i].y)*resize_factor),
 		// 					0.05, destination_color, -1);
 		// }
 		//also highlight the selected destination
+
+
+		//let us visualize the grid starting!
+		std::cout << "Current pose being visualized x: " << curr_pose.pose.position.x << std::endl;
+		std::cout << "Current pose being visualized y: " << curr_pose.pose.position.y << std::endl;
+
+		float pt_pos_x = curr_pose.pose.position.x*scale_factor;
+		float pt_pos_z = curr_pose.pose.position.y*scale_factor;
+
+		std::cout << "pt_pos_x visualized: " << pt_pos_x << std::endl;
+		std::cout << "pt_pos_z visulaized: " << pt_pos_z << std::endl;
+
+		int_pos_grid_x = int(floor((pt_pos_x) * norm_factor_x));
+		int_pos_grid_z = int(floor((pt_pos_z) * norm_factor_z));
+			
+		cv::Scalar start_Color(0, 255, 0);//Color of the circle
+		cv::circle(grid_map_rgb, cv::Point((w)*resize_factor, (h)*resize_factor),
+			3, start_Color, -1);
 		
 		cv::Scalar line_Color(255, 0, 0);//Color of the circle
 		cv::circle(grid_map_rgb, cv::Point(kf_pos_grid_x*resize_factor, kf_pos_grid_z*resize_factor),
 			3, line_Color, -1);
+		
+
+
+		
 		// if(destination_found){
 		// 	cout<<"drawing\n" <<endl;
 		// 	cv::Scalar final_destination_color(255,0,255);//color of dfs destinations 
