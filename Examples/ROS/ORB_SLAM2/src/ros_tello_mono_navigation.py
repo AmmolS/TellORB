@@ -312,7 +312,9 @@ def main():
                         if(inputChar == 'c'):
                             command = i.split(" ")
                             if(command[0] == "forward"):
-                                tello.move("forward", int(command[1]))
+                                # tello.move("forward", int(command[1]))
+                                tello.move("forward", 30)
+                                print("Moving forward by 30")
                             elif(command[0] == "ccw"):
                                 tello.rotate_counter_clockwise(int(command[1]))
                             elif(command[0] == "cw"):

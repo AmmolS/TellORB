@@ -171,7 +171,7 @@ bool dfs_started = false;
 std::stack<vector<geometry_msgs::Point> > dfs_stack;  // DFS stack this should be global
 vector<std::string> command_list;
 cv::Mat dfs_visited; //this should be global too
-double distance_threshold = 30;
+double distance_threshold = 50;
 vector<geometry_msgs::Point> dfs_destinations;
 vector<geometry_msgs::Point> dfs_destinations_visual;
 
