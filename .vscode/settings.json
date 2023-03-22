@@ -52,7 +52,14 @@
         "typeindex": "cpp",
         "typeinfo": "cpp",
         "string": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "queue": "cpp",
+        "bit": "cpp",
+        "compare": "cpp",
+        "concepts": "cpp",
+        "xstddef": "cpp",
+        "xtr1common": "cpp",
+        "xutility": "cpp"
     },
     "python.analysis.extraPaths": [
         "/home/alison/.local/bin/python3.8"

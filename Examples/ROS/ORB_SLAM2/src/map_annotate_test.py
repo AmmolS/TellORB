@@ -16,11 +16,9 @@ def main():
     pub_annotate = rospy.Publisher("map/annotate", Bool, queue_size=10)
     rospy.init_node('does_nothing', anonymous=True)
 
-    count = 10
-    while count > 0:
-        count -= 1
+    while True:
         pub_annotate.publish(True)
-        sleep(0.5)
+        sleep(2)
 
     
 
