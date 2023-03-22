@@ -818,11 +818,12 @@ void telloMoveComplete(const std_msgs::UInt32::ConstPtr& value){
 	cout << "tello has completed moving, setting the mode back to dfs" << endl;
 
 	//important - mark visited here! and clear the destination list for next iteration of dfs
-	cout << "dfs destination size is" << dfs_destinations.size();
-	dfs_visited.at<int>(dfs_destinations[0].y, dfs_destinations[0].x) = 1;
-	//clearing the destination list once we successfully generate a command and complete moving to that destination
-	dfs_destinations.clear();
-
+	if(dfs_destinations.size() !=0){
+		cout << "dfs destination size is" << dfs_destinations.size();
+		dfs_visited.at<int>(dfs_destinations[0].y, dfs_destinations[0].x) = 1;
+		//clearing the destination list once we successfully generate a command and complete moving to that destination
+		dfs_destinations.clear();
+	}
 	sent_command = false;
 	TELLO_MODE = dfs;
 }
