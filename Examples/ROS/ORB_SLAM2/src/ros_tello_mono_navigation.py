@@ -316,9 +316,19 @@ def main():
                                 tello.move("forward", 30)
                                 print("Moving forward by 30")
                             elif(command[0] == "ccw"):
-                                tello.rotate_counter_clockwise(int(command[1]))
+                                for i in range(int(command[1])/int(rotationAngle)):
+                                    print("Rotating ccw by " + str(int(rotationAngle)))
+                                    tello.rotate_counter_clockwise(int(rotationAngle))
+                                    time.sleep(sleepTime)
+                                print("Rotating ccw by " + str(int(command[1])%int(rotationAngle)))
+                                tello.rotate_counter_clockwise(int(command[1])%int(rotationAngle))
                             elif(command[0] == "cw"):
-                                tello.rotate_clockwise(int(command[1]))
+                                for i in range(int(command[1])/int(rotationAngle)):
+                                    print("Rotating cw by " + str(int(rotationAngle)))
+                                    tello.rotate_clockwise(int(rotationAngle))
+                                    time.sleep(sleepTime)
+                                print("Rotating cw by " + str(int(command[1])%int(rotationAngle)))
+                                tello.rotate_clockwise(int(command[1])%int(rotationAngle))
                             time.sleep(sleepTime)
                         elif(inputChar == '0'):
                             print("Exiting commands list...")
