@@ -111,6 +111,7 @@ geometry_msgs::PoseWithCovarianceStamped init_pose_stamped, curr_pose_stamped;
 tf::StampedTransform odom_to_map_transform_stamped;
 geometry_msgs::PoseStamped goal;
 geometry_msgs::PoseWithCovariance init_pose, curr_pose;
+std::vector<std::pair<float, float>> people;
 
 nav_msgs::Path goal_path;
 
@@ -684,9 +685,9 @@ vector<std::string> returnNextCommand(int init_x, int init_y)
 	//convert to string based, for printing now 
 	std::string angle = std::to_string(AngleDiff);
 	if (AngleDiff > 0) {
-		command_list.push_back("ccw "+ angle);
-	} else if (AngleDiff < 0) {
 		command_list.push_back("cw "+ angle);
+	} else if (AngleDiff < 0) {
+		command_list.push_back("ccw "+ angle);
 	}
 	
 		
@@ -818,25 +819,29 @@ void telloMoveComplete(const std_msgs::UInt32::ConstPtr& value){
 	cout << "tello has completed moving, setting the mode back to dfs" << endl;
 
 	//important - mark visited here! and clear the destination list for next iteration of dfs
-	cout << "dfs destination size is" << dfs_destinations.size();
-	dfs_visited.at<int>(dfs_destinations[0].y, dfs_destinations[0].x) = 1;
-	//clearing the destination list once we successfully generate a command and complete moving to that destination
-	dfs_destinations.clear();
-
+	if(dfs_destinations.size() !=0){
+		cout << "dfs destination size is" << dfs_destinations.size();
+		dfs_visited.at<int>(dfs_destinations[0].y, dfs_destinations[0].x) = 1;
+		//clearing the destination list once we successfully generate a command and complete moving to that destination
+		dfs_destinations.clear();
+	}
 	sent_command = false;
 	TELLO_MODE = dfs;
 }
 
 void annotateMapCallback(const std_msgs::Bool::ConstPtr& value) {
-	double curr_angle = atan2(int_pos_grid_x, int_pos_grid_z);
+	//  double curr_angle = atan2(int_pos_grid_z, int_pos_grid_x);
+	double curr_angle = tf::getYaw(curr_pose.pose.orientation);
 	
-	int dist_factor = 2; // TODO: use IoU from ML
-	float x = kf_pos_grid_x + dist_factor * cos(curr_angle);
-	float y = kf_pos_grid_x + dist_factor * sin(curr_angle);
+	int dist_factor = 30; // TODO: use IoU from ML
+	float x = kf_pos_grid_x - dist_factor * sin(curr_angle);
+	float y = kf_pos_grid_z + dist_factor * cos(curr_angle);
 
-	cv::Scalar line_Color(255, 255, 0);
-	cv::circle(grid_map_rgb, cv::Point(x*resize_factor, y*resize_factor),
-		3, line_Color, -1);
+	people.push_back(make_pair(x, y));
+
+	// cv::Scalar line_Color(255, 0, 255); // Magenta
+	// cv::circle(grid_map_rgb, cv::Point(x*resize_factor, y*resize_factor),
+	// 	3, line_Color, -1);
 }
 
 void getMixMax(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose,
@@ -1169,7 +1174,7 @@ void getGridMap() {
 	cv::resize(grid_map_thresh, grid_map_thresh_resized, grid_map_thresh_resized.size());
 }
 void showGridMap(unsigned int id) {
-	cv::imshow("grid_map_msg", cv::Mat(h, w, CV_8SC1, (char*)(grid_map_msg.data.data())));
+	// cv::imshow("grid_map_msg", cv::Mat(h, w, CV_8SC1, (char*)(grid_map_msg.data.data())));
 	if (show_camera_location) {
 		cv::cvtColor(grid_map_thresh_resized, grid_map_rgb, cv::COLOR_GRAY2BGR);
 		cv::Scalar destination_color(0,255,0);//color of dfs destinations 
@@ -1183,7 +1188,14 @@ void showGridMap(unsigned int id) {
 		cout << "The blue dot is" << kf_pos_grid_x << kf_pos_grid_z << endl;
 		cv::circle(grid_map_rgb, cv::Point(kf_pos_grid_x*resize_factor, kf_pos_grid_z*resize_factor),
 					3, line_Color, -1);
-		
+
+		for (auto & element : people) {
+			printf("Adding magenta dot to map at x: %f y: %f\n", element.first*resize_factor, element.second*resize_factor);
+			cv::Scalar line_Color(255, 0, 255); // Magenta
+			cv::circle(grid_map_rgb, cv::Point(element.first*resize_factor, element.second*resize_factor),
+				1, line_Color, -1);
+		}
+
 		cv::imshow("grid_map_thresh_resized_rgb", grid_map_rgb);
 	}
 	else {
