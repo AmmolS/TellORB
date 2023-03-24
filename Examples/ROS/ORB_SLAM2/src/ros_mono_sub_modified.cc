@@ -404,6 +404,7 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 }
 
 
+vector<geometry_msgs::Point> dfs_obstacles; 
 
 
 void DFS(int init_x, int init_y){
@@ -450,6 +451,19 @@ void DFS(int init_x, int init_y){
 	// Distance of source cell is 0 
 	//the current position of the drone is marked visited since it is already there
 	dfs_visited.at<int>(init_y, init_x) = 1;
+	int i,j;
+	for (i=0;i<h;i++){
+		for(j=0;j<w;j++){
+			if((int)img_final.at<short>(i, j) > 55 && grid_map_thresh.at<uchar>(i, j) != 128){
+				//cout << "occupied probability is" << (int)img_final.at<short>(i, j) << endl;
+				geometry_msgs::Point s; 
+				s.x = j;
+				s.y = i;
+				dfs_obstacles.push_back(s);
+			}
+		}
+
+	}
 
 	geometry_msgs::Point s; 
 	s.x = init_x;
@@ -1195,6 +1209,14 @@ void showGridMap(unsigned int id) {
 			cv::circle(grid_map_rgb, cv::Point(element.first*resize_factor, element.second*resize_factor),
 				1, line_Color, -1);
 		}
+		cv::Scalar obstacles_color(0,0,255);//color of dfs obstacles 
+		for (int i = 0; i < dfs_obstacles.size(); i++)  {
+				cv::circle(grid_map_rgb, cv::Point((dfs_obstacles[i].x)*resize_factor, (dfs_obstacles[i].y)*resize_factor),
+							3, obstacles_color, -1);
+		}
+		
+
+
 
 		cv::imshow("grid_map_thresh_resized_rgb", grid_map_rgb);
 	}

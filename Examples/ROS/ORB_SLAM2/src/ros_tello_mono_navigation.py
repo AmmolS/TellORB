@@ -31,7 +31,7 @@ class Tello_Modes(Enum):
     dfs = 1
     moving = 2
     
-MAX_ANGLE = 90
+MAX_ANGLE = 54
 
 
 tello = Tello(skipAddressCheck=True)
@@ -316,20 +316,20 @@ def main():
                                 tello.move("forward", 30)
                                 print("Moving forward by 30")
                             elif(command[0] == "ccw"):
-                                for i in range(int(command[1])/int(rotationAngle)):
+                                for i in range(int(int(command[1])/rotationAngle)):
                                     print("Rotating ccw by " + str(int(rotationAngle)))
                                     tello.rotate_counter_clockwise(int(rotationAngle))
-                                    time.sleep(sleepTime)
-                                print("Rotating ccw by " + str(int(command[1])%int(rotationAngle)))
-                                tello.rotate_counter_clockwise(int(command[1])%int(rotationAngle))
+                                    time.sleep(1)
+                                print("Rotating ccw by " + str(int(int(command[1])%rotationAngle)))
+                                tello.rotate_counter_clockwise(int(int(command[1])%rotationAngle))
                             elif(command[0] == "cw"):
-                                for i in range(int(command[1])/int(rotationAngle)):
+                                for i in range(int(int(command[1])/rotationAngle)):
                                     print("Rotating cw by " + str(int(rotationAngle)))
                                     tello.rotate_clockwise(int(rotationAngle))
-                                    time.sleep(sleepTime)
-                                print("Rotating cw by " + str(int(command[1])%int(rotationAngle)))
-                                tello.rotate_clockwise(int(command[1])%int(rotationAngle))
-                            time.sleep(sleepTime)
+                                    time.sleep(1)
+                                print("Rotating cw by " + str(int(int(command[1])%rotationAngle)))
+                                tello.rotate_clockwise(int(int(command[1])%rotationAngle))
+                            time.sleep(1)
                         elif(inputChar == '0'):
                             print("Exiting commands list...")
                             break
