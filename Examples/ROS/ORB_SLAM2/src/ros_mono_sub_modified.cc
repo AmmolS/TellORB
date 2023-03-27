@@ -165,7 +165,7 @@ bool dfs_started = false;
 std::stack<vector<geometry_msgs::Point>> dfs_stack; // DFS stack this should be global
 vector<std::string> command_list;
 cv::Mat dfs_visited; // this should be global too
-double distance_threshold = 50;
+double distance_threshold = 100;
 vector<geometry_msgs::Point> dfs_destinations;
 vector<geometry_msgs::Point> dfs_destinations_visual;
 
@@ -1263,12 +1263,12 @@ void showGridMap(unsigned int id)
 			cv::circle(grid_map_rgb, cv::Point(element.first * resize_factor, element.second * resize_factor),
 					   1, line_Color, -1);
 		}
-		// cv::Scalar obstacles_color(0, 0, 255); // color of dfs obstacles
-		// for (int i = 0; i < dfs_obstacles.size(); i++)
-		// {
-		// 	cv::circle(grid_map_rgb, cv::Point((dfs_obstacles[i].x) * resize_factor, (dfs_obstacles[i].y) * resize_factor),
-		// 			   3, obstacles_color, -1);
-		// }
+		cv::Scalar obstacles_color(0, 0, 255); // color of dfs obstacles
+		for (int i = 0; i < dfs_obstacles.size(); i++)
+		{
+			cv::circle(grid_map_rgb, cv::Point((dfs_obstacles[i].x) * resize_factor, (dfs_obstacles[i].y) * resize_factor),
+					   1, obstacles_color, -1);
+		}
 
 		cv::imshow("grid_map_thresh_resized_rgb", grid_map_rgb);
 	}
