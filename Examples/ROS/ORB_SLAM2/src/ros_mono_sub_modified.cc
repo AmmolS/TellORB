@@ -586,7 +586,7 @@ bool within_distance(int init_x, int init_y, int final_x, int final_y)
 	cout << "The angle difference after conversion is" << AngleDiff << endl;
 
 	// step 4: compare to threshold and determine whether point is ahead of drone, and return true or false
-	if (tello_distance <= distance_threshold || (abs(AngleDiff) != 90 && abs(AngleDiff) != 0))
+	if (tello_distance <= distance_threshold || abs(AngleDiff) >= 90) //|| (abs(AngleDiff) != 90 && abs(AngleDiff) != 0))
 		return true;
 	else
 		return false;
@@ -1262,12 +1262,12 @@ void showGridMap(unsigned int id)
 			cv::circle(grid_map_rgb, cv::Point(element.first * resize_factor, element.second * resize_factor),
 					   1, line_Color, -1);
 		}
-		cv::Scalar obstacles_color(0, 0, 255); // color of dfs obstacles
-		for (int i = 0; i < dfs_obstacles.size(); i++)
-		{
-			cv::circle(grid_map_rgb, cv::Point((dfs_obstacles[i].x) * resize_factor, (dfs_obstacles[i].y) * resize_factor),
-					   3, obstacles_color, -1);
-		}
+		// cv::Scalar obstacles_color(0, 0, 255); // color of dfs obstacles
+		// for (int i = 0; i < dfs_obstacles.size(); i++)
+		// {
+		// 	cv::circle(grid_map_rgb, cv::Point((dfs_obstacles[i].x) * resize_factor, (dfs_obstacles[i].y) * resize_factor),
+		// 			   3, obstacles_color, -1);
+		// }
 
 		cv::imshow("grid_map_thresh_resized_rgb", grid_map_rgb);
 	}
