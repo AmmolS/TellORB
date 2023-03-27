@@ -359,8 +359,6 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 		float pt_pos_x = curr_pose.pose.position.x*scale_factor;
 		float pt_pos_z = curr_pose.pose.position.y*scale_factor;
 
-		
-
 		int_pos_grid_x = int(floor((pt_pos_x) * norm_factor_x));
 		int_pos_grid_z = int(floor((pt_pos_z) * norm_factor_z));
 
@@ -513,22 +511,22 @@ void DFS(int init_x, int init_y){
 		//push it on the stack
 		for (int i = 0; i < 4; i++) 
 		{ 
-			int row = pt.x + rowNum[i]; 
-			int col = pt.y + colNum[i]; 
-            int probability_nearby = (int)img_final.at<short>(col, row);
+			int col = pt.x + rowNum[i]; 
+			int row = pt.y + colNum[i]; 
+            int probability_nearby = (int)img_final.at<short>(row, col);
 			//printf("exploringnearby nodes%d, %d with probabiity-%d , visited-%d\n",row,col,probability_nearby,visited.at<int>(col, row));
 
             
 		    if (isValid(row, col) 
 				&& probability_nearby < MAX_OCCUPIED_PROB 
 				&& probability_nearby >= 0 
-				&& dfs_visited.at<int>(col, row) != 1)
+				&& dfs_visited.at<int>(row, col) != 1)
 			{ 
 				// push onto the stack
-            	printf("DFS adding nearby nodes %d, %d\n",row,col);
+            	printf("DFS adding nearby nodes %d, %d\n",col,row);
 				geometry_msgs::Point newPoint;
-				newPoint.x = row;
-				newPoint.y = col;
+				newPoint.x = col;
+				newPoint.y = row;
 
                 vector<geometry_msgs::Point> newpath(dfs_path);
                 newpath.push_back(newPoint); 
@@ -564,6 +562,9 @@ bool within_distance(int init_x, int init_y, int final_x,int final_y){
 	double world_y1 = (final_y) / (norm_factor_z * scale_factor);
 	double world_x0 = (init_x) / (norm_factor_x * scale_factor); 
 	double world_y0 = (init_y) / (norm_factor_z * scale_factor);
+
+	int x_diff = final_x - init_x;
+	int y_diff = final_y - init_y;
 	
 	double x_world_diff =  world_x1  - world_x0;
 	double y_world_diff =  world_y1 -  world_y0;
@@ -585,7 +586,7 @@ bool within_distance(int init_x, int init_y, int final_x,int final_y){
 	cout << "init_x is" << init_x << ", init_y is " << init_y <<  endl;
 	// cout << "the current angle  init in degrees is" << int((currentAngle) * 180 / M_PI) <<endl;
 
-	double desiredAngle = atan2(final_y, final_x);
+	double desiredAngle = atan2(final_x, final_y);
 	cout << "final_x is" << final_x << ", final_y is " << final_y <<  endl;
 	cout<<"the desired angle on grid in degrees" <<  int((desiredAngle) * 180 / M_PI) << endl;
 
@@ -594,16 +595,18 @@ bool within_distance(int init_x, int init_y, int final_x,int final_y){
 
 
 	//not sure why they use pi/2 angles
-	// if(y_diff == 1){
-	// 	desiredAngle = M_PI / 2;
-	// } 
-	// else if(x_diff == 1){
-	// 	desiredAngle = 0;
-	// } else if(x_diff == -1){
-	// 	desiredAngle = M_PI;
-	// } else if(y_diff == -1){
-	// 	desiredAngle = - M_PI / 2;
-	// }
+	//our method fails if we move along x and y - so overwrite desired for mov along axis.
+	//not sure of positive and negative 
+	if(y_diff >= 1 && x_diff ==0){
+		desiredAngle = 0; //moving along direction of yaw, parallel to yaw
+	} 
+	else if(x_diff >= 1 && y_diff ==0){
+		desiredAngle = M_PI/2; //moving perpendicular to yaw
+	} else if(x_diff <= -1 && y_diff ==0){
+		desiredAngle = -M_PI/2;
+	}else if(y_diff <= -1 && x_diff ==0){
+		desiredAngle = M_PI;
+	}
 
 	//get angle difference in degrees as an integer. CCW angle is positive 
 	int AngleDiff = int((desiredAngle - currentAngleFromYaw) * 180 / M_PI);
@@ -614,7 +617,7 @@ bool within_distance(int init_x, int init_y, int final_x,int final_y){
 	cout << "The angle difference after conversion is" << AngleDiff << endl;
 
 	//step 4: compare to threshold and determine whether point is ahead of drone, and return true or false
-	if(tello_distance <= distance_threshold || abs(AngleDiff) >= 90)
+	if(tello_distance <= distance_threshold || (abs(AngleDiff) !=90 && abs(AngleDiff)!=0))
 		return true;
 	else 
 		return false;
@@ -628,6 +631,9 @@ vector<std::string> returnNextCommand(int init_x, int init_y)
 	cout << "moving to" << dfs_destinations[0].x << "," << dfs_destinations[0].y << endl;
 	int final_x = dfs_destinations[0].x;
 	int final_y = dfs_destinations[0].y;
+	int x_diff = final_x - init_x;
+	int y_diff = final_y - init_y;
+	
 	
 
 	//distance must be in world co ordinates that is m and then converted to cm for tello
@@ -656,8 +662,22 @@ vector<std::string> returnNextCommand(int init_x, int init_y)
 	double currentAngleFromYaw = tf::getYaw(curr_pose.pose.orientation);
 	cout << "the current angle from yaw function in degrees is " << int((currentAngleFromYaw) * 180 / M_PI) << endl;
 
-	double desiredAngle = atan2(final_y, final_x);
+	double desiredAngle = atan2(final_x, final_y);
 	cout<<"the desired angle is" << desiredAngle << endl;
+
+	//our method fails if we move along x and y - so overwrite desired for mov along axis.
+	//not sure of positive and negative 
+	if(y_diff >= 1 && x_diff ==0){
+		desiredAngle = 0; //moving along direction of yaw, parallel to yaw
+	} 
+	else if(x_diff >= 1 && y_diff ==0){
+		desiredAngle = M_PI/2; //moving perpendicular to yaw
+	} else if(x_diff <= -1 && y_diff ==0){
+		desiredAngle = -M_PI/2;
+	}else if(y_diff <= -1 && x_diff ==0){
+		desiredAngle = M_PI;
+	}
+
 
 	//get angle difference in degrees as an integer. CCW angle is positive 
 	int AngleDiff = int((desiredAngle - currentAngleFromYaw) * 180 / M_PI);
@@ -667,18 +687,7 @@ vector<std::string> returnNextCommand(int init_x, int init_y)
 	AngleDiff -= 360. * std::floor((AngleDiff + 180.) * (1. / 360.));
 	cout << "The angle difference after conversion is" << AngleDiff << endl;
 
-
-	// double desiredAngle = currentAngle;
-	// if(y_diff == 1){
-	// 	desiredAngle = M_PI / 2;
-	// } 
-	// else if(x_diff == 1){
-	// 	desiredAngle = 0;
-	// } else if(x_diff == -1){
-	// 	desiredAngle = M_PI;
-	// } else if(y_diff == -1){
-	// 	desiredAngle = - M_PI / 2;
-	// }
+	
 
 	// // CCW angle is positive 
 	// int AngleDiff = int((desiredAngle - currentAngle) * 180 / M_PI);
@@ -770,6 +779,9 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr& pts_and_pose){
 	    curr_pose_stamped.header.seq = ++curr_pose_id;
 	    curr_pose_stamped.pose = curr_pose;
 
+		//mark all current positions as visited! even if dfs is not running
+		dfs_visited.at<int>(kf_pos_grid_z, kf_pos_grid_x) = 1;
+
 	    pub_current_pose.publish(curr_pose_stamped);//used by current pose call back
 		//also publish dummy commands in moving mode to make connection to tello script
 		if(TELLO_MODE == moving && (!sent_command)){
@@ -835,7 +847,8 @@ void telloMoveComplete(const std_msgs::UInt32::ConstPtr& value){
 	//important - mark visited here! and clear the destination list for next iteration of dfs
 	if(dfs_destinations.size() !=0){
 		cout << "dfs destination size is" << dfs_destinations.size();
-		dfs_visited.at<int>(dfs_destinations[0].y, dfs_destinations[0].x) = 1;
+		//dfs_visited.at<int>(dfs_destinations[0].y, dfs_destinations[0].x) = 1;
+		dfs_visited.at<int>(kf_pos_grid_z, kf_pos_grid_x) = 1;
 		//clearing the destination list once we successfully generate a command and complete moving to that destination
 		dfs_destinations.clear();
 	}
