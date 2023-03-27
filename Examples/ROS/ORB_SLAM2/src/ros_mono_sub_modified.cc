@@ -586,10 +586,11 @@ bool within_distance(int init_x, int init_y, int final_x, int final_y)
 	cout << "The angle difference after conversion is" << AngleDiff << endl;
 
 	// step 4: compare to threshold and determine whether point is ahead of drone, and return true or false
-	if (tello_distance <= distance_threshold || abs(AngleDiff) >= 90) //|| (abs(AngleDiff) != 90 && abs(AngleDiff) != 0))
-		return true;
-	else
+	if(tello_distance > distance_threshold && ((abs(AngleDiff) >= 80 && abs(AngleDiff) <= 100) || abs(AngleDiff) <= 10))
+	// if (tello_distance <= distance_threshold /*|| abs(AngleDiff) >= 90)*/ || !(abs(AngleDiff) <= 90+10 && abs(AngleDiff) >= 90-10) || (abs(AngleDiff) >= 10))
 		return false;
+	else
+		return true;
 }
 
 vector<std::string> returnNextCommand(int init_x, int init_y)
@@ -679,7 +680,7 @@ vector<std::string> returnNextCommand(int init_x, int init_y)
 
 	// Rotate first
 	// convert to string based, for printing now
-	std::string angle = std::to_string(AngleDiff);
+	std::string angle = std::to_string(abs(AngleDiff));
 	if (AngleDiff > 0)
 	{
 		command_list.push_back("cw " + angle);
