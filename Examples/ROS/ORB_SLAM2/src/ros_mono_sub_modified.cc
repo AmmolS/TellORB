@@ -549,7 +549,7 @@ bool within_distance(int init_x, int init_y, int final_x, int final_y)
 	cout << "init_x is" << init_x << ", init_y is " << init_y << endl;
 	// cout << "the current angle  init in degrees is" << int((currentAngle) * 180 / M_PI) <<endl;
 
-	double desiredAngle = atan2(final_x, final_y);
+	double desiredAngle = atan2(x_diff, y_diff);
 	cout << "final_x is" << final_x << ", final_y is " << final_y << endl;
 	cout << "the desired angle on grid in degrees" << int((desiredAngle)*180 / M_PI) << endl;
 
@@ -559,22 +559,16 @@ bool within_distance(int init_x, int init_y, int final_x, int final_y)
 	// not sure why they use pi/2 angles
 	// our method fails if we move along x and y - so overwrite desired for mov along axis.
 	// not sure of positive and negative
-	if (y_diff >= 1 && x_diff == 0)
-	{
-		desiredAngle = 0; // moving along direction of yaw, parallel to yaw
-	}
-	else if (x_diff >= 1 && y_diff == 0)
-	{
-		desiredAngle = M_PI / 2; // moving perpendicular to yaw
-	}
-	else if (x_diff <= -1 && y_diff == 0)
-	{
-		desiredAngle = -M_PI / 2;
-	}
-	else if (y_diff <= -1 && x_diff == 0)
-	{
-		desiredAngle = M_PI;
-	}
+	//  if(y_diff >= 1 && x_diff ==0){
+	//  	desiredAngle = 0; //moving along direction of yaw, parallel to yaw
+	//  }
+	//  else if(x_diff >= 1 && y_diff ==0){
+	//  	desiredAngle = M_PI/2; //moving perpendicular to yaw
+	//  } else if(x_diff <= -1 && y_diff ==0){
+	//  	desiredAngle = -M_PI/2;
+	//  }else if(y_diff <= -1 && x_diff ==0){
+	//  	desiredAngle = M_PI;
+	//  }
 
 	// get angle difference in degrees as an integer. CCW angle is positive
 	int AngleDiff = int((desiredAngle - currentAngleFromYaw) * 180 / M_PI);
