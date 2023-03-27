@@ -549,7 +549,14 @@ bool within_distance(int init_x, int init_y, int final_x, int final_y)
 	cout << "init_x is" << init_x << ", init_y is " << init_y << endl;
 	// cout << "the current angle  init in degrees is" << int((currentAngle) * 180 / M_PI) <<endl;
 
-	double desiredAngle = atan2(x_diff, y_diff);
+	double desiredAngle = 0;
+
+	if(x_diff > 0 && y_diff > 0) desiredAngle = atan2(x_diff, y_diff);
+	else if(x_diff < 0 && y_diff > 0) desiredAngle = M_PI - atan2(x_diff, y_diff);
+	else if(x_diff < 0 && y_diff < 0) desiredAngle = -atan2(x_diff, y_diff);
+	else if(x_diff > 0 && y_diff < 0) desiredAngle = -atan2(x_diff, y_diff) - 180;
+
+	// double desiredAngle = atan2(x_diff, y_diff);
 	cout << "final_x is" << final_x << ", final_y is " << final_y << endl;
 	cout << "the desired angle on grid in degrees" << int((desiredAngle)*180 / M_PI) << endl;
 
@@ -570,7 +577,7 @@ bool within_distance(int init_x, int init_y, int final_x, int final_y)
 	//  	desiredAngle = M_PI;
 	//  }
 
-	// get angle difference in degrees as an integer. CCW angle is positive
+	// get angle difference in degrees as an integer. CW angle is positive
 	int AngleDiff = int((desiredAngle - currentAngleFromYaw) * 180 / M_PI);
 	cout << "The angle difference is" << AngleDiff << endl;
 
@@ -620,29 +627,35 @@ vector<std::string> returnNextCommand(int init_x, int init_y)
 	double currentAngleFromYaw = tf::getYaw(curr_pose.pose.orientation);
 	cout << "the current angle from yaw function in degrees is " << int((currentAngleFromYaw)*180 / M_PI) << endl;
 
-	double desiredAngle = atan2(final_x, final_y);
+	double desiredAngle = 0;
+	if(x_diff > 0 && y_diff > 0) desiredAngle = atan2(x_diff, y_diff);
+	else if(x_diff < 0 && y_diff > 0) desiredAngle = M_PI - atan2(x_diff, y_diff);
+	else if(x_diff < 0 && y_diff < 0) desiredAngle = -atan2(x_diff, y_diff);
+	else if(x_diff > 0 && y_diff < 0) desiredAngle = -atan2(x_diff, y_diff) - 180;
+	// double desiredAngle = atan2(final_x, final_y);
+	// double desiredAngle = atan2(x_diff, y_diff);
 	cout << "the desired angle is" << desiredAngle << endl;
 
 	// our method fails if we move along x and y - so overwrite desired for mov along axis.
 	// not sure of positive and negative
-	if (y_diff >= 1 && x_diff == 0)
-	{
-		desiredAngle = 0; // moving along direction of yaw, parallel to yaw
-	}
-	else if (x_diff >= 1 && y_diff == 0)
-	{
-		desiredAngle = M_PI / 2; // moving perpendicular to yaw
-	}
-	else if (x_diff <= -1 && y_diff == 0)
-	{
-		desiredAngle = -M_PI / 2;
-	}
-	else if (y_diff <= -1 && x_diff == 0)
-	{
-		desiredAngle = M_PI;
-	}
+	// if (y_diff >= 1 && x_diff == 0)
+	// {
+	// 	desiredAngle = 0; // moving along direction of yaw, parallel to yaw
+	// }
+	// else if (x_diff >= 1 && y_diff == 0)
+	// {
+	// 	desiredAngle = M_PI / 2; // moving perpendicular to yaw
+	// }
+	// else if (x_diff <= -1 && y_diff == 0)
+	// {
+	// 	desiredAngle = -M_PI / 2;
+	// }
+	// else if (y_diff <= -1 && x_diff == 0)
+	// {
+	// 	desiredAngle = M_PI;
+	// }
 
-	// get angle difference in degrees as an integer. CCW angle is positive
+	// get angle difference in degrees as an integer. CW angle is positive
 	int AngleDiff = int((desiredAngle - currentAngleFromYaw) * 180 / M_PI);
 	cout << "The angle difference is" << AngleDiff << endl;
 
