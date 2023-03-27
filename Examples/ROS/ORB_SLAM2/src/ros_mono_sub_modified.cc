@@ -469,11 +469,38 @@ void DFS(int init_x, int init_y)
 				dfs_destinations.push_back(pt);
 
 			// return once destination list has the first node
-			if (dfs_destinations.size() == 1)
+			if (dfs_destinations.size() == 5)
 			{
-				cout << "dfs returning, destination found" << pt.x << "," << pt.y << endl;
+				int minAngle = 180;
+				geometry_msgs::Point best;
+				for (int i=0; i<5; i++) {
+					int x_diff = dfs_destinations[i].x - init_x;
+					int y_diff = dfs_destinations[i].y - init_y;
+
+					double desiredAngle = 0.0;
+
+					if(x_diff > 0 && y_diff > 0) desiredAngle = atan2(x_diff, y_diff);
+					else if(x_diff < 0 && y_diff > 0) desiredAngle = M_PI - atan2(x_diff, y_diff);
+					else if(x_diff < 0 && y_diff < 0) desiredAngle = -atan2(x_diff, y_diff);
+					else if(x_diff > 0 && y_diff < 0) desiredAngle = -atan2(x_diff, y_diff) - M_PI;
+
+					double currentAngleFromYaw = tf::getYaw(curr_pose.pose.orientation);
+					int AngleDiff = int((desiredAngle - currentAngleFromYaw) * 180 / M_PI);
+
+					// convert angle difference to -180 to +180 degree range
+					AngleDiff -= 360. * std::floor((AngleDiff + 180.) * (1. / 360.));
+
+					if (AngleDiff < minAngle) {
+						minAngle = AngleDiff;
+						best = dfs_destinations[i];
+					}
+				}
+
+				dfs_destinations.clear();
+				dfs_destinations.push_back(best);
+				cout << "dfs returning, destination found" << best.x << "," << best.y << endl;
 				// add to a temp array for visualization !
-				dfs_destinations_visual.push_back(pt);
+				dfs_destinations_visual.push_back(best);
 				return;
 			}
 		}
@@ -554,7 +581,7 @@ bool within_distance(int init_x, int init_y, int final_x, int final_y)
 	if(x_diff > 0 && y_diff > 0) desiredAngle = atan2(x_diff, y_diff);
 	else if(x_diff < 0 && y_diff > 0) desiredAngle = M_PI - atan2(x_diff, y_diff);
 	else if(x_diff < 0 && y_diff < 0) desiredAngle = -atan2(x_diff, y_diff);
-	else if(x_diff > 0 && y_diff < 0) desiredAngle = -atan2(x_diff, y_diff) - 180;
+	else if(x_diff > 0 && y_diff < 0) desiredAngle = -atan2(x_diff, y_diff) - M_PI;
 
 	// double desiredAngle = atan2(x_diff, y_diff);
 	cout << "final_x is" << final_x << ", final_y is " << final_y << endl;
@@ -632,7 +659,7 @@ vector<std::string> returnNextCommand(int init_x, int init_y)
 	if(x_diff > 0 && y_diff > 0) desiredAngle = atan2(x_diff, y_diff);
 	else if(x_diff < 0 && y_diff > 0) desiredAngle = M_PI - atan2(x_diff, y_diff);
 	else if(x_diff < 0 && y_diff < 0) desiredAngle = -atan2(x_diff, y_diff);
-	else if(x_diff > 0 && y_diff < 0) desiredAngle = -atan2(x_diff, y_diff) - 180;
+	else if(x_diff > 0 && y_diff < 0) desiredAngle = -atan2(x_diff, y_diff) - M_PI;
 	// double desiredAngle = atan2(final_x, final_y);
 	// double desiredAngle = atan2(x_diff, y_diff);
 	cout << "the desired angle is" << desiredAngle << endl;
