@@ -293,6 +293,16 @@ def main():
                 tello.move_forward(100)
                 time.sleep(2)
                 pub_initialize_scale.publish(True);
+                
+                inputChar = readchar.readchar()
+                while(inputChar != 'l' and inputChar != '0'):
+                    print("Press l to move back and start DFS, 0 to cancel")
+                    inputChar = readchar.readchar()
+
+                if(inputChar == 'l'):
+                    tello.move_back(100)
+                    pub_initialize_scale.publish(True);
+                print("Providing manual control again")
             elif inputChar == 'b':
                 global all_commands_received
                 if all_commands_received:
