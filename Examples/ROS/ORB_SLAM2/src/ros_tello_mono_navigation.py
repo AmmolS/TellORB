@@ -194,10 +194,11 @@ def main():
         # cv2.imwrite("picture.png", frame_read.frame)
 
 
-        pub_initialize_scale.publish(True);
+        
 
-        # if(tello.get_height() < height):
-        #     tello.move("up", int(height - tello.get_height()))
+        if(tello.get_height() > height):
+            tello.move("down", abs(int(height - tello.get_height())))
+        pub_initialize_scale.publish(True);
         #next set of manouvers
         angle = 0
         time.sleep(sleepTime)#from the config file
@@ -313,8 +314,8 @@ def main():
                             command = i.split(" ")
                             if(command[0] == "forward"):
                                 # tello.move("forward", int(command[1]))
-                                tello.move("forward", 30)
-                                print("Moving forward by 30")
+                                tello.move("forward", 50)
+                                print("Moving forward by 50")
                             elif(command[0] == "ccw"):
                                 for i in range(int(int(command[1])/rotationAngle)):
                                     print("Rotating ccw by " + str(int(rotationAngle)))
