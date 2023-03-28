@@ -59,7 +59,13 @@
         "concepts": "cpp",
         "xstddef": "cpp",
         "xtr1common": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "cassert": "cpp",
+        "cerrno": "cpp",
+        "cfloat": "cpp",
+        "ciso646": "cpp",
+        "climits": "cpp",
+        "core": "cpp"
     },
     "python.analysis.extraPaths": [
         "/home/alison/.local/bin/python3.8"

@@ -37,6 +37,7 @@
 #include <tf/transform_broadcaster.h>
 #include <queue>
 #include <stack>
+#include <unordered_set>
 #include <cmath>
 
 #ifndef DISABLE_FLANN
@@ -105,6 +106,7 @@ tf::StampedTransform odom_to_map_transform_stamped;
 geometry_msgs::PoseStamped goal;
 geometry_msgs::PoseWithCovariance init_pose, curr_pose;
 std::vector<std::pair<float, float>> people;
+// std::unordered_set<geometry_msgs::Point> dfs_obstacles;
 
 nav_msgs::Path goal_path;
 
@@ -162,7 +164,6 @@ enum tello_modes
 enum tello_modes TELLO_MODE = scale_computing;
 bool sent_command = false;
 bool dfs_started = false;
-std::stack<vector<geometry_msgs::Point>> dfs_stack; // DFS stack this should be global
 vector<std::string> command_list;
 cv::Mat dfs_visited; // this should be global too
 double distance_threshold = 150;
@@ -380,12 +381,11 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 	/*ECE496 CODE ADDITIONS END HERE*/
 }
 
-vector<geometry_msgs::Point> dfs_obstacles;
 
 void DFS(int init_x, int init_y)
 {
 	// int MIN_PATH_SIZE = 5;
-	int MAX_OCCUPIED_PROB = 55;
+	int MAX_OCCUPIED_PROB = (1-occupied_thresh)*100;
 
 	// These arrays are used to get row and column
 	// numbers of 4 neighbours of a given cell
@@ -394,7 +394,7 @@ void DFS(int init_x, int init_y)
 
 	ROS_INFO("Start indexes DFS exploration: (%i, %i) \n", init_x, init_y);
 
-	cv::Mat test_grid_map_int = cv::Mat(h, w, CV_16SC1, (char *)(grid_map_msg.data.data()));
+	// cv::Mat test_grid_map_int = cv::Mat(h, w, CV_16SC1, (char *)(grid_map_msg.data.data()));
 	// cv::Mat test_grid_map_int;
 
 	cv::Mat img_first;
@@ -419,38 +419,21 @@ void DFS(int init_x, int init_y)
 	// running simple dfs without any path finding
 	////////////////////////////////////
 	// vector<geometry_msgs::Point> path; // Store path history
-	vector<geometry_msgs::Point> dfs_path;
+	std::stack<geometry_msgs::Point> dfs_stack;
 
 	// Distance of source cell is 0
 	// the current position of the drone is marked visited since it is already there
 	dfs_visited.at<int>(init_y, init_x) = 1;
-	int i, j;
-	for (i = 0; i < h; i++)
-	{
-		for (j = 0; j < w; j++)
-		{
-			if ((int)img_final.at<short>(i, j) > 55 && grid_map_thresh.at<uchar>(i, j) != 128)
-			{
-				// cout << "occupied probability is" << (int)img_final.at<short>(i, j) << endl;
-				geometry_msgs::Point s;
-				s.x = j;
-				s.y = i;
-				dfs_obstacles.push_back(s);
-			}
-		}
-	}
 
 	geometry_msgs::Point s;
 	s.x = init_x;
 	s.y = init_y;
-	dfs_path.push_back(s);	  // dfs path is the old code, legacy
-	dfs_stack.push(dfs_path); // push the current source node onto the stack
+	dfs_stack.push(s);	  // dfs path is the old code, legacy
 
 	while (!dfs_stack.empty())
 	{
-		dfs_path = dfs_stack.top();
-		geometry_msgs::Point pt = dfs_path[dfs_path.size() - 1]; // getting the last element on the path?
-		cout << "size of dfs path is" << dfs_path.size();
+		geometry_msgs::Point pt = dfs_stack.top();
+		cout << "size of dfs stack is" << dfs_stack.size();
 		dfs_stack.pop();
 		// check if the popped node from the stack is unvisited, unoccupied
 		int probability_current = (int)img_final.at<short>(pt.y, pt.x);
@@ -485,13 +468,13 @@ void DFS(int init_x, int init_y)
 					else if(x_diff > 0 && y_diff < 0) desiredAngle = -atan2(x_diff, y_diff) - M_PI;
 
 					double currentAngleFromYaw = tf::getYaw(curr_pose.pose.orientation);
-					int AngleDiff = int((desiredAngle - currentAngleFromYaw) * 180 / M_PI);
+					int angleDiff = int((desiredAngle - currentAngleFromYaw) * 180 / M_PI);
 
 					// convert angle difference to -180 to +180 degree range
-					AngleDiff -= 360. * std::floor((AngleDiff + 180.) * (1. / 360.));
-
-					if (AngleDiff < minAngle) {
-						minAngle = AngleDiff;
+					angleDiff -= 360. * std::floor((angleDiff + 180.) * (1. / 360.));
+					angleDiff = abs(angleDiff);
+					if (angleDiff < minAngle) {
+						minAngle = angleDiff;
 						best = dfs_destinations[i];
 					}
 				}
@@ -521,11 +504,7 @@ void DFS(int init_x, int init_y)
 				geometry_msgs::Point newPoint;
 				newPoint.x = col;
 				newPoint.y = row;
-
-				vector<geometry_msgs::Point> newpath(dfs_path);
-				newpath.push_back(newPoint);
-
-				dfs_stack.push(newpath);
+				dfs_stack.push(newPoint);
 			}
 		}
 	}
@@ -1241,6 +1220,13 @@ void getGridMap()
 				grid_map_thresh.at<uchar>(row, col) = 0;
 				grid_map_int.at<char>(row, col) = (1 - grid_map.at<float>(row, col)) * 100;
 			}
+			// if ((int)grid_map_thresh.at<short>(i, j) > MAX_OCCUPIED_PROB && grid_map_thresh.at<uchar>(i, j) != 128)
+			// {
+			// 	geometry_msgs::Point s;
+			// 	s.x = j;
+			// 	s.y = i;
+			// 	dfs_obstacles.emplace(s);
+			// }
 		}
 	}
 	if (use_boundary_detection)
@@ -1291,11 +1277,11 @@ void showGridMap(unsigned int id)
 					   1, line_Color, -1);
 		}
 		cv::Scalar obstacles_color(0, 0, 255); // color of dfs obstacles
-		for (int i = 0; i < dfs_obstacles.size(); i++)
-		{
-			cv::circle(grid_map_rgb, cv::Point((dfs_obstacles[i].x) * resize_factor, (dfs_obstacles[i].y) * resize_factor),
-					   1, obstacles_color, -1);
-		}
+		// for (auto iter : dfs_obstacles)
+		// {
+		// 	cv::circle(grid_map_rgb, cv::Point((iter->x) * resize_factor, (iter->y) * resize_factor),
+		// 			   1, obstacles_color, -1);
+		// }
 
 		cv::imshow("grid_map_thresh_resized_rgb", grid_map_rgb);
 	}
