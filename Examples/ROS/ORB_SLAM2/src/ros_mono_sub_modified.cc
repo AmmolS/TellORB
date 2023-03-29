@@ -574,12 +574,12 @@ bool within_distance(int init_x, int init_y, int final_x, int final_y)
 
 bool no_obstacles(int init_x, int init_y, int final_x, int final_y)
 {
-	// calculate number of nodes corresponding to 20 cm on x-axis
-	double world_drone_square_horizontal_length = 20 * scale;
+	// calculate number of nodes corresponding to 40 cm on x-axis
+	double world_drone_square_horizontal_length = 40 * scale;
 	int horizontal_length = world_drone_square_horizontal_length * norm_factor_x * scale_factor;
 
-	// calculate number of nodes corresponding to 20 cm on y-axis
-	double world_drone_square_vertical_length = 20 * scale;
+	// calculate number of nodes corresponding to 40 cm on y-axis
+	double world_drone_square_vertical_length = 40 * scale;
 	int vertical_length = world_drone_square_vertical_length * norm_factor_z * scale_factor;
 
 	int min_x = std::min(final_x, init_x);
@@ -597,7 +597,7 @@ bool no_obstacles(int init_x, int init_y, int final_x, int final_y)
 		for (int i = -horizontal_length / 2; i < horizontal_length / 2; i++)
 			for (int j = -vertical_length / 2; j < vertical_length / 2; j++) {
 				int probability_current = (int)img_final.at<short>(curr_x + i, curr_y + j);
-				if (!isValid(curr_x + i, curr_y + j) || (probability_current >= MAX_OCCUPIED_PROB && probability_current < 0))
+				if (!isValid(curr_x + i, curr_y + j) || (probability_current >= MAX_OCCUPIED_PROB || probability_current < 0))
 					return false;
 			}
 		curr_x += x_diff;
