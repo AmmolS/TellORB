@@ -60,7 +60,7 @@ class command_subscriber:
     def __init__(self):
         # initialize the subscriber node
         # here we deal with messages of type String which are commands coming from subscriber.
-        self.image_sub = rospy.Subscriber("tello/command", 
+        self.command_sub = rospy.Subscriber("tello/command", 
                                           String, self.process_command)
         print("Initializing the command subscriber!")
   

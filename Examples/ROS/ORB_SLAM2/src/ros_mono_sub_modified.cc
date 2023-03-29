@@ -133,7 +133,7 @@ void generatePath(vector<geometry_msgs::Point> &path);
 void printPointPath(vector<geometry_msgs::Point> &path);
 void publishCommand(std::string tello_mode);
 bool within_distance(int init_x, int init_y, int final_x, int final_y);
-bool no_obstacles(int init_x, int init_y, int final_x, int final_y);
+bool is_obstacle(int init_x, int init_y, int final_x, int final_y);
 ros::Time next_command_time;
 
 // ORBSLAM functions
@@ -169,7 +169,7 @@ bool sent_command = false;
 bool dfs_started = false;
 vector<std::string> command_list;
 cv::Mat dfs_visited; // this should be global too
-double distance_threshold = 150;
+double distance_threshold = 80;
 vector<geometry_msgs::Point> dfs_destinations;
 vector<geometry_msgs::Point> dfs_destinations_visual;
 
@@ -358,6 +358,7 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 
 		/*ECE496 CODE ADDITIONS START HERE*/
 		DFS(int_pos_grid_x, int_pos_grid_z);
+		
 
 		// dfs will populate dfs_destinations with the choosen destination, which will be our final position
 
@@ -421,6 +422,7 @@ void DFS(int init_x, int init_y)
 	// cout << grid_map_int.rowRange(final_y, init_y) << endl;
 
 	int erodeSize = 1;
+	// std::unordered_set<std::unordered_set<int>>
 
 	grid_map_int.convertTo(img_first, CV_16SC1);
 
@@ -443,7 +445,7 @@ void DFS(int init_x, int init_y)
 	s.x = init_x;
 	s.y = init_y;
 	dfs_stack.push(s); // dfs path is the old code, legacy
-	int iterations = 300;
+	int iterations = 50;
 
 	while (!dfs_stack.empty())
 	{
@@ -461,7 +463,7 @@ void DFS(int init_x, int init_y)
 			cout << "DFS TRAVERSAL PRINTS  " << pt.x << pt.y << endl;
 			// check if these candidates are within x (threshold cm), if so mark it visited
 			// if not, add it to the destination list
-			if (within_distance(init_x, init_y, pt.x, pt.y) && no_obstacles(init_x, init_y, pt.x, pt.y))
+			if (within_distance(init_x, init_y, pt.x, pt.y) || is_obstacle(init_x, init_y, pt.x, pt.y))
 				dfs_visited.at<int>(pt.y, pt.x) = 1;
 			else
 				dfs_destinations.push_back(pt);
@@ -516,6 +518,7 @@ void DFS(int init_x, int init_y)
 			}
 		}
 	}
+	dfs_destinations.clear();
 }
 
 bool isValid(int valid_x, int valid_y)
@@ -572,18 +575,13 @@ bool within_distance(int init_x, int init_y, int final_x, int final_y)
 	double tello_distance = slam_distance / scale;
 	// cout << "tello distance between the two points is " << tello_distance << endl;
 
-	// get angle difference in degrees as an integer. CW angle is positive
-	int AngleDiff = getDroneAngle(x_diff, y_diff);
-
 	// step 4: compare to threshold and determine whether point is ahead of drone, and return true or false
-	if (tello_distance > distance_threshold && ((abs(AngleDiff) >= 80 && abs(AngleDiff) <= 100) || abs(AngleDiff) <= 10))
-		// if (tello_distance <= distance_threshold /*|| abs(AngleDiff) >= 90)*/ || !(abs(AngleDiff) <= 90+10 && abs(AngleDiff) >= 90-10) || (abs(AngleDiff) >= 10))
+	if (tello_distance > distance_threshold)
 		return false;
-	else
-		return true;
+	return true;
 }
 
-bool no_obstacles(int init_x, int init_y, int final_x, int final_y)
+bool is_obstacle(int init_x, int init_y, int final_x, int final_y)
 {
 	// calculate number of nodes corresponding to 40 cm on x-axis
 	double world_drone_square_horizontal_length = 40 * scale;
@@ -609,13 +607,13 @@ bool no_obstacles(int init_x, int init_y, int final_x, int final_y)
 			for (int j = -vertical_length / 2; j < vertical_length / 2; j++) {
 				int probability_current = (int)img_final.at<short>(curr_x + i, curr_y + j);
 				if (!isValid(curr_x + i, curr_y + j) || probability_current >= MAX_OCCUPIED_PROB || probability_current < 0)
-					return false;
+					return true;
 			}
 		curr_x += x_diff;
 		curr_y += y_diff;
 	}
 
-	return true;
+	return false;
 }
 
 vector<std::string> returnNextCommand(int init_x, int init_y)
