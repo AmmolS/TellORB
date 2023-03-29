@@ -414,7 +414,7 @@ void DFS(int init_x, int init_y)
 												cv::Size(2 * erodeSize + 1, 2 * erodeSize + 1),
 												cv::Point(erodeSize, erodeSize));
 
-	cv::erode(img_first, img_final, element);
+	cv::dilate(img_first, img_final, element);
 
 	// running simple dfs without any path finding
 	////////////////////////////////////
@@ -429,6 +429,7 @@ void DFS(int init_x, int init_y)
 	s.x = init_x;
 	s.y = init_y;
 	dfs_stack.push(s);	  // dfs path is the old code, legacy
+	int iterations = 50;
 
 	while (!dfs_stack.empty())
 	{
@@ -452,11 +453,12 @@ void DFS(int init_x, int init_y)
 				dfs_destinations.push_back(pt);
 
 			// return once destination list has the first node
-			if (dfs_destinations.size() == 5)
+			
+			if (dfs_destinations.size() == iterations)
 			{
 				int minAngle = 180;
 				geometry_msgs::Point best;
-				for (int i=0; i<5; i++) {
+				for (int i=0; i<iterations; i++) {
 					int x_diff = dfs_destinations[i].x - init_x;
 					int y_diff = dfs_destinations[i].y - init_y;
 
@@ -486,6 +488,7 @@ void DFS(int init_x, int init_y)
 				dfs_destinations_visual.push_back(best);
 				return;
 			}
+			cout << "dfs_destinations.size() == " << dfs_destinations.size() << endl;
 		}
 
 		// get the adjacent vertices of the current source, if they are not visited,unoccupied

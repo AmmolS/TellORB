@@ -198,7 +198,7 @@ def main():
 
         if(tello.get_height() > height):
             tello.move("down", abs(int(height - tello.get_height())))
-        pub_initialize_scale.publish(True);
+        #pub_initialize_scale.publish(True);
         #next set of manouvers
         angle = 0
         time.sleep(sleepTime)#from the config file
@@ -294,6 +294,7 @@ def main():
                 time.sleep(2)
                 pub_initialize_scale.publish(True);
                 
+                print("Press l to move back and start DFS, 0 to cancel")
                 inputChar = readchar.readchar()
                 while(inputChar != 'l' and inputChar != '0'):
                     print("Press l to move back and start DFS, 0 to cancel")
