@@ -428,7 +428,7 @@ void DFS(int init_x, int init_y)
 	s.x = init_x;
 	s.y = init_y;
 	dfs_stack.push(s); // dfs path is the old code, legacy
-	int iterations = 50;
+	int iterations = 300;
 
 	while (!dfs_stack.empty())
 	{
@@ -473,7 +473,7 @@ void DFS(int init_x, int init_y)
 
 				dfs_destinations.clear();
 				dfs_destinations.push_back(best);
-				cout << "dfs returning, destination found" << best.x << "," << best.y << endl;
+				cout << "dfs returning, destination found" << best.x << "," << best.y << " with angle to drone at " << minAngle << endl;
 				// add to a temp array for visualization !
 				dfs_destinations_visual.push_back(best);
 				return;
@@ -518,14 +518,11 @@ int getDroneAngle(const int &x_diff, const int &y_diff)
 {
 	double desiredAngle = 0;
 	desiredAngle = atan2(x_diff, y_diff);
-	cout << "the desired angle on grid in degrees" << int((desiredAngle)*180 / M_PI) << endl;
 	double currentAngleFromYaw = tf::getYaw(curr_pose.pose.orientation);
 	int angleDiff = int((desiredAngle + currentAngleFromYaw) * 180 / M_PI);
-	cout << "The angle difference is" << angleDiff << endl;
 
 	// convert angle difference to -180 to +180 degree range
 	angleDiff -= 360. * std::floor((angleDiff + 180.) * (1. / 360.));
-	cout << "The angle difference after conversion is" << angleDiff << endl;
 	return angleDiff;
 }
 
@@ -552,13 +549,13 @@ bool within_distance(int init_x, int init_y, int final_x, int final_y)
 	double x_world_diff = world_x1 - world_x0;
 	double y_world_diff = world_y1 - world_y0;
 
-	cout << "x world diff is " << x_world_diff << ", y world diff is " << y_world_diff << endl;
+	// cout << "x world diff is " << x_world_diff << ", y world diff is " << y_world_diff << endl;
 	double slam_distance = (sqrt(pow(x_world_diff, 2) + pow(y_world_diff, 2)));
-	cout << "slam distance in float is " << sqrt(pow(x_world_diff, 2) + pow(y_world_diff, 2)) << endl;
+	// cout << "slam distance in float is " << sqrt(pow(x_world_diff, 2) + pow(y_world_diff, 2)) << endl;
 
 	// step 2: use scale to get distance from orb slam coordinates
 	double tello_distance = slam_distance / scale;
-	cout << "tello distance between the two points is " << tello_distance << endl;
+	// cout << "tello distance between the two points is " << tello_distance << endl;
 
 	// get angle difference in degrees as an integer. CW angle is positive
 	int AngleDiff = getDroneAngle(x_diff, y_diff);
@@ -569,7 +566,6 @@ bool within_distance(int init_x, int init_y, int final_x, int final_y)
 		return false;
 	else
 		return true;
-	// here
 }
 
 bool no_obstacles(int init_x, int init_y, int final_x, int final_y)
@@ -626,13 +622,13 @@ vector<std::string> returnNextCommand(int init_x, int init_y)
 	double x_world_diff = world_x1 - world_x0;
 	double y_world_diff = world_y1 - world_y0;
 
-	cout << "x world diff is " << x_world_diff << ", y world diff is " << y_world_diff << endl;
+	// cout << "x world diff is " << x_world_diff << ", y world diff is " << y_world_diff << endl;
 	double slam_distance = (sqrt(pow(x_world_diff, 2) + pow(y_world_diff, 2)));
-	cout << "slam distance in float is " << sqrt(pow(x_world_diff, 2) + pow(y_world_diff, 2)) << endl;
+	// cout << "slam distance in float is " << sqrt(pow(x_world_diff, 2) + pow(y_world_diff, 2)) << endl;
 
 	// step 2: use scale to get distance from orb slam coordinates
 	double tello_distance = slam_distance / scale;
-	cout << "tello distance between the two points is " << tello_distance << endl;
+	// cout << "tello distance between the two points is " << tello_distance << endl;
 
 	int AngleDiff = getDroneAngle(x_diff, y_diff);
 
