@@ -389,8 +389,23 @@ void DFS(int init_x, int init_y)
 
 	// These arrays are used to get row and column
 	// numbers of 4 neighbours of a given cell
-	int rowNum[] = {-1, 0, 0, 1};
-	int colNum[] = {0, -1, 1, 0};
+	std::vector<int> rowNum = {0, -1, 1, 0};
+	std::vector<int> colNum = {-1, 0, 0, 1};
+
+	double currYaw = tf::getYaw(curr_pose.pose.orientation);
+	if (currYaw <= M_PI/4 && currYaw >= -M_PI/4) { // down
+		rowNum = {0, -1, 1, 0};
+		colNum = {-1, 0, 0, 1};
+	} else if (currYaw > M_PI/4 && currYaw <= 3*M_PI/4) { // left
+		rowNum = {1, 0, 0, -1};
+		colNum = {0, -1, 1, 0};
+	} else if (currYaw < -M_PI/4 && currYaw >= -3*M_PI/4) { // right
+		rowNum = {-1, 0, 0, 1};
+		colNum = {0, -1, 1, 0};
+	} else if (currYaw > 3*M_PI/4 || currYaw < -3*M_PI/4) { // up
+		rowNum = {0, -1, 1, 0};
+		colNum = {1, 0, 0, -1};
+	}
 
 	ROS_INFO("Start indexes DFS exploration: (%i, %i) \n", init_x, init_y);
 
@@ -469,8 +484,7 @@ void DFS(int init_x, int init_y)
 					else if(x_diff < 0 && y_diff < 0) desiredAngle = -atan2(x_diff, y_diff);
 					else if(x_diff > 0 && y_diff < 0) desiredAngle = -atan2(x_diff, y_diff) - M_PI;
 
-					double currentAngleFromYaw = tf::getYaw(curr_pose.pose.orientation);
-					int angleDiff = int((desiredAngle - currentAngleFromYaw) * 180 / M_PI);
+					int angleDiff = int((desiredAngle - currYaw) * 180 / M_PI);
 
 					// convert angle difference to -180 to +180 degree range
 					angleDiff -= 360. * std::floor((angleDiff + 180.) * (1. / 360.));
@@ -1274,7 +1288,7 @@ void showGridMap(unsigned int id)
 
 		for (auto &element : people)
 		{
-			printf("Adding magenta dot to map at x: %f y: %f\n", element.first * resize_factor, element.second * resize_factor);
+			// printf("Adding magenta dot to map at x: %f y: %f\n", element.first * resize_factor, element.second * resize_factor);
 			cv::Scalar line_Color(255, 0, 255); // Magenta
 			cv::circle(grid_map_rgb, cv::Point(element.first * resize_factor, element.second * resize_factor),
 					   1, line_Color, -1);
