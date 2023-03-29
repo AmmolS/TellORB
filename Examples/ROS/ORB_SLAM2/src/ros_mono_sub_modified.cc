@@ -586,8 +586,8 @@ bool no_obstacles(int init_x, int init_y, int final_x, int final_y)
 	int max_x = std::max(final_x, init_x);
 	int min_y = std::min(final_y, init_y);
 	int max_y = std::max(final_y, init_y); // determine sloxpe
-	int x_diff = (max_x - min_x / horizontal_length);
-	int y_diff = (max_y - min_y / vertical_length);
+	int x_diff = (max_x - min_x) / horizontal_length;
+	int y_diff = (max_y - min_y) / vertical_length;
 
 	int curr_x = min_x;
 	int curr_y = min_y;
