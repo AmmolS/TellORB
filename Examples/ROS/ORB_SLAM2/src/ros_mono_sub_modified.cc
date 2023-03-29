@@ -119,6 +119,7 @@ geometry_msgs::Point kf_location;
 geometry_msgs::Quaternion kf_orientation;
 unsigned int kf_id = 0;
 unsigned int init_pose_id = 0, curr_pose_id = 0, curr_path_id = 0, goal_id = 0;
+int MAX_OCCUPIED_PROB = 0;
 
 using namespace std;
 using namespace cv;
@@ -132,6 +133,7 @@ void generatePath(vector<geometry_msgs::Point> &path);
 void printPointPath(vector<geometry_msgs::Point> &path);
 void publishCommand(std::string tello_mode);
 bool within_distance(int init_x, int init_y, int final_x, int final_y);
+bool no_obstacles(int init_x, int init_y, int final_x, int final_y);
 ros::Time next_command_time;
 
 // ORBSLAM functions
@@ -382,12 +384,8 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 	/*ECE496 CODE ADDITIONS END HERE*/
 }
 
-
 void DFS(int init_x, int init_y)
 {
-	// int MIN_PATH_SIZE = 5;
-	int MAX_OCCUPIED_PROB = (1-occupied_thresh)*100;
-
 	// These arrays are used to get row and column
 	// numbers of 4 neighbours of a given cell
 	int rowNum[] = {-1, 0, 0, 1};
@@ -429,7 +427,7 @@ void DFS(int init_x, int init_y)
 	geometry_msgs::Point s;
 	s.x = init_x;
 	s.y = init_y;
-	dfs_stack.push(s);	  // dfs path is the old code, legacy
+	dfs_stack.push(s); // dfs path is the old code, legacy
 	int iterations = 50;
 
 	while (!dfs_stack.empty())
@@ -448,24 +446,26 @@ void DFS(int init_x, int init_y)
 			cout << "DFS TRAVERSAL PRINTS  " << pt.x << pt.y << endl;
 			// check if these candidates are within x (threshold cm), if so mark it visited
 			// if not, add it to the destination list
-			if (within_distance(init_x, init_y, pt.x, pt.y))
+			if (within_distance(init_x, init_y, pt.x, pt.y) && no_obstacles(init_x, init_y, pt.x, pt.y))
 				dfs_visited.at<int>(pt.y, pt.x) = 1;
 			else
 				dfs_destinations.push_back(pt);
 
 			// return once destination list has the first node
-			
+
 			if (dfs_destinations.size() == iterations)
 			{
 				int minAngle = 180;
 				geometry_msgs::Point best;
-				for (int i=0; i<iterations; i++) {
+				for (int i = 0; i < iterations; i++)
+				{
 					int x_diff = dfs_destinations[i].x - init_x;
 					int y_diff = dfs_destinations[i].y - init_y;
 
 					int angleDiff = getDroneAngle(x_diff, y_diff);
 
-					if (angleDiff < minAngle) {
+					if (angleDiff < minAngle)
+					{
 						minAngle = angleDiff;
 						best = dfs_destinations[i];
 					}
@@ -514,7 +514,8 @@ bool isValid(int valid_x, int valid_y)
 	return true;
 }
 
-int getDroneAngle(const int &x_diff, const int &y_diff) {
+int getDroneAngle(const int &x_diff, const int &y_diff)
+{
 	double desiredAngle = 0;
 	desiredAngle = atan2(x_diff, y_diff);
 	cout << "the desired angle on grid in degrees" << int((desiredAngle)*180 / M_PI) << endl;
@@ -542,6 +543,12 @@ bool within_distance(int init_x, int init_y, int final_x, int final_y)
 	int x_diff = final_x - init_x;
 	int y_diff = final_y - init_y;
 
+	// float pt_pos_x = final_x * scale_factor;
+	// float pt_pos_z = final_y * scale_factor;
+
+	// int_pos_grid_x = int(floor((pt_pos_x)*norm_factor_x));
+	// int_pos_grid_z = int(floor((pt_pos_z)*norm_factor_z));
+
 	double x_world_diff = world_x1 - world_x0;
 	double y_world_diff = world_y1 - world_y0;
 
@@ -557,11 +564,47 @@ bool within_distance(int init_x, int init_y, int final_x, int final_y)
 	int AngleDiff = getDroneAngle(x_diff, y_diff);
 
 	// step 4: compare to threshold and determine whether point is ahead of drone, and return true or false
-	if(tello_distance > distance_threshold && ((abs(AngleDiff) >= 80 && abs(AngleDiff) <= 100) || abs(AngleDiff) <= 10))
-	// if (tello_distance <= distance_threshold /*|| abs(AngleDiff) >= 90)*/ || !(abs(AngleDiff) <= 90+10 && abs(AngleDiff) >= 90-10) || (abs(AngleDiff) >= 10))
+	if (tello_distance > distance_threshold && ((abs(AngleDiff) >= 80 && abs(AngleDiff) <= 100) || abs(AngleDiff) <= 10))
+		// if (tello_distance <= distance_threshold /*|| abs(AngleDiff) >= 90)*/ || !(abs(AngleDiff) <= 90+10 && abs(AngleDiff) >= 90-10) || (abs(AngleDiff) >= 10))
 		return false;
 	else
 		return true;
+	// here
+}
+
+bool no_obstacles(int init_x, int init_y, int final_x, int final_y)
+{
+	// calculate number of nodes corresponding to 20 cm on x-axis
+	double world_drone_square_horizontal_length = 20 * scale;
+	int horizontal_length = world_drone_square_horizontal_length * norm_factor_x * scale_factor;
+
+	// calculate number of nodes corresponding to 20 cm on y-axis
+	double world_drone_square_vertical_length = 20 * scale;
+	int vertical_length = world_drone_square_vertical_length * norm_factor_z * scale_factor;
+
+	int min_x = std::min(final_x, init_x);
+	int max_x = std::max(final_x, init_x);
+	int min_y = std::min(final_y, init_y);
+	int max_y = std::max(final_y, init_y); // determine sloxpe
+	int x_diff = (max_x - min_x / horizontal_length);
+	int y_diff = (max_y - min_y / vertical_length);
+
+	int curr_x = min_x;
+	int curr_y = min_y;
+	
+	while (curr_x < max_x && curr_y < max_y)
+	{
+		for (int i = -horizontal_length / 2; i < horizontal_length / 2; i++)
+			for (int j = -vertical_length / 2; j < vertical_length / 2; j++) {
+				int probability_current = (int)img_final.at<short>(curr_x + i, curr_y + j);
+				if (!isValid(curr_x + i, curr_y + j) || (probability_current >= MAX_OCCUPIED_PROB && probability_current < 0))
+					return false;
+			}
+		curr_x += x_diff;
+		curr_y += y_diff;
+	}
+
+	return true;
 }
 
 vector<std::string> returnNextCommand(int init_x, int init_y)
@@ -1241,6 +1284,7 @@ void showGridMap(unsigned int id)
 		if (occupied_thresh >= free_thresh)
 		{
 			occupied_thresh = free_thresh - thresh_diff;
+			MAX_OCCUPIED_PROB = (1 - occupied_thresh) * 100;
 		}
 		printf("Setting occupied_thresh to: %f\n", occupied_thresh);
 	}
@@ -1354,6 +1398,7 @@ void parseParams(int argc, char **argv)
 	if (argc > arg_id)
 	{
 		occupied_thresh = atof(argv[arg_id++]);
+		MAX_OCCUPIED_PROB = (1 - occupied_thresh) * 100;
 	}
 	if (argc > arg_id)
 	{
