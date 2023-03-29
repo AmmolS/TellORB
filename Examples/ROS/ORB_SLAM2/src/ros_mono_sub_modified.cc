@@ -413,7 +413,7 @@ void DFS(int init_x, int init_y)
 												cv::Size(2 * erodeSize + 1, 2 * erodeSize + 1),
 												cv::Point(erodeSize, erodeSize));
 
-	cv::dilate(img_first, img_final, element);
+	cv::erode(img_first, img_final, element);
 
 	// running simple dfs without any path finding
 	////////////////////////////////////
@@ -593,7 +593,7 @@ bool no_obstacles(int init_x, int init_y, int final_x, int final_y)
 		for (int i = -horizontal_length / 2; i < horizontal_length / 2; i++)
 			for (int j = -vertical_length / 2; j < vertical_length / 2; j++) {
 				int probability_current = (int)img_final.at<short>(curr_x + i, curr_y + j);
-				if (!isValid(curr_x + i, curr_y + j) || (probability_current >= MAX_OCCUPIED_PROB || probability_current < 0))
+				if (!isValid(curr_x + i, curr_y + j) || probability_current >= MAX_OCCUPIED_PROB || probability_current < 0)
 					return false;
 			}
 		curr_x += x_diff;
