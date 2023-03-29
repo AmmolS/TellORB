@@ -125,6 +125,7 @@ using namespace cv;
 
 // Search functions
 void DFS(int init_x, int init_y);
+int getDroneAngle(const int &x_diff, const int &y_diff);
 bool isValid(int valid_x, int valid_y);
 vector<std::string> returnNextCommand(int init_x, int init_y);
 void generatePath(vector<geometry_msgs::Point> &path);
@@ -462,19 +463,8 @@ void DFS(int init_x, int init_y)
 					int x_diff = dfs_destinations[i].x - init_x;
 					int y_diff = dfs_destinations[i].y - init_y;
 
-					double desiredAngle = 0.0;
+					int angleDiff = getDroneAngle(x_diff, y_diff);
 
-					if(x_diff > 0 && y_diff > 0) desiredAngle = atan2(x_diff, y_diff);
-					else if(x_diff < 0 && y_diff > 0) desiredAngle = M_PI - atan2(x_diff, y_diff);
-					else if(x_diff < 0 && y_diff < 0) desiredAngle = -atan2(x_diff, y_diff);
-					else if(x_diff > 0 && y_diff < 0) desiredAngle = -atan2(x_diff, y_diff) - M_PI;
-
-					double currentAngleFromYaw = tf::getYaw(curr_pose.pose.orientation);
-					int angleDiff = int((desiredAngle - currentAngleFromYaw) * 180 / M_PI);
-
-					// convert angle difference to -180 to +180 degree range
-					angleDiff -= 360. * std::floor((angleDiff + 180.) * (1. / 360.));
-					angleDiff = abs(angleDiff);
 					if (angleDiff < minAngle) {
 						minAngle = angleDiff;
 						best = dfs_destinations[i];
@@ -524,9 +514,22 @@ bool isValid(int valid_x, int valid_y)
 	return true;
 }
 
+int getDroneAngle(const int &x_diff, const int &y_diff) {
+	double desiredAngle = 0;
+	desiredAngle = atan2(x_diff, y_diff);
+	cout << "the desired angle on grid in degrees" << int((desiredAngle)*180 / M_PI) << endl;
+	double currentAngleFromYaw = tf::getYaw(curr_pose.pose.orientation);
+	int angleDiff = int((desiredAngle + currentAngleFromYaw) * 180 / M_PI);
+	cout << "The angle difference is" << angleDiff << endl;
+
+	// convert angle difference to -180 to +180 degree range
+	angleDiff -= 360. * std::floor((angleDiff + 180.) * (1. / 360.));
+	cout << "The angle difference after conversion is" << angleDiff << endl;
+	return angleDiff;
+}
+
 // function that checks if two points on the grid are less than threshold cm apart, if so it returns true
 // if not, it returns false
-
 bool within_distance(int init_x, int init_y, int final_x, int final_y)
 {
 
@@ -550,49 +553,8 @@ bool within_distance(int init_x, int init_y, int final_x, int final_y)
 	double tello_distance = slam_distance / scale;
 	cout << "tello distance between the two points is " << tello_distance << endl;
 
-	// step 3: determine how many degrees drone would turn. Angle is believed to be from cartesian angle between x and y axes
-	double currentAngleFromYaw = tf::getYaw(curr_pose.pose.orientation);
-	cout << "the current angle from yaw function in degrees is " << int((currentAngleFromYaw)*180 / M_PI) << endl;
-
-	// double currentAngle = atan2(init_y, init_x);
-	cout << "init_x is" << init_x << ", init_y is " << init_y << endl;
-	// cout << "the current angle  init in degrees is" << int((currentAngle) * 180 / M_PI) <<endl;
-
-	double desiredAngle = 0;
-
-	if(x_diff > 0 && y_diff > 0) desiredAngle = atan2(x_diff, y_diff);
-	else if(x_diff < 0 && y_diff > 0) desiredAngle = M_PI - atan2(x_diff, y_diff);
-	else if(x_diff < 0 && y_diff < 0) desiredAngle = -atan2(x_diff, y_diff);
-	else if(x_diff > 0 && y_diff < 0) desiredAngle = -atan2(x_diff, y_diff) - M_PI;
-
-	// double desiredAngle = atan2(x_diff, y_diff);
-	cout << "final_x is" << final_x << ", final_y is " << final_y << endl;
-	cout << "the desired angle on grid in degrees" << int((desiredAngle)*180 / M_PI) << endl;
-
-	// double desiredAngleFromYaw = atan2(world_y1,world_x1);
-	// cout << "the desired angle from world is" << int((desiredAngleFromYaw) * 180 / M_PI)  << endl;
-
-	// not sure why they use pi/2 angles
-	// our method fails if we move along x and y - so overwrite desired for mov along axis.
-	// not sure of positive and negative
-	//  if(y_diff >= 1 && x_diff ==0){
-	//  	desiredAngle = 0; //moving along direction of yaw, parallel to yaw
-	//  }
-	//  else if(x_diff >= 1 && y_diff ==0){
-	//  	desiredAngle = M_PI/2; //moving perpendicular to yaw
-	//  } else if(x_diff <= -1 && y_diff ==0){
-	//  	desiredAngle = -M_PI/2;
-	//  }else if(y_diff <= -1 && x_diff ==0){
-	//  	desiredAngle = M_PI;
-	//  }
-
 	// get angle difference in degrees as an integer. CW angle is positive
-	int AngleDiff = int((desiredAngle - currentAngleFromYaw) * 180 / M_PI);
-	cout << "The angle difference is" << AngleDiff << endl;
-
-	// convert angle difference to -180 to +180 degree range
-	AngleDiff -= 360. * std::floor((AngleDiff + 180.) * (1. / 360.));
-	cout << "The angle difference after conversion is" << AngleDiff << endl;
+	int AngleDiff = getDroneAngle(x_diff, y_diff);
 
 	// step 4: compare to threshold and determine whether point is ahead of drone, and return true or false
 	if(tello_distance > distance_threshold && ((abs(AngleDiff) >= 80 && abs(AngleDiff) <= 100) || abs(AngleDiff) <= 10))
@@ -629,63 +591,7 @@ vector<std::string> returnNextCommand(int init_x, int init_y)
 	double tello_distance = slam_distance / scale;
 	cout << "tello distance between the two points is " << tello_distance << endl;
 
-	// step 3: determine how many degrees drone would turn. Angle is believed to be from cartesian angle between x and y axes
-	//  double currentAngle = tf::getYaw(curr_pose.pose.orientation);
-	//  double currentAngle = atan2(init_y, init_x);
-	//  cout << "the current angle is" << currentAngle << endl;
-	// step 3: determine how many degrees drone would turn. Angle is believed to be from cartesian angle between x and y axes
-	double currentAngleFromYaw = tf::getYaw(curr_pose.pose.orientation);
-	cout << "the current angle from yaw function in degrees is " << int((currentAngleFromYaw)*180 / M_PI) << endl;
-
-	double desiredAngle = 0;
-	if(x_diff > 0 && y_diff > 0) desiredAngle = atan2(x_diff, y_diff);
-	else if(x_diff < 0 && y_diff > 0) desiredAngle = M_PI - atan2(x_diff, y_diff);
-	else if(x_diff < 0 && y_diff < 0) desiredAngle = -atan2(x_diff, y_diff);
-	else if(x_diff > 0 && y_diff < 0) desiredAngle = -atan2(x_diff, y_diff) - M_PI;
-	// double desiredAngle = atan2(final_x, final_y);
-	// double desiredAngle = atan2(x_diff, y_diff);
-	cout << "the desired angle is" << desiredAngle << endl;
-
-	// our method fails if we move along x and y - so overwrite desired for mov along axis.
-	// not sure of positive and negative
-	// if (y_diff >= 1 && x_diff == 0)
-	// {
-	// 	desiredAngle = 0; // moving along direction of yaw, parallel to yaw
-	// }
-	// else if (x_diff >= 1 && y_diff == 0)
-	// {
-	// 	desiredAngle = M_PI / 2; // moving perpendicular to yaw
-	// }
-	// else if (x_diff <= -1 && y_diff == 0)
-	// {
-	// 	desiredAngle = -M_PI / 2;
-	// }
-	// else if (y_diff <= -1 && x_diff == 0)
-	// {
-	// 	desiredAngle = M_PI;
-	// }
-
-	// get angle difference in degrees as an integer. CW angle is positive
-	int AngleDiff = int((desiredAngle - currentAngleFromYaw) * 180 / M_PI);
-	cout << "The angle difference is" << AngleDiff << endl;
-
-	// convert angle difference to -180 to +180 degree range
-	AngleDiff -= 360. * std::floor((AngleDiff + 180.) * (1. / 360.));
-	cout << "The angle difference after conversion is" << AngleDiff << endl;
-
-	// // CCW angle is positive
-	// int AngleDiff = int((desiredAngle - currentAngle) * 180 / M_PI);
-
-	// AngleDiff -= 360. * std::floor((AngleDiff + 180.) * (1. / 360.));
-	// std::string angle = std::to_string(AngleDiff);
-
-	// cout << "angle_diff wrap: " << AngleDiff << endl;
-
-	// Based on the angle difference, we rotate first
-	// then we go forward by x cm.
-
-	// We return an array of 2 sets of strings with our commands
-	// Then in current pose call back we send both the commands.
+	int AngleDiff = getDroneAngle(x_diff, y_diff);
 
 	// Rotate first
 	// convert to string based, for printing now
