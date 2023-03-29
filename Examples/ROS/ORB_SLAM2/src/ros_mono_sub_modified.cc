@@ -373,6 +373,11 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 				cout << command_list[i];
 			}
 			cout << endl;
+		} else {
+			command_list.clear();
+			command_list.push_back("ccw 90");
+
+			cout << "found 0 commands from DFS. Issuing 90 degree left turn command" << endl;
 		}
 
 		cout << "setting the mode to moving the tello now" << endl;
@@ -704,9 +709,9 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr &pts_and_pose)
 	curr_pose.pose.position.x = kf_pos_grid_x_us;
 	curr_pose.pose.position.y = kf_pos_grid_z_us;
 
-	ROS_INFO("Publishing current pose: (%f, %f)\n", kf_pos_grid_x_us, kf_pos_grid_z_us);
-	ROS_INFO("Publishing current pose: (%f, %f)\n", kf_location.x, kf_location.z);
-	ROS_INFO("Publishing new current pose: (%f, %f)\n", kf_pos_grid_x * resize_factor, kf_pos_grid_z * resize_factor);
+	ROS_DEBUG("Publishing current pose: (%f, %f)\n", kf_pos_grid_x_us, kf_pos_grid_z_us);
+	ROS_DEBUG("Publishing current pose: (%f, %f)\n", kf_location.x, kf_location.z);
+	ROS_DEBUG("Publishing new current pose: (%f, %f)\n", kf_pos_grid_x * resize_factor, kf_pos_grid_z * resize_factor);
 	curr_pose.pose.position.z = 0;
 	curr_pose.pose.orientation.x = kf_orientation.x;
 	curr_pose.pose.orientation.y = kf_orientation.z;
@@ -738,7 +743,7 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr &pts_and_pose)
 				publishCommand(command_list[i]);
 				// maybe we need a dalay after each command? test first
 			}
-			publishCommand("done"); // some silly placeholder to indicate end
+			publishCommand("done"); // to indicate end
 			sent_command = true;
 		}
 	}
