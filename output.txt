@@ -3,7 +3,7 @@ Using params:
 scale_factor: 45.000000
 resize_factor: 1.000000
 cloud_max: 29.000000, 48.000000	 cloud_min: -25.000000, -12.000000
-free_thresh: 0.700000
+free_thresh: 0.600000
 occupied_thresh: 0.400000
 use_local_counters: 1
 visit_thresh: 30
@@ -14,7 +14,7 @@ normal_thresh_deg: 80.000000
 canny_thresh: 300
 enable_goal_publishing: 0
 show_camera_location: 1
-gaussian_kernel_size: 3
+gaussian_kernel_size: 9
 cam_radius: 3
 normal_thresh_y_rad: 0.174533 rad
 grid_max: 1305.000000, 2160.000000	 grid_min: -1125.000000, -540.000000
@@ -24,576 +24,324 @@ norm_factor_x_us: 0.981481
 norm_factor_z_us: 0.983333
 norm_factor_x: 0.999588
 norm_factor_z: 0.999630
+The blue dot is1124539
+The blue dot is1124540
+The blue dot is1124541
 The blue dot is1124542
-[0m[ INFO] [1679947629.779082539]: Publishing current pose: (24.997818, 12.055387)
-[0m
-[0m[ INFO] [1679947629.779862293]: Publishing current pose: (-0.002183, 0.055388)
-[0m
-[0m[ INFO] [1679947629.779871001]: Publishing new current pose: (1124.000000, 542.000000)
-[0m
 The blue dot is1124544
-[0m[ INFO] [1679947629.882034494]: Publishing current pose: (24.988497, 12.097583)
-[0m
-[0m[ INFO] [1679947629.882105078]: Publishing current pose: (-0.011503, 0.097583)
-[0m
-[0m[ INFO] [1679947629.882129953]: Publishing new current pose: (1124.000000, 544.000000)
-[0m
-The blue dot is1124544
-[0m[ INFO] [1679947630.065919381]: Publishing current pose: (24.991280, 12.108009)
-[0m
-[0m[ INFO] [1679947630.065947756]: Publishing current pose: (-0.008721, 0.108009)
-[0m
-[0m[ INFO] [1679947630.065953839]: Publishing new current pose: (1124.000000, 544.000000)
-[0m
-The blue dot is1125541
-[0m[ INFO] [1679947630.216988901]: Publishing current pose: (25.019873, 12.045735)
-[0m
-[0m[ INFO] [1679947630.217010110]: Publishing current pose: (0.019872, 0.045735)
-[0m
-[0m[ INFO] [1679947630.217014735]: Publishing new current pose: (1125.000000, 541.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947630.368886009]: Publishing current pose: (25.036819, 11.998283)
-[0m
-[0m[ INFO] [1679947630.368908801]: Publishing current pose: (0.036820, -0.001717)
-[0m
-[0m[ INFO] [1679947630.368913759]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1125539
-[0m[ INFO] [1679947630.519481152]: Publishing current pose: (25.026438, 11.985703)
-[0m
-[0m[ INFO] [1679947630.520661074]: Publishing current pose: (0.026438, -0.014298)
-[0m
-[0m[ INFO] [1679947630.520677074]: Publishing new current pose: (1125.000000, 539.000000)
-[0m
-The blue dot is1125539
-[0m[ INFO] [1679947631.318135337]: Publishing current pose: (25.026474, 11.986219)
-[0m
-[0m[ INFO] [1679947631.318157004]: Publishing current pose: (0.026473, -0.013781)
-[0m
-[0m[ INFO] [1679947631.318161337]: Publishing new current pose: (1125.000000, 539.000000)
-[0m
-The blue dot is1125539
-[0m[ INFO] [1679947631.548101488]: Publishing current pose: (25.029907, 11.984799)
-[0m
-[0m[ INFO] [1679947631.548139904]: Publishing current pose: (0.029908, -0.015201)
-[0m
-[0m[ INFO] [1679947631.548150904]: Publishing new current pose: (1125.000000, 539.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947631.729680072]: Publishing current pose: (25.039625, 11.982314)
-[0m
-[0m[ INFO] [1679947631.729762989]: Publishing current pose: (0.039625, -0.017686)
-[0m
-[0m[ INFO] [1679947631.729783739]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947631.918652900]: Publishing current pose: (25.041000, 11.982821)
-[0m
-[0m[ INFO] [1679947631.918698192]: Publishing current pose: (0.041001, -0.017179)
-[0m
-[0m[ INFO] [1679947631.918710483]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947632.152039442]: Publishing current pose: (25.042400, 11.983177)
-[0m
-[0m[ INFO] [1679947632.152066567]: Publishing current pose: (0.042401, -0.016823)
-[0m
-[0m[ INFO] [1679947632.152074692]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947632.361712286]: Publishing current pose: (25.045010, 11.983342)
-[0m
-[0m[ INFO] [1679947632.361780787]: Publishing current pose: (0.045010, -0.016658)
-[0m
-[0m[ INFO] [1679947632.361838787]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947632.649491424]: Publishing current pose: (25.045527, 11.983520)
-[0m
-[0m[ INFO] [1679947632.650861389]: Publishing current pose: (0.045527, -0.016480)
-[0m
-[0m[ INFO] [1679947632.650877181]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947632.947881655]: Publishing current pose: (25.045895, 11.983590)
-[0m
-[0m[ INFO] [1679947632.948416533]: Publishing current pose: (0.045895, -0.016410)
-[0m
-[0m[ INFO] [1679947632.948425491]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947633.214525066]: Publishing current pose: (25.045616, 11.983685)
-[0m
-[0m[ INFO] [1679947633.214559983]: Publishing current pose: (0.045617, -0.016316)
-[0m
-[0m[ INFO] [1679947633.214565733]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947633.461626466]: Publishing current pose: (25.045681, 11.984019)
-[0m
-[0m[ INFO] [1679947633.461667966]: Publishing current pose: (0.045681, -0.015981)
-[0m
-[0m[ INFO] [1679947633.461674633]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947633.743710368]: Publishing current pose: (25.045490, 11.984107)
-[0m
-[0m[ INFO] [1679947633.743777910]: Publishing current pose: (0.045491, -0.015893)
-[0m
-[0m[ INFO] [1679947633.743834452]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947634.062107446]: Publishing current pose: (25.044872, 11.984370)
-[0m
-[0m[ INFO] [1679947634.062311780]: Publishing current pose: (0.044872, -0.015630)
-[0m
-[0m[ INFO] [1679947634.062391947]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947634.371556563]: Publishing current pose: (25.044762, 11.984841)
-[0m
-[0m[ INFO] [1679947634.372375192]: Publishing current pose: (0.044763, -0.015159)
-[0m
-[0m[ INFO] [1679947634.372430859]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947634.669406333]: Publishing current pose: (25.045605, 11.985222)
-[0m
-[0m[ INFO] [1679947634.669555292]: Publishing current pose: (0.045606, -0.014778)
-[0m
-[0m[ INFO] [1679947634.669594959]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947634.926180488]: Publishing current pose: (25.046032, 11.984942)
-[0m
-[0m[ INFO] [1679947634.926413572]: Publishing current pose: (0.046032, -0.015058)
-[0m
-[0m[ INFO] [1679947634.926466364]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947635.252754438]: Publishing current pose: (25.046074, 11.984967)
-[0m
-[0m[ INFO] [1679947635.253021397]: Publishing current pose: (0.046074, -0.015033)
-[0m
-[0m[ INFO] [1679947635.253035898]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947635.542714836]: Publishing current pose: (25.046534, 11.984788)
-[0m
-[0m[ INFO] [1679947635.543359006]: Publishing current pose: (0.046534, -0.015212)
-[0m
-[0m[ INFO] [1679947635.543373423]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947635.808064908]: Publishing current pose: (25.045895, 11.985890)
-[0m
-[0m[ INFO] [1679947635.808375826]: Publishing current pose: (0.045894, -0.014110)
-[0m
-[0m[ INFO] [1679947635.808433243]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947636.048713152]: Publishing current pose: (25.053410, 11.982744)
-[0m
-[0m[ INFO] [1679947636.048741277]: Publishing current pose: (0.053410, -0.017255)
-[0m
-[0m[ INFO] [1679947636.048746277]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947636.334821573]: Publishing current pose: (25.054802, 11.983643)
-[0m
-[0m[ INFO] [1679947636.334844115]: Publishing current pose: (0.054802, -0.016357)
-[0m
-[0m[ INFO] [1679947636.334848573]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947636.634028516]: Publishing current pose: (25.055357, 11.983086)
-[0m
-[0m[ INFO] [1679947636.634162517]: Publishing current pose: (0.055357, -0.016914)
-[0m
-[0m[ INFO] [1679947636.634203934]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947636.931999287]: Publishing current pose: (25.055841, 11.983416)
-[0m
-[0m[ INFO] [1679947636.932021245]: Publishing current pose: (0.055841, -0.016584)
-[0m
-[0m[ INFO] [1679947636.932026203]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947637.231812108]: Publishing current pose: (25.056547, 11.983641)
-[0m
-[0m[ INFO] [1679947637.231945067]: Publishing current pose: (0.056547, -0.016359)
-[0m
-[0m[ INFO] [1679947637.231972483]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947637.493303702]: Publishing current pose: (25.057049, 11.983422)
-[0m
-[0m[ INFO] [1679947637.493324744]: Publishing current pose: (0.057050, -0.016578)
-[0m
-[0m[ INFO] [1679947637.493329494]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947637.735314286]: Publishing current pose: (25.056763, 11.983587)
-[0m
-[0m[ INFO] [1679947637.735360953]: Publishing current pose: (0.056762, -0.016412)
-[0m
-[0m[ INFO] [1679947637.735373661]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947638.053461237]: Publishing current pose: (25.059658, 11.983391)
-[0m
-[0m[ INFO] [1679947638.053498987]: Publishing current pose: (0.059658, -0.016609)
-[0m
-[0m[ INFO] [1679947638.053510320]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947638.319046393]: Publishing current pose: (25.059292, 11.983537)
-[0m
-[0m[ INFO] [1679947638.319067768]: Publishing current pose: (0.059291, -0.016463)
-[0m
-[0m[ INFO] [1679947638.319072768]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947638.613649980]: Publishing current pose: (25.059053, 11.983169)
-[0m
-[0m[ INFO] [1679947638.613986815]: Publishing current pose: (0.059053, -0.016832)
-[0m
-[0m[ INFO] [1679947638.614045232]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947638.887493343]: Publishing current pose: (25.059675, 11.983272)
-[0m
-[0m[ INFO] [1679947638.887579718]: Publishing current pose: (0.059676, -0.016729)
-[0m
-[0m[ INFO] [1679947638.887605135]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947639.211622781]: Publishing current pose: (25.059456, 11.982995)
-[0m
-[0m[ INFO] [1679947639.211652073]: Publishing current pose: (0.059456, -0.017005)
-[0m
-[0m[ INFO] [1679947639.211656864]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947639.480483286]: Publishing current pose: (25.059595, 11.982780)
-[0m
-[0m[ INFO] [1679947639.480528536]: Publishing current pose: (0.059594, -0.017221)
-[0m
-[0m[ INFO] [1679947639.480534578]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947639.773388740]: Publishing current pose: (25.059015, 11.982991)
-[0m
-[0m[ INFO] [1679947639.773414907]: Publishing current pose: (0.059016, -0.017009)
-[0m
-[0m[ INFO] [1679947639.773420865]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947640.084289156]: Publishing current pose: (25.059093, 11.983238)
-[0m
-[0m[ INFO] [1679947640.084360240]: Publishing current pose: (0.059094, -0.016762)
-[0m
-[0m[ INFO] [1679947640.084385032]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947640.332113476]: Publishing current pose: (25.059469, 11.983485)
-[0m
-[0m[ INFO] [1679947640.332288061]: Publishing current pose: (0.059469, -0.016515)
-[0m
-[0m[ INFO] [1679947640.332329394]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947640.614294087]: Publishing current pose: (25.059414, 11.983161)
-[0m
-[0m[ INFO] [1679947640.614323921]: Publishing current pose: (0.059413, -0.016839)
-[0m
-[0m[ INFO] [1679947640.614329588]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947640.849564222]: Publishing current pose: (25.059261, 11.982898)
-[0m
-[0m[ INFO] [1679947640.849628222]: Publishing current pose: (0.059261, -0.017102)
-[0m
-[0m[ INFO] [1679947640.849651139]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947641.145342982]: Publishing current pose: (25.058668, 11.983022)
-[0m
-[0m[ INFO] [1679947641.145422316]: Publishing current pose: (0.058668, -0.016978)
-[0m
-[0m[ INFO] [1679947641.145486233]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947641.413906985]: Publishing current pose: (25.058281, 11.983336)
-[0m
-[0m[ INFO] [1679947641.415922953]: Publishing current pose: (0.058280, -0.016664)
-[0m
-[0m[ INFO] [1679947641.415931704]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947641.677831717]: Publishing current pose: (25.058300, 11.982934)
-[0m
-[0m[ INFO] [1679947641.687870598]: Publishing current pose: (0.058300, -0.017066)
-[0m
-[0m[ INFO] [1679947641.687892348]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947641.954838511]: Publishing current pose: (25.059042, 11.982863)
-[0m
-[0m[ INFO] [1679947641.955203471]: Publishing current pose: (0.059042, -0.017137)
-[0m
-[0m[ INFO] [1679947641.955262596]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947642.177271459]: Publishing current pose: (25.059107, 11.982904)
-[0m
-[0m[ INFO] [1679947642.177315501]: Publishing current pose: (0.059107, -0.017096)
-[0m
-[0m[ INFO] [1679947642.177326626]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947642.517968935]: Publishing current pose: (25.059210, 11.982995)
-[0m
-[0m[ INFO] [1679947642.517988769]: Publishing current pose: (0.059210, -0.017005)
-[0m
-[0m[ INFO] [1679947642.517994019]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947642.785463267]: Publishing current pose: (25.059191, 11.982862)
-[0m
-[0m[ INFO] [1679947642.785545934]: Publishing current pose: (0.059191, -0.017138)
-[0m
-[0m[ INFO] [1679947642.785611059]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947643.029055317]: Publishing current pose: (25.059208, 11.983138)
-[0m
-[0m[ INFO] [1679947643.029093775]: Publishing current pose: (0.059208, -0.016862)
-[0m
-[0m[ INFO] [1679947643.029105359]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947643.314016024]: Publishing current pose: (25.059717, 11.982776)
-[0m
-[0m[ INFO] [1679947643.314074441]: Publishing current pose: (0.059716, -0.017224)
-[0m
-[0m[ INFO] [1679947643.314080941]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947643.566728493]: Publishing current pose: (25.059671, 11.983016)
-[0m
-[0m[ INFO] [1679947643.566882619]: Publishing current pose: (0.059671, -0.016984)
-[0m
-[0m[ INFO] [1679947643.566958411]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947643.869480578]: Publishing current pose: (25.059793, 11.982757)
-[0m
-[0m[ INFO] [1679947643.869517953]: Publishing current pose: (0.059793, -0.017244)
-[0m
-[0m[ INFO] [1679947643.869529079]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947644.226229007]: Publishing current pose: (25.059608, 11.983113)
-[0m
-[0m[ INFO] [1679947644.226309091]: Publishing current pose: (0.059608, -0.016887)
-[0m
-[0m[ INFO] [1679947644.226332924]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947644.463301734]: Publishing current pose: (25.059292, 11.983315)
-[0m
-[0m[ INFO] [1679947644.463320401]: Publishing current pose: (0.059291, -0.016684)
-[0m
-[0m[ INFO] [1679947644.463324776]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1127539
-[0m[ INFO] [1679947644.764617687]: Publishing current pose: (25.073788, 11.989000)
-[0m
-[0m[ INFO] [1679947644.764793855]: Publishing current pose: (0.073788, -0.011000)
-[0m
-[0m[ INFO] [1679947644.764833896]: Publishing new current pose: (1127.000000, 539.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947645.007665193]: Publishing current pose: (25.046461, 11.989183)
-[0m
-[0m[ INFO] [1679947645.007799360]: Publishing current pose: (0.046461, -0.010816)
-[0m
-[0m[ INFO] [1679947645.007843110]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947645.243748914]: Publishing current pose: (25.047947, 11.990142)
-[0m
-[0m[ INFO] [1679947645.243889540]: Publishing current pose: (0.047947, -0.009858)
-[0m
-[0m[ INFO] [1679947645.243932832]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947645.453464801]: Publishing current pose: (25.046659, 11.987457)
-[0m
-[0m[ INFO] [1679947645.453521760]: Publishing current pose: (0.046659, -0.012542)
-[0m
-[0m[ INFO] [1679947645.453533635]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947645.653097680]: Publishing current pose: (25.045765, 11.986719)
-[0m
-[0m[ INFO] [1679947645.653260806]: Publishing current pose: (0.045765, -0.013281)
-[0m
-[0m[ INFO] [1679947645.653293431]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1126538
-[0m[ INFO] [1679947646.170731593]: Publishing current pose: (25.045092, 11.981004)
-[0m
-[0m[ INFO] [1679947646.170767385]: Publishing current pose: (0.045092, -0.018996)
-[0m
-[0m[ INFO] [1679947646.170774510]: Publishing new current pose: (1126.000000, 538.000000)
-[0m
-The blue dot is1126538
-[0m[ INFO] [1679947646.996762077]: Publishing current pose: (25.043810, 11.974833)
-[0m
-[0m[ INFO] [1679947646.996903703]: Publishing current pose: (0.043810, -0.025167)
-[0m
-[0m[ INFO] [1679947646.996946787]: Publishing new current pose: (1126.000000, 538.000000)
-[0m
-The blue dot is1126538
-[0m[ INFO] [1679947647.516771294]: Publishing current pose: (25.043627, 11.976385)
-[0m
-[0m[ INFO] [1679947647.516894461]: Publishing current pose: (0.043626, -0.023614)
-[0m
-[0m[ INFO] [1679947647.516920003]: Publishing new current pose: (1126.000000, 538.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947649.190901284]: Publishing current pose: (25.043591, 11.984252)
-[0m
-[0m[ INFO] [1679947649.190927326]: Publishing current pose: (0.043591, -0.015748)
-[0m
-[0m[ INFO] [1679947649.190932243]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947649.916237657]: Publishing current pose: (25.044031, 11.986520)
-[0m
-[0m[ INFO] [1679947649.916463284]: Publishing current pose: (0.044030, -0.013480)
-[0m
-[0m[ INFO] [1679947649.916510909]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-initialPose x: 25.044
-initialPose y: 11.9865
-The blue dot is1126539
-[0m[ INFO] [1679947651.139595099]: Publishing current pose: (25.044151, 11.989100)
-[0m
-[0m[ INFO] [1679947651.139685141]: Publishing current pose: (0.044151, -0.010901)
-[0m
-[0m[ INFO] [1679947651.139710016]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947651.741249709]: Publishing current pose: (25.044449, 11.992524)
-[0m
-[0m[ INFO] [1679947651.741611669]: Publishing current pose: (0.044449, -0.007476)
-[0m
-[0m[ INFO] [1679947651.741647794]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1126539
-[0m[ INFO] [1679947651.988866320]: Publishing current pose: (25.044714, 11.998489)
-[0m
-[0m[ INFO] [1679947651.989017487]: Publishing current pose: (0.044715, -0.001510)
-[0m
-[0m[ INFO] [1679947651.989060196]: Publishing new current pose: (1126.000000, 539.000000)
-[0m
-The blue dot is1126540
-[0m[ INFO] [1679947652.203327438]: Publishing current pose: (25.044495, 12.005868)
-[0m
-[0m[ INFO] [1679947652.203349563]: Publishing current pose: (0.044494, 0.005868)
-[0m
-[0m[ INFO] [1679947652.203353938]: Publishing new current pose: (1126.000000, 540.000000)
-[0m
-The blue dot is1126540
-[0m[ INFO] [1679947652.427030308]: Publishing current pose: (25.042997, 12.019149)
-[0m
-[0m[ INFO] [1679947652.427437477]: Publishing current pose: (0.042997, 0.019149)
-[0m
-[0m[ INFO] [1679947652.427545144]: Publishing new current pose: (1126.000000, 540.000000)
-[0m
-The blue dot is1126541
-[0m[ INFO] [1679947652.645601404]: Publishing current pose: (25.041342, 12.038100)
-[0m
-[0m[ INFO] [1679947652.645759405]: Publishing current pose: (0.041341, 0.038100)
-[0m
-[0m[ INFO] [1679947652.645973531]: Publishing new current pose: (1126.000000, 541.000000)
-[0m
-The blue dot is1126542
-[0m[ INFO] [1679947652.897602203]: Publishing current pose: (25.039492, 12.055510)
-[0m
-[0m[ INFO] [1679947652.897742162]: Publishing current pose: (0.039491, 0.055510)
-[0m
-[0m[ INFO] [1679947652.897792954]: Publishing new current pose: (1126.000000, 542.000000)
-[0m
-The blue dot is1126543
-[0m[ INFO] [1679947653.187695644]: Publishing current pose: (25.036787, 12.088250)
-[0m
-[0m[ INFO] [1679947653.187724435]: Publishing current pose: (0.036788, 0.088250)
-[0m
-[0m[ INFO] [1679947653.187730435]: Publishing new current pose: (1126.000000, 543.000000)
-[0m
-The blue dot is1126544
-[0m[ INFO] [1679947653.450421327]: Publishing current pose: (25.034464, 12.114841)
-[0m
-[0m[ INFO] [1679947653.450577661]: Publishing current pose: (0.034464, 0.114841)
-[0m
-[0m[ INFO] [1679947653.450622120]: Publishing new current pose: (1126.000000, 544.000000)
-[0m
-The blue dot is1126545
-[0m[ INFO] [1679947653.742335318]: Publishing current pose: (25.033993, 12.135609)
-[0m
-[0m[ INFO] [1679947653.742449569]: Publishing current pose: (0.033992, 0.135609)
-[0m
-[0m[ INFO] [1679947653.742480986]: Publishing new current pose: (1126.000000, 545.000000)
-[0m
-The blue dot is1126546
-[0m[ INFO] [1679947653.942015157]: Publishing current pose: (25.032898, 12.153631)
-[0m
-[0m[ INFO] [1679947653.942216449]: Publishing current pose: (0.032897, 0.153632)
-[0m
-[0m[ INFO] [1679947653.942268491]: Publishing new current pose: (1126.000000, 546.000000)
-[0m
-The blue dot is1125547
-[0m[ INFO] [1679947654.246898502]: Publishing current pose: (25.031525, 12.171858)
-[0m
-[0m[ INFO] [1679947654.246922835]: Publishing current pose: (0.031525, 0.171857)
-[0m
-[0m[ INFO] [1679947654.246927585]: Publishing new current pose: (1125.000000, 547.000000)
-[0m
-The blue dot is1125548
-[0m[ INFO] [1679947654.488295249]: Publishing current pose: (25.031185, 12.183537)
-[0m
-[0m[ INFO] [1679947654.488397000]: Publishing current pose: (0.031186, 0.183538)
-[0m
-[0m[ INFO] [1679947654.488425708]: Publishing new current pose: (1125.000000, 548.000000)
-[0m
-The blue dot is1125548
-[0m[ INFO] [1679947654.835449257]: Publishing current pose: (25.031624, 12.191735)
-[0m
-[0m[ INFO] [1679947654.835553841]: Publishing current pose: (0.031624, 0.191735)
-[0m
-[0m[ INFO] [1679947654.835575466]: Publishing new current pose: (1125.000000, 548.000000)
-[0m
-The blue dot is1125548
-[0m[ INFO] [1679947655.076428378]: Publishing current pose: (25.031069, 12.197629)
-[0m
-[0m[ INFO] [1679947655.076714546]: Publishing current pose: (0.031069, 0.197629)
-[0m
-[0m[ INFO] [1679947655.076725421]: Publishing new current pose: (1125.000000, 548.000000)
-[0m
-The blue dot is1125548
-[0m[ INFO] [1679947655.305645525]: Publishing current pose: (25.031200, 12.200177)
-[0m
-[0m[ INFO] [1679947655.305876193]: Publishing current pose: (0.031200, 0.200177)
-[0m
-[0m[ INFO] [1679947655.305935026]: Publishing new current pose: (1125.000000, 548.000000)
-[0m
-newPose x: 25.0312
-newPose y: 12.2002
-Calculated scale: 0.00214042
+The blue dot is1124546
+The blue dot is1124547
+The blue dot is1124546
+The blue dot is1124545
+The blue dot is1123546
+The blue dot is1123546
+The blue dot is1123546
+The blue dot is1123545
+The blue dot is1123545
+The blue dot is1123545
+The blue dot is1123544
+The blue dot is1123545
+The blue dot is1123545
+The blue dot is1123545
+The blue dot is1123545
+The blue dot is1123545
+The blue dot is1123544
+The blue dot is1123544
+The blue dot is1122543
+The blue dot is1122543
+The blue dot is1122543
+The blue dot is1122543
+The blue dot is1122543
+The blue dot is1122543
+The blue dot is1122542
+The blue dot is1122543
+The blue dot is1122543
+The blue dot is1122543
+The blue dot is1122543
+The blue dot is1122543
+The blue dot is1122543
+The blue dot is1122543
+The blue dot is1122543
+The blue dot is1121542
+The blue dot is1120543
+The blue dot is1120544
+initialPose x: 24.9194
+initialPose y: 12.105
+The blue dot is1120545
+The blue dot is1120546
+The blue dot is1120547
+The blue dot is1120547
+The blue dot is1120548
+The blue dot is1120548
+The blue dot is1120548
+The blue dot is1120548
+The blue dot is1120547
+The blue dot is1120545
+The blue dot is1120544
+The blue dot is1120543
+The blue dot is1120542
+The blue dot is1120542
+newPose x: 24.9059
+newPose y: 12.06
+Calculated scale: 0.000470417
 setting the mode to dfs now
+The blue dot is1120542
+Current index: 1120, 542
+[0m[ INFO] [1680202434.218141916]: Start indexes DFS exploration: (1120, 542) 
+[0m
+size of dfs stack is1 DFS exploring nodes for path 1120, 542
+DFS occupied 0
+DFS visited 1
+exploring nearby nodes541, 1120 with probabiity-0 , visited-0 , visited locally-0
+exploring nearby nodes542, 1119 with probabiity--1 , visited-0 , visited locally-0
+exploring nearby nodes542, 1121 with probabiity-0 , visited-0 , visited locally-0
+exploring nearby nodes543, 1120 with probabiity-0 , visited-0 , visited locally-0
+found 0 commands from DFS. Issuing 90 degree left turn command
+setting the mode to moving the tello now
+The blue dot is1120542
+Transmitting tello command: ccw 90
+Transmitting tello command: done
+The blue dot is1120542
+The blue dot is1120542
+The blue dot is1120543
+The blue dot is1120543
+The blue dot is1120543
+The blue dot is1120544
+The blue dot is1120544
+The blue dot is1120544
+The blue dot is1120544
+The blue dot is1120544
+The blue dot is1120544
+The blue dot is1120544
+The blue dot is1120543
+The blue dot is1119543
+The blue dot is1119542
+The blue dot is1119542
+The blue dot is1119543
+The blue dot is1119543
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119545
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119543
+The blue dot is1119543
+The blue dot is1119542
+The blue dot is1119543
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119545
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119543
+The blue dot is1119543
+The blue dot is1119542
+The blue dot is1119542
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1120543
+The blue dot is1119543
+The blue dot is1119543
+The blue dot is1119542
+The blue dot is1119542
+The blue dot is1119542
+The blue dot is1119542
+The blue dot is1119543
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+tello has completed moving, setting the mode back to dfs
+The blue dot is1119544
+Current index: 1119, 544
+[0m[ INFO] [1680202468.699550358]: Start indexes DFS exploration: (1119, 544) 
+[0m
+size of dfs stack is1 DFS exploring nodes for path 1119, 544
+DFS occupied 0
+DFS visited 1
+exploring nearby nodes544, 1120 with probabiity-0 , visited-0 , visited locally-0
+exploring nearby nodes543, 1119 with probabiity-0 , visited-0 , visited locally-0
+exploring nearby nodes545, 1119 with probabiity-0 , visited-0 , visited locally-0
+exploring nearby nodes544, 1118 with probabiity-0 , visited-0 , visited locally-0
+found 0 commands from DFS. Issuing 90 degree left turn command
+setting the mode to moving the tello now
+The blue dot is1119544
+Transmitting tello command: ccw 90
+Transmitting tello command: done
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119543
+The blue dot is1119543
+The blue dot is1119542
+The blue dot is1119542
+The blue dot is1119542
+The blue dot is1119542
+The blue dot is1119542
+The blue dot is1119543
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119543
+The blue dot is1119542
+The blue dot is1119542
+The blue dot is1119542
+The blue dot is1119543
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119543
+The blue dot is1119542
+The blue dot is1119542
+The blue dot is1119542
+The blue dot is1119543
+The blue dot is1119543
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119543
+The blue dot is1119542
+The blue dot is1119542
+The blue dot is1119542
+The blue dot is1119543
+The blue dot is1119543
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119543
+The blue dot is1119543
+The blue dot is1119542
+The blue dot is1119542
+The blue dot is1119543
+The blue dot is1119544
+The blue dot is1119544
+tello has completed moving, setting the mode back to dfs
+The blue dot is1119544
+Current index: 1119, 544
+[0m[ INFO] [1680202507.493587393]: Start indexes DFS exploration: (1119, 544) 
+[0m
+size of dfs stack is1 DFS exploring nodes for path 1119, 544
+DFS occupied 0
+DFS visited 1
+exploring nearby nodes545, 1119 with probabiity-0 , visited-0 , visited locally-0
+exploring nearby nodes544, 1118 with probabiity-0 , visited-0 , visited locally-0
+exploring nearby nodes544, 1120 with probabiity-0 , visited-0 , visited locally-0
+exploring nearby nodes543, 1119 with probabiity-0 , visited-0 , visited locally-0
+found 0 commands from DFS. Issuing 90 degree left turn command
+setting the mode to moving the tello now
+The blue dot is1119544
+Transmitting tello command: ccw 90
+Transmitting tello command: done
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119543
+The blue dot is1119543
+The blue dot is1119542
+The blue dot is1119542
+The blue dot is1119542
+The blue dot is1119542
+The blue dot is1119543
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119543
+The blue dot is1119543
+The blue dot is1119542
+The blue dot is1119542
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1119544
+The blue dot is1120543
+The blue dot is1120543
+The blue dot is1120542
+The blue dot is1120542
+The blue dot is1120542
+The blue dot is1120542
+The blue dot is1120542
+The blue dot is1120543
+The blue dot is1120544
+The blue dot is1120544
+The blue dot is1120544
+The blue dot is1120544
+The blue dot is1120543
+The blue dot is1120543
+The blue dot is1120543
+The blue dot is1120542
+The blue dot is1119543
+The blue dot is1119544
+The blue dot is1120544
+The blue dot is1120544
+The blue dot is1120544
+The blue dot is1120543
+The blue dot is1120542
+The blue dot is1120542
+The blue dot is1120542
+The blue dot is1120543
+tello has completed moving, setting the mode back to dfs
+The blue dot is1119544
+Current index: 1119, 544
+[0m[ INFO] [1680202548.610584257]: Start indexes DFS exploration: (1119, 544) 
+[0m
+size of dfs stack is1 DFS exploring nodes for path 1119, 544
+DFS occupied 0
+DFS visited 1
+exploring nearby nodes545, 1119 with probabiity-0 , visited-0 , visited locally-0
+exploring nearby nodes544, 1118 with probabiity-0 , visited-0 , visited locally-0
+exploring nearby nodes544, 1120 with probabiity-0 , visited-0 , visited locally-0
+exploring nearby nodes543, 1119 with probabiity-0 , visited-0 , visited locally-0
+found 0 commands from DFS. Issuing 90 degree left turn command
+setting the mode to moving the tello now
+The blue dot is1120544
+Transmitting tello command: ccw 90
+Transmitting tello command: done
+The blue dot is1120544
+tello has completed moving, setting the mode back to dfs
+The blue dot is1119544
+Current index: 1119, 544
+[0m[ INFO] [1680202569.292023158]: Start indexes DFS exploration: (1119, 544) 
+[0m
+size of dfs stack is1 DFS exploring nodes for path 1119, 544
+DFS occupied 0
+DFS visited 1
+exploring nearby nodes545, 1119 with probabiity-0 , visited-0 , visited locally-0
+exploring nearby nodes544, 1118 with probabiity-0 , visited-0 , visited locally-0
+exploring nearby nodes544, 1120 with probabiity-0 , visited-0 , visited locally-0
+exploring nearby nodes543, 1119 with probabiity-0 , visited-0 , visited locally-0
+found 0 commands from DFS. Issuing 90 degree left turn command
+setting the mode to moving the tello now
+The blue dot is1119545
+Transmitting tello command: ccw 90
+Transmitting tello command: done
+The blue dot is1119545
+The blue dot is1119545

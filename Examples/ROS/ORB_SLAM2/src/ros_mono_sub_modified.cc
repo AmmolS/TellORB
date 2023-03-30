@@ -445,6 +445,8 @@ void DFS(int init_x, int init_y)
 	// Distance of source cell is 0
 	// the current position of the drone is marked visited since it is already there
 	dfs_visited.at<int>(init_y, init_x) = 1;
+	cv::Mat dfs_visited_local = dfs_visited.clone();
+	
 
 	geometry_msgs::Point s;
 	s.x = init_x;
@@ -462,16 +464,19 @@ void DFS(int init_x, int init_y)
 		printf(" DFS exploring nodes for path %d, %d\n", int(pt.x), int(pt.y));
 		printf("DFS occupied %d\n", probability_current);
 		printf("DFS visited %d\n", dfs_visited.at<int>(pt.y, pt.x));
-		if (isValid(pt.x, pt.y) && probability_current < MAX_OCCUPIED_PROB && probability_current >= 0 && dfs_visited.at<int>(pt.y, pt.x) != 1)
+		if (isValid(pt.x, pt.y) && probability_current < MAX_OCCUPIED_PROB && probability_current >= 0 && dfs_visited.at<int>(pt.y, pt.x) != 1 && dfs_visited_local.at<int>(pt.y, pt.x) != 1)
 		{
 			// these are the possible candidates as destinations
 			cout << "DFS TRAVERSAL PRINTS  " << pt.x << pt.y << endl;
 			// check if these candidates are within x (threshold cm), if so mark it visited
 			// if not, add it to the destination list
-			if (within_distance(init_x, init_y, pt.x, pt.y) || is_obstacle(init_x, init_y, pt.x, pt.y))
+			if (within_distance(init_x, init_y, pt.x, pt.y)) {
 				dfs_visited.at<int>(pt.y, pt.x) = 1;
-			else
+			} else if (is_obstacle(init_x, init_y, pt.x, pt.y)) {
+				dfs_visited_local.at<int>(pt.y, pt.x) = 1;
+			} else {
 				dfs_destinations.push_back(pt);
+			}
 
 			// return once destination list has the first node
 
@@ -510,9 +515,9 @@ void DFS(int init_x, int init_y)
 			int col = pt.x + rowNum[i];
 			int row = pt.y + colNum[i];
 			int probability_nearby = (int)img_final.at<short>(row, col);
-			// printf("exploringnearby nodes%d, %d with probabiity-%d , visited-%d\n",row,col,probability_nearby,visited.at<int>(col, row));
+			printf("exploring nearby nodes%d, %d with probabiity-%d , visited-%d , visited locally-%d\n",row,col,probability_nearby,dfs_visited.at<int>(col, row),dfs_visited_local.at<int>(col, row));
 
-			if (isValid(row, col) && probability_nearby < MAX_OCCUPIED_PROB && probability_nearby >= 0 && dfs_visited.at<int>(row, col) != 1)
+			if (isValid(row, col) && probability_nearby < MAX_OCCUPIED_PROB && probability_nearby >= 0 && dfs_visited.at<int>(row, col) != 1 && dfs_visited_local.at<int>(pt.y, pt.x) != 1)
 			{
 				// push onto the stack
 				printf("DFS adding nearby nodes %d, %d\n", col, row);
@@ -574,11 +579,11 @@ bool within_distance(int init_x, int init_y, int final_x, int final_y)
 
 	// cout << "x world diff is " << x_world_diff << ", y world diff is " << y_world_diff << endl;
 	double slam_distance = (sqrt(pow(x_world_diff, 2) + pow(y_world_diff, 2)));
-	// cout << "slam distance in float is " << sqrt(pow(x_world_diff, 2) + pow(y_world_diff, 2)) << endl;
+	cout << "slam distance in float is " << sqrt(pow(x_world_diff, 2) + pow(y_world_diff, 2)) << endl;
 
 	// step 2: use scale to get distance from orb slam coordinates
 	double tello_distance = slam_distance / scale;
-	// cout << "tello distance between the two points is " << tello_distance << endl;
+	cout << "tello distance between the two points is " << tello_distance << endl;
 
 	// step 4: compare to threshold and determine whether point is ahead of drone, and return true or false
 	if (tello_distance > distance_threshold)
@@ -590,11 +595,11 @@ bool is_obstacle(int init_x, int init_y, int final_x, int final_y)
 {
 	// calculate number of nodes corresponding to 40 cm on x-axis
 	double world_drone_square_horizontal_length = 40 * scale;
-	int horizontal_length = world_drone_square_horizontal_length * norm_factor_x * scale_factor;
+	double horizontal_length = world_drone_square_horizontal_length * norm_factor_x * scale_factor;
 
 	// calculate number of nodes corresponding to 40 cm on y-axis
 	double world_drone_square_vertical_length = 40 * scale;
-	int vertical_length = world_drone_square_vertical_length * norm_factor_z * scale_factor;
+	double vertical_length = world_drone_square_vertical_length * norm_factor_z * scale_factor;
 
 	int min_x = std::min(final_x, init_x);
 	int max_x = std::max(final_x, init_x);
@@ -801,7 +806,7 @@ void telloMoveComplete(const std_msgs::UInt32::ConstPtr &value)
 	{
 		cout << "dfs destination size is" << dfs_destinations.size();
 		// dfs_visited.at<int>(dfs_destinations[0].y, dfs_destinations[0].x) = 1;
-		dfs_visited.at<int>(kf_pos_grid_z, kf_pos_grid_x) = 1;
+		dfs_visited.at<int>(int_pos_grid_z, int_pos_grid_x) = 1;
 		// clearing the destination list once we successfully generate a command and complete moving to that destination
 		dfs_destinations.clear();
 	}
