@@ -66,6 +66,7 @@
         "ciso646": "cpp",
         "climits": "cpp",
         "core": "cpp",
+<<<<<<< Updated upstream
         "condition_variable": "cpp",
         "unordered_set": "cpp",
         "iterator": "cpp",
@@ -75,6 +76,10 @@
         "set": "cpp",
         "string_view": "cpp",
         "variant": "cpp"
+=======
+        "*.ipp": "cpp",
+        "unordered_set": "cpp"
+>>>>>>> Stashed changes
     },
     "python.analysis.extraPaths": [
         "/home/alison/.local/bin/python3.8"
