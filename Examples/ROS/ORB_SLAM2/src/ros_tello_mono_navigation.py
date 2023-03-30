@@ -290,7 +290,7 @@ def main():
                     print("Rotation angle is now " + str(angle))
                     time.sleep(sleepTime)#from config file
             elif inputChar == 'l':
-                tello.move_forward(100)
+                tello.move_back(100)
                 time.sleep(2)
                 pub_initialize_scale.publish(True);
                 
@@ -301,7 +301,7 @@ def main():
                     inputChar = readchar.readchar()
 
                 if(inputChar == 'l'):
-                    tello.move_back(100)
+                    tello.move_forward(100)
                 
                 print("Press l to start DFS, 0 to cancel")
                 inputChar = readchar.readchar()

@@ -471,7 +471,7 @@ void DFS(int init_x, int init_y)
 			// check if these candidates are within x (threshold cm), if so mark it visited
 			// if not, add it to the destination list
 			if (within_distance(init_x, init_y, pt.x, pt.y)) {
-				dfs_visited.at<int>(pt.y, pt.x) = 1;
+				// dfs_visited.at<int>(pt.y, pt.x) = 1;
 			} else if (is_obstacle(init_x, init_y, pt.x, pt.y)) {
 				dfs_visited_local.at<int>(pt.y, pt.x) = 1;
 			} else {
@@ -515,7 +515,7 @@ void DFS(int init_x, int init_y)
 			int col = pt.x + rowNum[i];
 			int row = pt.y + colNum[i];
 			int probability_nearby = (int)img_final.at<short>(row, col);
-			printf("exploring nearby nodes%d, %d with probabiity-%d , visited-%d , visited locally-%d\n",row,col,probability_nearby,dfs_visited.at<int>(row, col),dfs_visited_local.at<int>(row, col));
+			printf("exploring nearby nodes%d, %d with probabiity-%d , visited-%d , visited locally-%d\n",row,col,probability_nearby,dfs_visited.at<int>(row, col),dfs_visited_local.at<int>(row,col));
 
 			if (isValid(row, col) && probability_nearby < MAX_OCCUPIED_PROB && probability_nearby >= 0 && dfs_visited.at<int>(row, col) != 1 && dfs_visited_local.at<int>(row, col) != 1)
 			{
@@ -586,7 +586,10 @@ bool within_distance(int init_x, int init_y, int final_x, int final_y)
 	cout << "tello distance between the two points is " << tello_distance << endl;
 
 	// step 4: compare to threshold and determine whether point is ahead of drone, and return true or false
-	if (tello_distance > distance_threshold)
+	if (tello_distance < 30) {
+		dfs_visited.at<int>(final_y, final_x) = 1;
+		return true;
+	} else if (tello_distance > distance_threshold)
 		return false;
 	return true;
 }
@@ -623,6 +626,7 @@ bool is_obstacle(int init_x, int init_y, int final_x, int final_y)
 		curr_y += y_diff;
 	}
 
+	cout << "is obstacle failed" << endl;
 	return false;
 }
 
@@ -1231,7 +1235,7 @@ void showGridMap(unsigned int id)
 		for (int i = 0; i < dfs_destinations_visual.size(); i++)
 		{
 			cv::circle(grid_map_rgb, cv::Point((dfs_destinations_visual[i].x) * resize_factor, (dfs_destinations_visual[i].y) * resize_factor),
-					   3, destination_color, -1);
+					   1, destination_color, -1);
 		}
 
 		cv::Scalar line_Color(255, 0, 0); // Color of the circle
@@ -1417,9 +1421,7 @@ void parseParams(int argc, char **argv)
 	if (argc > arg_id)
 	{
 		occupied_thresh = atof(argv[arg_id++]);
-		//MAX_OCCUPIED_PROB = (1 - occupied_thresh) * 100;
-		MAX_OCCUPIED_PROB = 7;
-
+		MAX_OCCUPIED_PROB = (1 - occupied_thresh) * 100;
 	}
 	if (argc > arg_id)
 	{
