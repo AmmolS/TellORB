@@ -454,7 +454,7 @@ void DFS(int init_x, int init_y)
 	dfs_stack.push(s); // dfs path is the old code, legacy
 	int iterations = 50;
 
-	while (!dfs_stack.empty())
+	while (!dfs_stack.empty() && dfs_stack.size() < 50000)
 	{
 		geometry_msgs::Point pt = dfs_stack.top();
 		cout << "size of dfs stack is" << dfs_stack.size();
@@ -626,7 +626,7 @@ bool is_obstacle(int init_x, int init_y, int final_x, int final_y)
 		curr_y += y_diff;
 	}
 
-	cout << "is obstacle failed" << endl;
+	cout << "is obstacle succeeded" << endl;
 	return false;
 }
 
@@ -786,7 +786,7 @@ void initializeScaleCallback(const std_msgs::Bool::ConstPtr &value)
 		newPose = curr_pose;
 		std::cout << "newPose x: " << newPose.pose.position.x << std::endl;
 		std::cout << "newPose y: " << newPose.pose.position.y << std::endl;
-		scale = (sqrt(pow((newPose.pose.position.x - initialPose.pose.position.x), 2) + pow((newPose.pose.position.y - initialPose.pose.position.y), 2))) / 100;
+		scale = (sqrt(pow((newPose.pose.position.x - initialPose.pose.position.x), 2) + pow((newPose.pose.position.y - initialPose.pose.position.y), 2))) / 50;
 		std::cout << "Calculated scale: " << scale << std::endl;
 		std::cout << "setting the mode to dfs now" << endl;
 		TELLO_MODE = dfs;

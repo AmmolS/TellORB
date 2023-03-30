@@ -290,18 +290,18 @@ def main():
                     print("Rotation angle is now " + str(angle))
                     time.sleep(sleepTime)#from config file
             elif inputChar == 'l':
-                tello.move_back(100)
+                tello.move_forward(100)
                 time.sleep(2)
                 pub_initialize_scale.publish(True);
                 
-                print("Press l to move back, 0 two times to cancel")
-                inputChar = readchar.readchar()
-                while(inputChar != 'l' and inputChar != '0'):
-                    print("Press l to move back, 0 to cancel")
-                    inputChar = readchar.readchar()
+                # print("Press l to move back, 0 two times to cancel")
+                # inputChar = readchar.readchar()
+                # while(inputChar != 'l' and inputChar != '0'):
+                #     print("Press l to move back, 0 to cancel")
+                #     inputChar = readchar.readchar()
 
-                if(inputChar == 'l'):
-                    tello.move_forward(100)
+                # if(inputChar == 'l'):
+                #     tello.move_back(50)
                 
                 print("Press l to start DFS, 0 to cancel")
                 inputChar = readchar.readchar()
@@ -310,6 +310,7 @@ def main():
                     inputChar = readchar.readchar()
 
                 if(inputChar == 'l'):
+                    tello.move_back(50)
                     pub_initialize_scale.publish(True);
                 print("Providing manual control again")
             elif inputChar == 'b':
