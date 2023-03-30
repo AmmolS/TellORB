@@ -472,8 +472,8 @@ void DFS(int init_x, int init_y)
 			// if not, add it to the destination list
 			if (within_distance(init_x, init_y, pt.x, pt.y)) {
 				dfs_visited.at<int>(pt.y, pt.x) = 1;
-			} else if (is_obstacle(init_x, init_y, pt.x, pt.y)) {
-				dfs_visited_local.at<int>(pt.y, pt.x) = 1;
+			// } else if (is_obstacle(init_x, init_y, pt.x, pt.y)) {
+			// 	dfs_visited_local.at<int>(pt.y, pt.x) = 1;
 			} else {
 				dfs_destinations.push_back(pt);
 			}
