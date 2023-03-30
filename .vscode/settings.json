@@ -65,7 +65,16 @@
         "cfloat": "cpp",
         "ciso646": "cpp",
         "climits": "cpp",
-        "core": "cpp"
+        "core": "cpp",
+        "condition_variable": "cpp",
+        "unordered_set": "cpp",
+        "iterator": "cpp",
+        "map": "cpp",
+        "memory_resource": "cpp",
+        "optional": "cpp",
+        "set": "cpp",
+        "string_view": "cpp",
+        "variant": "cpp"
     },
     "python.analysis.extraPaths": [
         "/home/alison/.local/bin/python3.8"
