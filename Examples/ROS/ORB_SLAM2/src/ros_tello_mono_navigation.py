@@ -196,8 +196,8 @@ def main():
 
         
 
-        if(tello.get_height() > height):
-            tello.move("down", abs(int(height - tello.get_height())))
+        # if(tello.get_height() > height):
+            # tello.move("down", abs(int(height - tello.get_height())))
         #pub_initialize_scale.publish(True);
         #next set of manouvers
         angle = 0

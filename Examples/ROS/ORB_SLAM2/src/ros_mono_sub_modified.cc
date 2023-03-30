@@ -515,9 +515,9 @@ void DFS(int init_x, int init_y)
 			int col = pt.x + rowNum[i];
 			int row = pt.y + colNum[i];
 			int probability_nearby = (int)img_final.at<short>(row, col);
-			printf("exploring nearby nodes%d, %d with probabiity-%d , visited-%d , visited locally-%d\n",row,col,probability_nearby,dfs_visited.at<int>(col, row),dfs_visited_local.at<int>(col, row));
+			printf("exploring nearby nodes%d, %d with probabiity-%d , visited-%d , visited locally-%d\n",row,col,probability_nearby,dfs_visited.at<int>(row, col),dfs_visited_local.at<int>(row, col));
 
-			if (isValid(row, col) && probability_nearby < MAX_OCCUPIED_PROB && probability_nearby >= 0 && dfs_visited.at<int>(row, col) != 1 && dfs_visited_local.at<int>(pt.y, pt.x) != 1)
+			if (isValid(row, col) && probability_nearby < MAX_OCCUPIED_PROB && probability_nearby >= 0 && dfs_visited.at<int>(row, col) != 1 && dfs_visited_local.at<int>(row, col) != 1)
 			{
 				// push onto the stack
 				printf("DFS adding nearby nodes %d, %d\n", col, row);
@@ -1417,7 +1417,9 @@ void parseParams(int argc, char **argv)
 	if (argc > arg_id)
 	{
 		occupied_thresh = atof(argv[arg_id++]);
-		MAX_OCCUPIED_PROB = (1 - occupied_thresh) * 100;
+		//MAX_OCCUPIED_PROB = (1 - occupied_thresh) * 100;
+		MAX_OCCUPIED_PROB = 7;
+
 	}
 	if (argc > arg_id)
 	{
