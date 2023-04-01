@@ -169,7 +169,7 @@ bool sent_command = false;
 bool dfs_started = false;
 vector<std::string> command_list;
 cv::Mat dfs_visited; // this should be global too
-double distance_threshold = 100;
+double distance_threshold = 80;
 vector<geometry_msgs::Point> dfs_destinations;
 vector<geometry_msgs::Point> dfs_destinations_visual;
 
@@ -603,16 +603,35 @@ bool is_obstacle(int init_x, int init_y, int final_x, int final_y)
 	// calculate number of nodes corresponding to 40 cm on y-axis
 	double vertical_length = world_drone_square_length * norm_factor_z * scale_factor;
 
-	int min_x = std::min(final_x, init_x);
-	int max_x = std::max(final_x, init_x);
-	int min_y = std::min(final_y, init_y);
-	int max_y = std::max(final_y, init_y); // determine sloxpe
+	int min_x = 0;
+	int max_x = 0;
+	int min_y = 0;
+	int max_y = 0;
+	if (final_x > init_x) {
+		min_x = init_x;
+		max_x = final_x;
+	} else {
+		min_x = final_x;
+		max_x = init_x;
+	}
+	if (final_y > init_y) {
+		min_y = init_y;
+		max_y = final_y;
+	} else {
+		min_y = final_y;
+		max_y = init_y;
+	}
 	int x_diff = (max_x - min_x) / horizontal_length;
 	int y_diff = (max_y - min_y) / vertical_length;
+	if (x_diff < 1)
+		x_diff = 1;
+	if (y_diff < 1)
+		y_diff = 1;
 
 	int curr_x = min_x;
 	int curr_y = min_y;
 	printf("Scanning coords x: %d to %d and y: %d to %d with xdiff: %d and ydiff: %d\n", min_x, max_x, min_y, max_y, x_diff, y_diff);
+	printf("Horizontal length is %f and Vertical length is %f\n", horizontal_length, vertical_length);
 	
 	while (curr_x <= max_x && curr_y <= max_y)
 	{

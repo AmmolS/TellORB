@@ -196,10 +196,10 @@ def main():
 
         time.sleep(2)
 
-        if(tello.get_height() < height):
-            tello.move("up", int(height - tello.get_height()))
-        elif(tello.get_height() > height):
-            tello.move("down", int(height - tello.get_height()) + 5)
+        if(tello.get_height() < height - 21):
+            tello.move("up", abs(int(height - tello.get_height())))
+        elif(tello.get_height() > height + 21):
+            tello.move("down", abs(int(height - tello.get_height())) + 5)
         droneUp = False
         #pub_initialize_scale.publish(True);
         #next set of manouvers
@@ -251,10 +251,10 @@ def main():
                 # rospy.spin()
             elif inputChar == 'n':
                 angle = 0
-                if(tello.get_height() < height):
-                    tello.move("up", int(height - tello.get_height()))
-                elif(tello.get_height() > height):
-                    tello.move("down", int(height - tello.get_height()) + 5)
+                if(tello.get_height() < height - 21):
+                    tello.move("up", abs(int(height - tello.get_height())))
+                elif(tello.get_height() > height + 21):
+                    tello.move("down", abs(int(height - tello.get_height())) + 5)
                 time.sleep(sleepTime)
                 while angle < (MAX_ANGLE):
                     print("Rotating: " + str(rotationAngle))
@@ -265,48 +265,48 @@ def main():
 
                     time.sleep(sleepTime)
                     if droneUp:
-                        tello.move("down", 30)
+                        tello.move("down", 25)
                     else:
-                        tello.move("up", 30)
+                        tello.move("up", 25)
                     droneUp = not droneUp
                     time.sleep(sleepTime)
                         
                     angle += rotationAngle
                     print("Rotation angle is now " + str(angle))
                     time.sleep(sleepTime)
-                if(tello.get_height() < height):
-                    tello.move("up", int(height - tello.get_height()))
-                elif(tello.get_height() > height):
-                    tello.move("down", int(height - tello.get_height()) + 5)
+                if(tello.get_height() < height - 21):
+                    tello.move("up", abs(int(height - tello.get_height())))
+                elif(tello.get_height() > height + 21):
+                    tello.move("down", abs(int(height - tello.get_height())) + 5)
             elif inputChar == 'm':
                 angle = 0
-                if(tello.get_height() < height):
-                    tello.move("up", int(height - tello.get_height()))
-                elif(tello.get_height() > height):
-                    tello.move("down", int(height - tello.get_height()) + 5)
+                if(tello.get_height() < height - 21):
+                    tello.move("up", abs(int(height - tello.get_height())))
+                elif(tello.get_height() > height + 21):
+                    tello.move("down", abs(int(height - tello.get_height())) + 5)
                 time.sleep(sleepTime)#from the config file
                 while angle < (MAX_ANGLE): #not sure if this will over rotate
                     print("Rotating: " + str(rotationAngle))
 
                     tello.set_speed(20)
-                    tello.rotate_counter_clockwise(rotationAngle)
+                    tello.rotate_clockwise(rotationAngle)
                     tello.set_speed(flightSpeed)
 
                     time.sleep(sleepTime)
                     if droneUp:
-                        tello.move("down", 30)
+                        tello.move("down", 25)
                     else:
-                        tello.move("up", 30)
+                        tello.move("up", 25)
                     droneUp = not droneUp
                     time.sleep(sleepTime)
 
                     angle += rotationAngle
                     print("Rotation angle is now " + str(angle))
                     time.sleep(sleepTime)#from config file
-                if(tello.get_height() < height):
-                    tello.move("up", int(height - tello.get_height()))
-                elif(tello.get_height() > height):
-                    tello.move("down", int(height - tello.get_height()) + 5)
+                if(tello.get_height() < height - 21):
+                    tello.move("up", abs(int(height - tello.get_height())))
+                elif(tello.get_height() > height + 21):
+                    tello.move("down", abs(int(height - tello.get_height())) + 5)
             elif inputChar == 'l':
                 tello.move_forward(100)
 
@@ -351,8 +351,8 @@ def main():
                             command = i.split(" ")
                             if(command[0] == "forward"):
                                 # tello.move("forward", int(command[1]))
-                                tello.move("forward", 75)
-                                print("Moving forward by 75")
+                                tello.move("forward", 55)
+                                print("Moving forward by 55")
                             elif(command[0] == "ccw"):
                                 for i in range(int(int(command[1])/rotationAngle)):
                                     print("Rotating ccw by " + str(int(rotationAngle)))
@@ -362,9 +362,9 @@ def main():
 
                                     time.sleep(sleepTime)
                                     if droneUp:
-                                        tello.move("down", 30)
+                                        tello.move("down", 25)
                                     else:
-                                        tello.move("up", 30)
+                                        tello.move("up", 25)
                                     droneUp = not droneUp
                                     time.sleep(sleepTime)
                                 print("Rotating ccw by " + str(int(int(command[1])%rotationAngle)))
@@ -373,14 +373,14 @@ def main():
                                 for i in range(int(int(command[1])/rotationAngle)):
                                     print("Rotating cw by " + str(int(rotationAngle)))
                                     tello.set_speed(20)
-                                    tello.rotate_counter_clockwise(rotationAngle)
+                                    tello.rotate_clockwise(rotationAngle)
                                     tello.set_speed(flightSpeed)
 
                                     time.sleep(sleepTime)
                                     if droneUp:
-                                        tello.move("down", 30)
+                                        tello.move("down", 25)
                                     else:
-                                        tello.move("up", 30)
+                                        tello.move("up", 25)
                                     droneUp = not droneUp
                                     time.sleep(sleepTime)
                                 print("Rotating cw by " + str(int(int(command[1])%rotationAngle)))
