@@ -169,7 +169,7 @@ bool sent_command = false;
 bool dfs_started = false;
 vector<std::string> command_list;
 cv::Mat dfs_visited; // this should be global too
-double distance_threshold = 80;
+double distance_threshold = 100;
 vector<geometry_msgs::Point> dfs_destinations;
 vector<geometry_msgs::Point> dfs_destinations_visual;
 
@@ -419,8 +419,8 @@ void DFS(int init_x, int init_y)
 
 	cv::Mat img_first;
 
-	double minval, maxval;
-	cv::minMaxLoc(grid_map_int, &minval, &maxval, NULL, NULL);
+	// double minval, maxval;
+	// cv::minMaxLoc(grid_map_int, &minval, &maxval, NULL, NULL);
 
 	// cout << grid_map_int.type() << endl; // 1
 
@@ -489,7 +489,7 @@ void DFS(int init_x, int init_y)
 					int x_diff = dfs_destinations[i].x - init_x;
 					int y_diff = dfs_destinations[i].y - init_y;
 
-					int angleDiff = getDroneAngle(x_diff, y_diff);
+					int angleDiff = abs(getDroneAngle(x_diff, y_diff));
 
 					if (angleDiff < minAngle)
 					{
@@ -515,7 +515,7 @@ void DFS(int init_x, int init_y)
 			int col = pt.x + rowNum[i];
 			int row = pt.y + colNum[i];
 			int probability_nearby = (int)img_final.at<short>(row, col);
-			printf("exploring nearby nodes%d, %d with probabiity-%d , visited-%d , visited locally-%d\n",row,col,probability_nearby,dfs_visited.at<int>(row, col),dfs_visited_local.at<int>(row,col));
+			printf("exploring nearby nodes%d, %d with probabiity-%d , visited-%d , visited locally-%d\n",col,row,probability_nearby,dfs_visited.at<int>(row, col),dfs_visited_local.at<int>(row,col));
 
 			if (isValid(row, col) && probability_nearby < MAX_OCCUPIED_PROB && probability_nearby >= 0 && dfs_visited.at<int>(row, col) != 1 && dfs_visited_local.at<int>(row, col) != 1)
 			{
@@ -597,12 +597,11 @@ bool within_distance(int init_x, int init_y, int final_x, int final_y)
 bool is_obstacle(int init_x, int init_y, int final_x, int final_y)
 {
 	// calculate number of nodes corresponding to 40 cm on x-axis
-	double world_drone_square_horizontal_length = 40 * scale;
-	double horizontal_length = world_drone_square_horizontal_length * norm_factor_x * scale_factor;
+	double world_drone_square_length = 40 * scale;
+	double horizontal_length = world_drone_square_length * norm_factor_x * scale_factor;
 
 	// calculate number of nodes corresponding to 40 cm on y-axis
-	double world_drone_square_vertical_length = 40 * scale;
-	double vertical_length = world_drone_square_vertical_length * norm_factor_z * scale_factor;
+	double vertical_length = world_drone_square_length * norm_factor_z * scale_factor;
 
 	int min_x = std::min(final_x, init_x);
 	int max_x = std::max(final_x, init_x);
@@ -613,20 +612,23 @@ bool is_obstacle(int init_x, int init_y, int final_x, int final_y)
 
 	int curr_x = min_x;
 	int curr_y = min_y;
+	printf("Scanning coords x: %d to %d and y: %d to %d with xdiff: %d and ydiff: %d\n", min_x, max_x, min_y, max_y, x_diff, y_diff);
 	
-	while (curr_x < max_x && curr_y < max_y)
+	while (curr_x <= max_x && curr_y <= max_y)
 	{
 		for (int i = -horizontal_length / 2; i < horizontal_length / 2; i++)
 			for (int j = -vertical_length / 2; j < vertical_length / 2; j++) {
-				int probability_current = (int)img_final.at<short>(curr_x + i, curr_y + j);
-				if (!isValid(curr_x + i, curr_y + j) || probability_current >= MAX_OCCUPIED_PROB || probability_current < 0)
+				int probability_current = (int)img_final.at<short>(curr_y + j, curr_x + i);
+				if (!isValid(curr_x + i, curr_y + j) || probability_current >= MAX_OCCUPIED_PROB || probability_current < 0) {
+					cout << "is obstacle succeeded: FALSE" << endl;
 					return true;
+				}
 			}
 		curr_x += x_diff;
 		curr_y += y_diff;
 	}
 
-	cout << "is obstacle succeeded" << endl;
+	cout << "is obstacle succeeded: TRUE" << endl;
 	return false;
 }
 
@@ -735,7 +737,7 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr &pts_and_pose)
 	int_pos_grid_z = int(floor((pt_pos_z)*norm_factor_z));
 
 	// mark all current positions as visited! even if dfs is not running
-	dfs_visited.at<int>(kf_pos_grid_z, kf_pos_grid_x) = 1;
+	dfs_visited.at<int>(int_pos_grid_z, int_pos_grid_x) = 1;
 
 	if (TELLO_MODE == scale_computing || TELLO_MODE == moving || (!dfs_started)) // we pause callbacks in dfs mode
 	{
@@ -834,42 +836,6 @@ void annotateMapCallback(const std_msgs::Bool::ConstPtr &value)
 	// 	3, line_Color, -1);
 }
 
-void getMixMax(const geometry_msgs::PoseArray::ConstPtr &pts_and_pose,
-			   geometry_msgs::Point &min_pt, geometry_msgs::Point &max_pt)
-{
-
-	min_pt.x = min_pt.y = min_pt.z = std::numeric_limits<double>::infinity();
-	max_pt.x = max_pt.y = max_pt.z = -std::numeric_limits<double>::infinity();
-	for (unsigned int i = 0; i < pts_and_pose->poses.size(); ++i)
-	{
-		const geometry_msgs::Point &curr_pt = pts_and_pose->poses[i].position;
-		if (curr_pt.x < min_pt.x)
-		{
-			min_pt.x = curr_pt.x;
-		}
-		if (curr_pt.y < min_pt.y)
-		{
-			min_pt.y = curr_pt.y;
-		}
-		if (curr_pt.z < min_pt.z)
-		{
-			min_pt.z = curr_pt.z;
-		}
-
-		if (curr_pt.x > max_pt.x)
-		{
-			max_pt.x = curr_pt.x;
-		}
-		if (curr_pt.y > max_pt.y)
-		{
-			max_pt.y = curr_pt.y;
-		}
-		if (curr_pt.z > max_pt.z)
-		{
-			max_pt.z = curr_pt.z;
-		}
-	}
-}
 void processMapPt(const geometry_msgs::Point &curr_pt, cv::Mat &occupied, cv::Mat &visited,
 				  cv::Mat &pt_mask, int kf_pos_grid_x, int kf_pos_grid_z, unsigned int pt_id)
 {
