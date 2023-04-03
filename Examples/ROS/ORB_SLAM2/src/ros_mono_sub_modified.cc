@@ -180,7 +180,7 @@ geometry_msgs::PoseWithCovariance initialPose;
 geometry_msgs::PoseWithCovariance newPose;
 void initializeScaleCallback(const std_msgs::Bool::ConstPtr &value);
 void telloMoveComplete(const std_msgs::UInt32::ConstPtr &value);
-void annotateMapCallback(const std_msgs::Bool::ConstPtr &value);
+void annotateMapCallback(const std_msgs::String::ConstPtr &value);
 
 int main(int argc, char **argv)
 {
@@ -268,7 +268,7 @@ int main(int argc, char **argv)
 	// tello completing move code
 	ros::Subscriber sub_tello_move_complete = nodeHandler.subscribe("tello/move_complete", 1000, telloMoveComplete);
 	// annotate map
-	ros::Subscriber sub_map_annotate = nodeHandler.subscribe("map/annotate", 1000, annotateMapCallback);
+	ros::Subscriber sub_map_annotate = nodeHandler.subscribe("map/annotate", 10, annotateMapCallback);
 
 	pub_grid_map = nodeHandler.advertise<nav_msgs::OccupancyGrid>("map", 1000);
 	pub_grid_map_metadata = nodeHandler.advertise<nav_msgs::MapMetaData>("map_metadata", 1000);
@@ -818,20 +818,52 @@ void telloMoveComplete(const std_msgs::UInt32::ConstPtr &value)
 	TELLO_MODE = dfs;
 }
 
-void annotateMapCallback(const std_msgs::Bool::ConstPtr &value)
-{
-	//  double curr_angle = atan2(int_pos_grid_z, int_pos_grid_x);
+std::vector<std::string> split (const std::string &s, char delim) {
+    std::vector<std::string> result;
+    std::stringstream ss (s);
+    std::string item;
+
+    while (getline (ss, item, delim)) {
+        result.push_back (item);
+    }
+
+    return result;
+}
+
+void annotateMapCallback(const std_msgs::String::ConstPtr &value)
+{	//  double curr_angle = atan2(int_pos_grid_z, int_pos_grid_x);
+	std::vector<std::string> boxes = split(value->data.c_str(), ';');
+	// cout << "Boxes: " << value->data.c_str() << endl;
+
 	double curr_angle = tf::getYaw(curr_pose.pose.orientation);
 
-	int dist_factor = 30; // TODO: use IoU from ML
-	float x = kf_pos_grid_x - dist_factor * sin(curr_angle);
-	float y = kf_pos_grid_z + dist_factor * cos(curr_angle);
+	int index = 0;
+	for (auto &element : people) { // remove old people in current fov
+		float x_diff = kf_pos_grid_x - element.first; // flip since +z is down
+		float z_diff = element.second - kf_pos_grid_z;
+		double angle = atan2(x_diff, z_diff);
+		cout << "x_diff: " << x_diff << " z_diff: " << z_diff << "Yaw: " << curr_angle << " Person: " << angle << endl;
 
-	people.push_back(make_pair(x, y));
+		double angle_diff = abs(angle - curr_angle);
+		if (angle_diff > M_PI) angle_diff = abs(angle_diff - 2 * M_PI);
 
+		if (angle_diff < M_PI / 6) people.erase(people.begin() + index);
+
+		index++;
+	}
+
+	int dist_factor = 30;
+	for (auto &box : boxes) {
+		double val = (::atof(box.c_str()) - 0.5) * 20;
+		float x = kf_pos_grid_x - dist_factor * sin(curr_angle) + val * cos(curr_angle);
+		float z = kf_pos_grid_z + dist_factor * cos(curr_angle) - val * sin(abs(curr_angle));
+
+		people.push_back(make_pair(x, z));
+	}
+	
 	// cv::Scalar line_Color(255, 0, 255); // Magenta
 	// cv::circle(grid_map_rgb, cv::Point(x*resize_factor, y*resize_factor),
-	// 	3, line_Color, -1);
+	// 	1, line_Color, -1);
 }
 
 void getMixMax(const geometry_msgs::PoseArray::ConstPtr &pts_and_pose,
