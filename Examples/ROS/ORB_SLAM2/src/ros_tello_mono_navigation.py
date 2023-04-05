@@ -308,6 +308,7 @@ def main():
                 elif(tello.get_height() > height + 21):
                     tello.move("down", abs(int(height - tello.get_height())) + 5)
             elif inputChar == 'l':
+                pub_initialize_scale.publish(True)
                 tello.move_forward(100)
 
                 print("Press l to move back 50cm, 0 to cancel")
@@ -315,10 +316,10 @@ def main():
                 while(inputChar != 'l' and inputChar != '0'):
                     print("Press l to move back 50cm, 0 to cancel")
                     inputChar = readchar.readchar()
-                pub_initialize_scale.publish(True)
-                time.sleep(0.05)
-
+                
                 if(inputChar == 'l'):
+                    pub_initialize_scale.publish(True)
+                    time.sleep(0.05)
                     tello.move_back(50)
 
                 print("Press l to finish scaling, 0 to cancel")
@@ -327,8 +328,8 @@ def main():
                     print("Press l to finish scaling, 0 to cancel")
                     inputChar = readchar.readchar()
 
-                if (inputChar == 'l'):
-                    pub_initialize_scale.publish(True)
+                # if (inputChar == 'l'):
+                #     pub_initialize_scale.publish(True)
                 print("Providing manual control again")
             elif inputChar == 'b':
                 global all_commands_received

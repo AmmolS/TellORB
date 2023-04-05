@@ -169,13 +169,14 @@ bool sent_command = false;
 bool dfs_started = false;
 vector<std::string> command_list;
 cv::Mat dfs_visited; // this should be global too
-double distance_threshold = 80;
+double distance_threshold = 75;
 vector<geometry_msgs::Point> dfs_destinations;
 vector<geometry_msgs::Point> dfs_destinations_visual;
 
 // scale stuff
 bool got_tello_initial_pose = false;
-double scale = 1;
+double scale = 0.002;
+double scaled_height = -14;
 geometry_msgs::PoseWithCovariance initialPose;
 geometry_msgs::PoseWithCovariance newPose;
 void initializeScaleCallback(const std_msgs::Bool::ConstPtr &value);
@@ -352,7 +353,7 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped current_
 		// pause all callbacks
 		dfs_started = true;
 
-		cout << "Current index: " << int_pos_grid_x << ", " << int_pos_grid_z << endl;
+		// cout << "Current index: " << int_pos_grid_x << ", " << int_pos_grid_z << endl;
 		// double currentAngle = tf::getYaw(curr_pose.pose.orientation);
 		// cout << "Current Angle: "<< currentAngle;
 
@@ -426,8 +427,7 @@ void DFS(int init_x, int init_y)
 
 	// cout << grid_map_int.rowRange(final_y, init_y) << endl;
 
-	int erodeSize = 1;
-	// std::unordered_set<std::unordered_set<int>>
+	int erodeSize = 0;
 
 	grid_map_int.convertTo(img_first, CV_16SC1);
 
@@ -460,17 +460,17 @@ void DFS(int init_x, int init_y)
 	while (!dfs_stack.empty() && dfs_stack.size() < 50000)
 	{
 		geometry_msgs::Point pt = dfs_stack.top();
-		cout << "size of dfs stack is" << dfs_stack.size();
+		// cout << "size of dfs stack is" << dfs_stack.size();
 		dfs_stack.pop();
 		// check if the popped node from the stack is unvisited, unoccupied
 		int probability_current = (int)img_final.at<short>(pt.y, pt.x);
-		printf(" DFS exploring nodes for path %d, %d\n", int(pt.x), int(pt.y));
-		printf("DFS occupied %d\n", probability_current);
-		printf("DFS visited %d\n", dfs_visited.at<int>(pt.y, pt.x));
+		// printf(" DFS exploring nodes for path %d, %d\n", int(pt.x), int(pt.y));
+		// printf("DFS occupied %d\n", probability_current);
+		// printf("DFS visited %d\n", dfs_visited.at<int>(pt.y, pt.x));
 		if (isValid(pt.x, pt.y) && probability_current < MAX_OCCUPIED_PROB && probability_current >= 0 && dfs_visited_local.at<int>(pt.y, pt.x) != 1 && dfs_visited_local_distance.at<int>(pt.y, pt.x) != 1)
 		{
 			// these are the possible candidates as destinations
-			cout << "DFS TRAVERSAL PRINTS  " << pt.x << pt.y << endl;
+			// cout << "DFS TRAVERSAL PRINTS  " << pt.x << " " << pt.y << endl;
 			// check if these candidates are within x (threshold cm), if so mark it visited
 			// if not, add it to the destination list
 			int ret = within_distance(init_x, init_y, pt.x, pt.y);
@@ -506,12 +506,13 @@ void DFS(int init_x, int init_y)
 
 				dfs_destinations.clear();
 				dfs_destinations.push_back(best);
-				cout << "dfs returning, destination found" << best.x << "," << best.y << " with angle to drone at " << minAngle << endl;
+				// cout << "dfs returning, destination found" << best.x << "," << best.y << " with angle to drone at " << minAngle << endl;
 				// add to a temp array for visualization !
 				dfs_destinations_visual.push_back(best);
+				dfs_visited = dfs_visited_local_distance.clone();
 				return;
 			}
-			cout << "dfs_destinations.size() == " << dfs_destinations.size() << endl;
+			// cout << "dfs_destinations.size() == " << dfs_destinations.size() << endl;
 		}
 		dfs_visited_local.at<int>(pt.y, pt.x) = 1;
 
@@ -522,12 +523,12 @@ void DFS(int init_x, int init_y)
 			int col = pt.x + rowNum[i];
 			int row = pt.y + colNum[i];
 			int probability_nearby = (int)img_final.at<short>(row, col);
-			printf("exploring nearby nodes%d, %d with probabiity-%d , visited-%d , visited locally-%d , visited locally distance-%d\n",col,row,probability_nearby,dfs_visited.at<int>(row, col),dfs_visited_local.at<int>(row,col), dfs_visited_local_distance.at<int>(row, col));
+			// printf("exploring nearby nodes %d, %d with probability-%d , visited-%d , visited locally-%d , visited locally distance-%d\n",col,row,probability_nearby,dfs_visited.at<int>(row, col),dfs_visited_local.at<int>(row,col), dfs_visited_local_distance.at<int>(row, col));
 
 			if (isValid(row, col) && probability_nearby < MAX_OCCUPIED_PROB && probability_nearby >= 0 && dfs_visited_local.at<int>(row, col) != 1 && dfs_visited_local_distance.at<int>(row, col) != 1)
 			{
 				// push onto the stack
-				printf("DFS adding nearby nodes %d, %d\n", col, row);
+				// printf("DFS adding nearby nodes %d, %d\n", col, row);
 				geometry_msgs::Point newPoint;
 				newPoint.x = col;
 				newPoint.y = row;
@@ -555,14 +556,14 @@ void DFS(int init_x, int init_y)
 
 		dfs_destinations.clear();
 		dfs_destinations.push_back(best);
-		cout << "dfs returning, destination found" << best.x << "," << best.y << " with angle to drone at " << minAngle << endl;
+		// cout << "dfs returning, destination found" << best.x << "," << best.y << " with angle to drone at " << minAngle << endl;
 		// add to a temp array for visualization !
 		dfs_destinations_visual.push_back(best);
+		dfs_visited = dfs_visited_local_distance.clone();
 		return;
 	}
-	cout << "dfs_destinations.size() == " << dfs_destinations.size() << endl;
+	// cout << "dfs_destinations.size() == " << dfs_destinations.size() << endl;
 	dfs_destinations.clear();
-	dfs_visited = dfs_visited_local_distance;
 }
 
 bool isValid(int valid_x, int valid_y)
@@ -613,11 +614,11 @@ int within_distance(int init_x, int init_y, int final_x, int final_y)
 
 	// cout << "x world diff is " << x_world_diff << ", y world diff is " << y_world_diff << endl;
 	double slam_distance = (sqrt(pow(x_world_diff, 2) + pow(y_world_diff, 2)));
-	cout << "slam distance in float is " << sqrt(pow(x_world_diff, 2) + pow(y_world_diff, 2)) << endl;
+	// cout << "slam distance in float is " << sqrt(pow(x_world_diff, 2) + pow(y_world_diff, 2)) << endl;
 
 	// step 2: use scale to get distance from orb slam coordinates
 	double tello_distance = slam_distance / scale;
-	cout << "tello distance between the two points is " << tello_distance << endl;
+	// cout << "tello distance between the two points is " << tello_distance << endl;
 
 	// step 4: compare to threshold and determine whether point is ahead of drone, and return true or false
 	if (tello_distance < 30) {
@@ -630,7 +631,7 @@ int within_distance(int init_x, int init_y, int final_x, int final_y)
 bool is_obstacle(int init_x, int init_y, int final_x, int final_y)
 {
 	// calculate number of nodes corresponding to 40 cm on x-axis
-	double world_drone_square_length = 40 * scale;
+	double world_drone_square_length = 50 * scale;
 	double horizontal_length = world_drone_square_length * norm_factor_x * scale_factor;
 
 	// calculate number of nodes corresponding to 40 cm on y-axis
@@ -663,8 +664,8 @@ bool is_obstacle(int init_x, int init_y, int final_x, int final_y)
 
 	int curr_x = min_x;
 	int curr_y = min_y;
-	printf("Scanning coords x: %d to %d and y: %d to %d with xdiff: %d and ydiff: %d\n", min_x, max_x, min_y, max_y, x_diff, y_diff);
-	printf("Horizontal length is %f and Vertical length is %f\n", horizontal_length, vertical_length);
+	// printf("Scanning coords x: %d to %d and y: %d to %d with xdiff: %d and ydiff: %d\n", min_x, max_x, min_y, max_y, x_diff, y_diff);
+	// printf("Horizontal length is %f and Vertical length is %f\n", horizontal_length, vertical_length);
 	
 	while (curr_x <= max_x && curr_y <= max_y)
 	{
@@ -672,7 +673,7 @@ bool is_obstacle(int init_x, int init_y, int final_x, int final_y)
 			for (int j = -vertical_length / 2; j < vertical_length / 2; j++) {
 				int probability_current = (int)img_final.at<short>(curr_y + j, curr_x + i);
 				if (!isValid(curr_x + i, curr_y + j) || probability_current >= MAX_OCCUPIED_PROB || probability_current < 0) {
-					cout << "is obstacle succeeded: FALSE" << endl;
+					// cout << "is obstacle succeeded: FALSE" << endl;
 					return true;
 				}
 			}
@@ -680,7 +681,7 @@ bool is_obstacle(int init_x, int init_y, int final_x, int final_y)
 		curr_y += y_diff;
 	}
 
-	cout << "is obstacle succeeded: TRUE" << endl;
+	// cout << "is obstacle succeeded: TRUE" << endl;
 	return false;
 }
 
@@ -771,11 +772,13 @@ void ptCallback(const geometry_msgs::PoseArray::ConstPtr &pts_and_pose)
 	// current pose's x and y is set here
 	curr_pose.pose.position.x = kf_pos_grid_x_us;
 	curr_pose.pose.position.y = kf_pos_grid_z_us;
+	curr_pose.pose.position.z = kf_location.y;
+	// cout << "currpose: " << kf_location.y / scale << endl;
 
 	ROS_DEBUG("Publishing current pose: (%f, %f)\n", kf_pos_grid_x_us, kf_pos_grid_z_us);
 	ROS_DEBUG("Publishing current pose: (%f, %f)\n", kf_location.x, kf_location.z);
 	ROS_DEBUG("Publishing new current pose: (%f, %f)\n", kf_pos_grid_x * resize_factor, kf_pos_grid_z * resize_factor);
-	curr_pose.pose.position.z = 0;
+	// curr_pose.pose.position.z = 0;
 	curr_pose.pose.orientation.x = kf_orientation.x;
 	curr_pose.pose.orientation.y = kf_orientation.z;
 	curr_pose.pose.orientation.z = kf_orientation.y;
@@ -840,7 +843,9 @@ void initializeScaleCallback(const std_msgs::Bool::ConstPtr &value)
 		newPose = curr_pose;
 		std::cout << "newPose x: " << newPose.pose.position.x << std::endl;
 		std::cout << "newPose y: " << newPose.pose.position.y << std::endl;
-		scale = (sqrt(pow((newPose.pose.position.x - initialPose.pose.position.x), 2) + pow((newPose.pose.position.y - initialPose.pose.position.y), 2))) / 50;
+		std::cout << "newPose z: " << newPose.pose.position.z << std::endl;
+		scale = (sqrt(pow((newPose.pose.position.x - initialPose.pose.position.x), 2) + pow((newPose.pose.position.y - initialPose.pose.position.y), 2))) / 100;
+		scaled_height = newPose.pose.position.z / scale;
 		std::cout << "Calculated scale: " << scale << std::endl;
 		std::cout << "setting the mode to dfs now" << endl;
 		TELLO_MODE = dfs;
@@ -896,7 +901,7 @@ void annotateMapCallback(const std_msgs::String::ConstPtr &value)
 		float x_diff = kf_pos_grid_x - element.first; // flip since +z is down
 		float z_diff = element.second - kf_pos_grid_z;
 		double angle = atan2(x_diff, z_diff);
-		cout << "x_diff: " << x_diff << " z_diff: " << z_diff << "Yaw: " << curr_angle << " Person: " << angle << endl;
+		// cout << "x_diff: " << x_diff << " z_diff: " << z_diff << "Yaw: " << curr_angle << " Person: " << angle << endl;
 
 		double angle_diff = abs(angle - curr_angle);
 		if (angle_diff > M_PI) angle_diff = abs(angle_diff - 2 * M_PI);
@@ -938,10 +943,13 @@ void processMapPt(const geometry_msgs::Point &curr_pt, cv::Mat &occupied, cv::Ma
 	bool is_in_horizontal_plane = false;
 	if (use_height_thresholding)
 	{
-		float pt_pos_y = curr_pt.y * scale_factor;
-		Eigen::Vector4d transformed_point_location = transform_mat * Eigen::Vector4d(pt_pos_x, pt_pos_y, pt_pos_z, 1);
-		double transformed_point_height = transformed_point_location[1] / transformed_point_location[3];
-		is_ground_pt = transformed_point_height < 0;
+		// float pt_pos_y = curr_pt.y * scale_factor;
+		// Eigen::Vector4d transformed_point_location = transform_mat * Eigen::Vector4d(pt_pos_x, pt_pos_y, pt_pos_z, 1);
+		// double transformed_point_height = transformed_point_location[1] / transformed_point_location[3];
+		// is_ground_pt = transformed_point_height < 0;
+		double pt_pos_y = curr_pt.y / scale;
+		is_ground_pt = pt_pos_y > scaled_height + 30;
+		// cout << "point height: " << pt_pos_y << "starting height: " << scaled_height << endl;
 	}
 #ifndef DISABLE_FLANN
 	if (use_plane_normals)
@@ -1290,7 +1298,7 @@ void showGridMap(unsigned int id)
 
 		cv::Scalar line_Color(255, 0, 0); // Color of the circle
 		// printing out the blue dot position:
-		cout << "The blue dot is" << kf_pos_grid_x << kf_pos_grid_z << endl;
+		// cout << "The blue dot is" << kf_pos_grid_x << kf_pos_grid_z << endl;
 		cv::circle(grid_map_rgb, cv::Point(kf_pos_grid_x * resize_factor, kf_pos_grid_z * resize_factor),
 				   3, line_Color, -1);
 
@@ -1357,8 +1365,8 @@ void showGridMap(unsigned int id)
 		if (occupied_thresh >= free_thresh)
 		{
 			occupied_thresh = free_thresh - thresh_diff;
-			// MAX_OCCUPIED_PROB = (1 - occupied_thresh) * 100;
-			MAX_OCCUPIED_PROB = 5;
+			MAX_OCCUPIED_PROB = (1 - occupied_thresh) * 100;
+			// MAX_OCCUPIED_PROB = 5;
 		}
 		printf("Setting occupied_thresh to: %f\n", occupied_thresh);
 	}
@@ -1472,8 +1480,8 @@ void parseParams(int argc, char **argv)
 	if (argc > arg_id)
 	{
 		occupied_thresh = atof(argv[arg_id++]);
-		// MAX_OCCUPIED_PROB = (1 - occupied_thresh) * 100;
-		MAX_OCCUPIED_PROB = 5;
+		MAX_OCCUPIED_PROB = (1 - occupied_thresh) * 100;
+		// MAX_OCCUPIED_PROB = 5;
 	}
 	if (argc > arg_id)
 	{
