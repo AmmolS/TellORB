@@ -1,6 +1,7 @@
 # Tello - no flight - publish camera to ros topic
 import os
 import rospy
+import time
 
 from sensor_msgs.msg import Image
 
@@ -26,7 +27,7 @@ keepRecording.set()
 tello.streamon()
 frame_read = tello.get_frame_read()
 bridge = CvBridge()
-pub_img = rospy.Publisher("camera/image_raw", Image, queue_size=10)
+pub_img = rospy.Publisher("tello/image_raw", Image, queue_size=10)
 
 print("Tello Battery Level = {}%".format(tello.get_battery()))
 

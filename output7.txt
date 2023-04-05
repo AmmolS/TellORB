@@ -1,0 +1,1139 @@
+starting mono pub
+Using params:
+scale_factor: 45.000000
+resize_factor: 0.750000
+cloud_max: 29.000000, 48.000000	 cloud_min: -25.000000, -12.000000
+free_thresh: 0.650000
+occupied_thresh: 0.400000
+use_local_counters: 1
+visit_thresh: 30
+use_gaussian_counters: 1
+use_boundary_detection: 1
+use_height_thresholding: 1
+normal_thresh_deg: 80.000000
+canny_thresh: 300
+enable_goal_publishing: 0
+show_camera_location: 1
+gaussian_kernel_size: 3
+cam_radius: 3
+normal_thresh_y_rad: 0.174533 rad
+grid_max: 1305.000000, 2160.000000	 grid_min: -1125.000000, -540.000000
+grid_size: (2700, 2430)
+output_size: (2025, 1822)
+norm_factor_x_us: 0.981481
+norm_factor_z_us: 0.983333
+norm_factor_x: 0.999588
+norm_factor_z: 0.999630
+The blue dot is1124539
+The blue dot is1124538
+The blue dot is1124538
+The blue dot is1124538
+The blue dot is1125537
+The blue dot is1125536
+The blue dot is1125536
+The blue dot is1125536
+The blue dot is1125535
+The blue dot is1125535
+The blue dot is1125535
+The blue dot is1125535
+The blue dot is1125535
+The blue dot is1124535
+The blue dot is1124535
+The blue dot is1124535
+The blue dot is1124535
+The blue dot is1124535
+The blue dot is1124535
+The blue dot is1124535
+The blue dot is1124535
+The blue dot is1124536
+The blue dot is1124536
+The blue dot is1124536
+The blue dot is1124536
+The blue dot is1124536
+The blue dot is1124536
+The blue dot is1124536
+The blue dot is1124536
+The blue dot is1124537
+The blue dot is1124537
+The blue dot is1124537
+The blue dot is1124537
+The blue dot is1124538
+The blue dot is1124538
+The blue dot is1124538
+The blue dot is1124538
+The blue dot is1124539
+The blue dot is1124539
+The blue dot is1124539
+The blue dot is1124539
+The blue dot is1124539
+The blue dot is1124540
+The blue dot is1124540
+The blue dot is1124541
+The blue dot is1124541
+The blue dot is1124541
+The blue dot is1125541
+The blue dot is1125541
+The blue dot is1125542
+The blue dot is1125544
+The blue dot is1125546
+The blue dot is1125549
+The blue dot is1125553
+The blue dot is1125557
+The blue dot is1125559
+The blue dot is1125563
+The blue dot is1125564
+The blue dot is1125565
+The blue dot is1125566
+initialPose x: 25.0252
+initialPose y: 12.5957
+The blue dot is1125562
+The blue dot is1125558
+The blue dot is1125559
+newPose x: 25.0183
+newPose y: 12.4381
+Calculated scale: 0.00315446
+setting the mode to dfs now
+The blue dot is1125560
+Current index: 1125, 560
+[0m[ INFO] [1680386262.802194478]: Start indexes DFS exploration: (1125, 560) 
+[0m
+size of dfs stack is1 DFS exploring nodes for path 1125, 560
+DFS occupied 0
+DFS visited 1
+exploring nearby nodes1125, 559 with probabiity-0 , visited-1 , visited locally-1
+exploring nearby nodes1124, 560 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1124, 560
+exploring nearby nodes1126, 560 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 560
+exploring nearby nodes1125, 561 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1125, 561
+size of dfs stack is3 DFS exploring nodes for path 1125, 561
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1125561
+slam distance in float is 0.0222311
+tello distance between the two points is 7.04751
+dfs_destinations.size() == 0
+exploring nearby nodes1125, 560 with probabiity-0 , visited-1 , visited locally-1
+exploring nearby nodes1124, 561 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1124, 561
+exploring nearby nodes1126, 561 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 561
+exploring nearby nodes1125, 562 with probabiity-0 , visited-1 , visited locally-1
+size of dfs stack is4 DFS exploring nodes for path 1126, 561
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1126561
+slam distance in float is 0.0314389
+tello distance between the two points is 9.96647
+dfs_destinations.size() == 0
+exploring nearby nodes1126, 560 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 560
+exploring nearby nodes1125, 561 with probabiity-0 , visited-1 , visited locally-0
+exploring nearby nodes1127, 561 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1127, 561
+exploring nearby nodes1126, 562 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 562
+size of dfs stack is6 DFS exploring nodes for path 1126, 562
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1126562
+slam distance in float is 0.049709
+tello distance between the two points is 15.7583
+dfs_destinations.size() == 0
+exploring nearby nodes1126, 561 with probabiity-0 , visited-1 , visited locally-0
+exploring nearby nodes1125, 562 with probabiity-0 , visited-1 , visited locally-1
+exploring nearby nodes1127, 562 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1127, 562
+exploring nearby nodes1126, 563 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 563
+size of dfs stack is7 DFS exploring nodes for path 1126, 563
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1126563
+slam distance in float is 0.0702988
+tello distance between the two points is 22.2855
+dfs_destinations.size() == 0
+exploring nearby nodes1126, 562 with probabiity-0 , visited-1 , visited locally-0
+exploring nearby nodes1125, 563 with probabiity-0 , visited-1 , visited locally-1
+exploring nearby nodes1127, 563 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1127, 563
+exploring nearby nodes1126, 564 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 564
+size of dfs stack is8 DFS exploring nodes for path 1126, 564
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1126564
+slam distance in float is 0.0916591
+tello distance between the two points is 29.057
+dfs_destinations.size() == 0
+exploring nearby nodes1126, 563 with probabiity-0 , visited-1 , visited locally-0
+exploring nearby nodes1125, 564 with probabiity-0 , visited-1 , visited locally-1
+exploring nearby nodes1127, 564 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1127, 564
+exploring nearby nodes1126, 565 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 565
+size of dfs stack is9 DFS exploring nodes for path 1126, 565
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1126565
+slam distance in float is 0.113354
+tello distance between the two points is 35.9344
+dfs_destinations.size() == 0
+exploring nearby nodes1126, 564 with probabiity-0 , visited-1 , visited locally-0
+exploring nearby nodes1125, 565 with probabiity-0 , visited-1 , visited locally-1
+exploring nearby nodes1127, 565 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1127, 565
+exploring nearby nodes1126, 566 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 566
+size of dfs stack is10 DFS exploring nodes for path 1126, 566
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1126566
+slam distance in float is 0.135223
+tello distance between the two points is 42.8671
+dfs_destinations.size() == 0
+exploring nearby nodes1126, 565 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 565
+exploring nearby nodes1125, 566 with probabiity-0 , visited-1 , visited locally-1
+exploring nearby nodes1127, 566 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1127, 566
+exploring nearby nodes1126, 567 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 567
+size of dfs stack is12 DFS exploring nodes for path 1126, 567
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1126567
+slam distance in float is 0.157194
+tello distance between the two points is 49.8322
+dfs_destinations.size() == 0
+exploring nearby nodes1126, 566 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 566
+exploring nearby nodes1125, 567 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1125, 567
+exploring nearby nodes1127, 567 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1127, 567
+exploring nearby nodes1126, 568 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 568
+size of dfs stack is15 DFS exploring nodes for path 1126, 568
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1126568
+slam distance in float is 0.179228
+tello distance between the two points is 56.8173
+dfs_destinations.size() == 0
+exploring nearby nodes1126, 567 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 567
+exploring nearby nodes1125, 568 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1125, 568
+exploring nearby nodes1127, 568 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1127, 568
+exploring nearby nodes1126, 569 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 569
+size of dfs stack is18 DFS exploring nodes for path 1126, 569
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1126569
+slam distance in float is 0.201305
+tello distance between the two points is 63.8161
+dfs_destinations.size() == 0
+exploring nearby nodes1126, 568 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 568
+exploring nearby nodes1125, 569 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1125, 569
+exploring nearby nodes1127, 569 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1127, 569
+exploring nearby nodes1126, 570 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 570
+size of dfs stack is21 DFS exploring nodes for path 1126, 570
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1126570
+slam distance in float is 0.223414
+tello distance between the two points is 70.8248
+dfs_destinations.size() == 0
+exploring nearby nodes1126, 569 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 569
+exploring nearby nodes1125, 570 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1125, 570
+exploring nearby nodes1127, 570 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1127, 570
+exploring nearby nodes1126, 571 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 571
+size of dfs stack is24 DFS exploring nodes for path 1126, 571
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1126571
+slam distance in float is 0.245544
+tello distance between the two points is 77.8402
+dfs_destinations.size() == 0
+exploring nearby nodes1126, 570 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 570
+exploring nearby nodes1125, 571 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1125, 571
+exploring nearby nodes1127, 571 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1127, 571
+exploring nearby nodes1126, 572 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 572
+size of dfs stack is27 DFS exploring nodes for path 1126, 572
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1126572
+slam distance in float is 0.26769
+tello distance between the two points is 84.8608
+Scanning coords x: 1125 to 1126 and y: 560 to 572 with xdiff: 1 and ydiff: 2
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 1
+exploring nearby nodes1126, 571 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 571
+exploring nearby nodes1125, 572 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1125, 572
+exploring nearby nodes1127, 572 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1127, 572
+exploring nearby nodes1126, 573 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 573
+size of dfs stack is30 DFS exploring nodes for path 1126, 573
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1126573
+slam distance in float is 0.28985
+tello distance between the two points is 91.8859
+Scanning coords x: 1125 to 1126 and y: 560 to 573 with xdiff: 1 and ydiff: 2
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 2
+exploring nearby nodes1126, 572 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 572
+exploring nearby nodes1125, 573 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1125, 573
+exploring nearby nodes1127, 573 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1127, 573
+exploring nearby nodes1126, 574 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 574
+size of dfs stack is33 DFS exploring nodes for path 1126, 574
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1126574
+slam distance in float is 0.31202
+tello distance between the two points is 98.9138
+Scanning coords x: 1125 to 1126 and y: 560 to 574 with xdiff: 1 and ydiff: 2
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 3
+exploring nearby nodes1126, 573 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 573
+exploring nearby nodes1125, 574 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1125, 574
+exploring nearby nodes1127, 574 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1127, 574
+exploring nearby nodes1126, 575 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 575
+size of dfs stack is36 DFS exploring nodes for path 1126, 575
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1126575
+slam distance in float is 0.334197
+tello distance between the two points is 105.944
+Scanning coords x: 1125 to 1126 and y: 560 to 575 with xdiff: 1 and ydiff: 2
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 4
+exploring nearby nodes1126, 574 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 574
+exploring nearby nodes1125, 575 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1125, 575
+exploring nearby nodes1127, 575 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1127, 575
+exploring nearby nodes1126, 576 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 576
+size of dfs stack is39 DFS exploring nodes for path 1126, 576
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1126576
+slam distance in float is 0.356382
+tello distance between the two points is 112.977
+Scanning coords x: 1125 to 1126 and y: 560 to 576 with xdiff: 1 and ydiff: 2
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 5
+exploring nearby nodes1126, 575 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 575
+exploring nearby nodes1125, 576 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1125, 576
+exploring nearby nodes1127, 576 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1127, 576
+exploring nearby nodes1126, 577 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 577
+size of dfs stack is42 DFS exploring nodes for path 1126, 577
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1126577
+slam distance in float is 0.378571
+tello distance between the two points is 120.011
+Scanning coords x: 1125 to 1126 and y: 560 to 577 with xdiff: 1 and ydiff: 2
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 6
+exploring nearby nodes1126, 576 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 576
+exploring nearby nodes1125, 577 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1125, 577
+exploring nearby nodes1127, 577 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1127, 577
+exploring nearby nodes1126, 578 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 578
+size of dfs stack is45 DFS exploring nodes for path 1126, 578
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1126578
+slam distance in float is 0.400765
+tello distance between the two points is 127.047
+Scanning coords x: 1125 to 1126 and y: 560 to 578 with xdiff: 1 and ydiff: 3
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 7
+exploring nearby nodes1126, 577 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 577
+exploring nearby nodes1125, 578 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1125, 578
+exploring nearby nodes1127, 578 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1127, 578
+exploring nearby nodes1126, 579 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 579
+size of dfs stack is48 DFS exploring nodes for path 1126, 579
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1126579
+slam distance in float is 0.422964
+tello distance between the two points is 134.084
+Scanning coords x: 1125 to 1126 and y: 560 to 579 with xdiff: 1 and ydiff: 3
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 8
+exploring nearby nodes1126, 578 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 578
+exploring nearby nodes1125, 579 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1125, 579
+exploring nearby nodes1127, 579 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1127, 579
+exploring nearby nodes1126, 580 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 580
+size of dfs stack is51 DFS exploring nodes for path 1126, 580
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1126580
+slam distance in float is 0.445165
+tello distance between the two points is 141.122
+Scanning coords x: 1125 to 1126 and y: 560 to 580 with xdiff: 1 and ydiff: 3
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 9
+exploring nearby nodes1126, 579 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 579
+exploring nearby nodes1125, 580 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1125, 580
+exploring nearby nodes1127, 580 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1127, 580
+exploring nearby nodes1126, 581 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is53 DFS exploring nodes for path 1127, 580
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1127580
+slam distance in float is 0.446827
+tello distance between the two points is 141.649
+Scanning coords x: 1125 to 1127 and y: 560 to 580 with xdiff: 1 and ydiff: 3
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 10
+exploring nearby nodes1127, 579 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1127, 579
+exploring nearby nodes1126, 580 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1126, 580
+exploring nearby nodes1128, 580 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 580
+exploring nearby nodes1127, 581 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is55 DFS exploring nodes for path 1128, 580
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1128580
+slam distance in float is 0.449584
+tello distance between the two points is 142.523
+Scanning coords x: 1125 to 1128 and y: 560 to 580 with xdiff: 1 and ydiff: 3
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 11
+exploring nearby nodes1128, 579 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 579
+exploring nearby nodes1127, 580 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1127, 580
+exploring nearby nodes1129, 580 with probabiity-1 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 580
+exploring nearby nodes1128, 581 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 581
+size of dfs stack is58 DFS exploring nodes for path 1128, 581
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1128581
+slam distance in float is 0.47158
+tello distance between the two points is 149.496
+Scanning coords x: 1125 to 1128 and y: 560 to 581 with xdiff: 1 and ydiff: 3
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 12
+exploring nearby nodes1128, 580 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 580
+exploring nearby nodes1127, 581 with probabiity--1 , visited-0 , visited locally-0
+exploring nearby nodes1129, 581 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 581
+exploring nearby nodes1128, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 582
+size of dfs stack is60 DFS exploring nodes for path 1128, 582
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1128582
+slam distance in float is 0.493597
+tello distance between the two points is 156.476
+Scanning coords x: 1125 to 1128 and y: 560 to 582 with xdiff: 1 and ydiff: 3
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 13
+exploring nearby nodes1128, 581 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 581
+exploring nearby nodes1127, 582 with probabiity--1 , visited-0 , visited locally-0
+exploring nearby nodes1129, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 582
+exploring nearby nodes1128, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 583
+size of dfs stack is62 DFS exploring nodes for path 1128, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1128583
+slam distance in float is 0.515632
+tello distance between the two points is 163.461
+Scanning coords x: 1125 to 1128 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 14
+exploring nearby nodes1128, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 582
+exploring nearby nodes1127, 583 with probabiity--1 , visited-0 , visited locally-0
+exploring nearby nodes1129, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 583
+exploring nearby nodes1128, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is63 DFS exploring nodes for path 1129, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1129583
+slam distance in float is 0.518976
+tello distance between the two points is 164.521
+Scanning coords x: 1125 to 1129 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 15
+exploring nearby nodes1129, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 582
+exploring nearby nodes1128, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 583
+exploring nearby nodes1130, 583 with probabiity-7 , visited-0 , visited locally-0
+DFS adding nearby nodes 1130, 583
+exploring nearby nodes1129, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is65 DFS exploring nodes for path 1130, 583
+DFS occupied 7
+DFS visited 0
+DFS TRAVERSAL PRINTS  1130583
+slam distance in float is 0.523244
+tello distance between the two points is 165.874
+Scanning coords x: 1125 to 1130 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: FALSE
+dfs_destinations.size() == 15
+exploring nearby nodes1130, 582 with probabiity-3 , visited-0 , visited locally-0
+DFS adding nearby nodes 1130, 582
+exploring nearby nodes1129, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 583
+exploring nearby nodes1131, 583 with probabiity--1 , visited-0 , visited locally-0
+exploring nearby nodes1130, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is66 DFS exploring nodes for path 1129, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1129583
+slam distance in float is 0.518976
+tello distance between the two points is 164.521
+Scanning coords x: 1125 to 1129 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 16
+exploring nearby nodes1129, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 582
+exploring nearby nodes1128, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 583
+exploring nearby nodes1130, 583 with probabiity-7 , visited-0 , visited locally-1
+exploring nearby nodes1129, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is67 DFS exploring nodes for path 1128, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1128583
+slam distance in float is 0.515632
+tello distance between the two points is 163.461
+Scanning coords x: 1125 to 1128 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 17
+exploring nearby nodes1128, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 582
+exploring nearby nodes1127, 583 with probabiity--1 , visited-0 , visited locally-0
+exploring nearby nodes1129, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 583
+exploring nearby nodes1128, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is68 DFS exploring nodes for path 1129, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1129583
+slam distance in float is 0.518976
+tello distance between the two points is 164.521
+Scanning coords x: 1125 to 1129 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 18
+exploring nearby nodes1129, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 582
+exploring nearby nodes1128, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 583
+exploring nearby nodes1130, 583 with probabiity-7 , visited-0 , visited locally-1
+exploring nearby nodes1129, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is69 DFS exploring nodes for path 1128, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1128583
+slam distance in float is 0.515632
+tello distance between the two points is 163.461
+Scanning coords x: 1125 to 1128 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 19
+exploring nearby nodes1128, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 582
+exploring nearby nodes1127, 583 with probabiity--1 , visited-0 , visited locally-0
+exploring nearby nodes1129, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 583
+exploring nearby nodes1128, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is70 DFS exploring nodes for path 1129, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1129583
+slam distance in float is 0.518976
+tello distance between the two points is 164.521
+Scanning coords x: 1125 to 1129 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 20
+exploring nearby nodes1129, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 582
+exploring nearby nodes1128, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 583
+exploring nearby nodes1130, 583 with probabiity-7 , visited-0 , visited locally-1
+exploring nearby nodes1129, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is71 DFS exploring nodes for path 1128, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1128583
+slam distance in float is 0.515632
+tello distance between the two points is 163.461
+Scanning coords x: 1125 to 1128 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 21
+exploring nearby nodes1128, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 582
+exploring nearby nodes1127, 583 with probabiity--1 , visited-0 , visited locally-0
+exploring nearby nodes1129, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 583
+exploring nearby nodes1128, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is72 DFS exploring nodes for path 1129, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1129583
+slam distance in float is 0.518976
+tello distance between the two points is 164.521
+Scanning coords x: 1125 to 1129 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 22
+exploring nearby nodes1129, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 582
+exploring nearby nodes1128, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 583
+exploring nearby nodes1130, 583 with probabiity-7 , visited-0 , visited locally-1
+exploring nearby nodes1129, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is73 DFS exploring nodes for path 1128, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1128583
+slam distance in float is 0.515632
+tello distance between the two points is 163.461
+Scanning coords x: 1125 to 1128 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 23
+exploring nearby nodes1128, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 582
+exploring nearby nodes1127, 583 with probabiity--1 , visited-0 , visited locally-0
+exploring nearby nodes1129, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 583
+exploring nearby nodes1128, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is74 DFS exploring nodes for path 1129, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1129583
+slam distance in float is 0.518976
+tello distance between the two points is 164.521
+Scanning coords x: 1125 to 1129 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 24
+exploring nearby nodes1129, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 582
+exploring nearby nodes1128, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 583
+exploring nearby nodes1130, 583 with probabiity-7 , visited-0 , visited locally-1
+exploring nearby nodes1129, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is75 DFS exploring nodes for path 1128, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1128583
+slam distance in float is 0.515632
+tello distance between the two points is 163.461
+Scanning coords x: 1125 to 1128 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 25
+exploring nearby nodes1128, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 582
+exploring nearby nodes1127, 583 with probabiity--1 , visited-0 , visited locally-0
+exploring nearby nodes1129, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 583
+exploring nearby nodes1128, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is76 DFS exploring nodes for path 1129, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1129583
+slam distance in float is 0.518976
+tello distance between the two points is 164.521
+Scanning coords x: 1125 to 1129 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 26
+exploring nearby nodes1129, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 582
+exploring nearby nodes1128, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 583
+exploring nearby nodes1130, 583 with probabiity-7 , visited-0 , visited locally-1
+exploring nearby nodes1129, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is77 DFS exploring nodes for path 1128, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1128583
+slam distance in float is 0.515632
+tello distance between the two points is 163.461
+Scanning coords x: 1125 to 1128 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 27
+exploring nearby nodes1128, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 582
+exploring nearby nodes1127, 583 with probabiity--1 , visited-0 , visited locally-0
+exploring nearby nodes1129, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 583
+exploring nearby nodes1128, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is78 DFS exploring nodes for path 1129, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1129583
+slam distance in float is 0.518976
+tello distance between the two points is 164.521
+Scanning coords x: 1125 to 1129 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 28
+exploring nearby nodes1129, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 582
+exploring nearby nodes1128, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 583
+exploring nearby nodes1130, 583 with probabiity-7 , visited-0 , visited locally-1
+exploring nearby nodes1129, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is79 DFS exploring nodes for path 1128, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1128583
+slam distance in float is 0.515632
+tello distance between the two points is 163.461
+Scanning coords x: 1125 to 1128 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 29
+exploring nearby nodes1128, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 582
+exploring nearby nodes1127, 583 with probabiity--1 , visited-0 , visited locally-0
+exploring nearby nodes1129, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 583
+exploring nearby nodes1128, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is80 DFS exploring nodes for path 1129, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1129583
+slam distance in float is 0.518976
+tello distance between the two points is 164.521
+Scanning coords x: 1125 to 1129 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 30
+exploring nearby nodes1129, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 582
+exploring nearby nodes1128, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 583
+exploring nearby nodes1130, 583 with probabiity-7 , visited-0 , visited locally-1
+exploring nearby nodes1129, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is81 DFS exploring nodes for path 1128, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1128583
+slam distance in float is 0.515632
+tello distance between the two points is 163.461
+Scanning coords x: 1125 to 1128 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 31
+exploring nearby nodes1128, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 582
+exploring nearby nodes1127, 583 with probabiity--1 , visited-0 , visited locally-0
+exploring nearby nodes1129, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 583
+exploring nearby nodes1128, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is82 DFS exploring nodes for path 1129, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1129583
+slam distance in float is 0.518976
+tello distance between the two points is 164.521
+Scanning coords x: 1125 to 1129 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 32
+exploring nearby nodes1129, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 582
+exploring nearby nodes1128, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 583
+exploring nearby nodes1130, 583 with probabiity-7 , visited-0 , visited locally-1
+exploring nearby nodes1129, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is83 DFS exploring nodes for path 1128, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1128583
+slam distance in float is 0.515632
+tello distance between the two points is 163.461
+Scanning coords x: 1125 to 1128 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 33
+exploring nearby nodes1128, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 582
+exploring nearby nodes1127, 583 with probabiity--1 , visited-0 , visited locally-0
+exploring nearby nodes1129, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 583
+exploring nearby nodes1128, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is84 DFS exploring nodes for path 1129, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1129583
+slam distance in float is 0.518976
+tello distance between the two points is 164.521
+Scanning coords x: 1125 to 1129 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 34
+exploring nearby nodes1129, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 582
+exploring nearby nodes1128, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 583
+exploring nearby nodes1130, 583 with probabiity-7 , visited-0 , visited locally-1
+exploring nearby nodes1129, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is85 DFS exploring nodes for path 1128, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1128583
+slam distance in float is 0.515632
+tello distance between the two points is 163.461
+Scanning coords x: 1125 to 1128 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 35
+exploring nearby nodes1128, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 582
+exploring nearby nodes1127, 583 with probabiity--1 , visited-0 , visited locally-0
+exploring nearby nodes1129, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 583
+exploring nearby nodes1128, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is86 DFS exploring nodes for path 1129, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1129583
+slam distance in float is 0.518976
+tello distance between the two points is 164.521
+Scanning coords x: 1125 to 1129 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 36
+exploring nearby nodes1129, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 582
+exploring nearby nodes1128, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 583
+exploring nearby nodes1130, 583 with probabiity-7 , visited-0 , visited locally-1
+exploring nearby nodes1129, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is87 DFS exploring nodes for path 1128, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1128583
+slam distance in float is 0.515632
+tello distance between the two points is 163.461
+Scanning coords x: 1125 to 1128 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 37
+exploring nearby nodes1128, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 582
+exploring nearby nodes1127, 583 with probabiity--1 , visited-0 , visited locally-0
+exploring nearby nodes1129, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 583
+exploring nearby nodes1128, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is88 DFS exploring nodes for path 1129, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1129583
+slam distance in float is 0.518976
+tello distance between the two points is 164.521
+Scanning coords x: 1125 to 1129 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 38
+exploring nearby nodes1129, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 582
+exploring nearby nodes1128, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 583
+exploring nearby nodes1130, 583 with probabiity-7 , visited-0 , visited locally-1
+exploring nearby nodes1129, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is89 DFS exploring nodes for path 1128, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1128583
+slam distance in float is 0.515632
+tello distance between the two points is 163.461
+Scanning coords x: 1125 to 1128 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 39
+exploring nearby nodes1128, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 582
+exploring nearby nodes1127, 583 with probabiity--1 , visited-0 , visited locally-0
+exploring nearby nodes1129, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 583
+exploring nearby nodes1128, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is90 DFS exploring nodes for path 1129, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1129583
+slam distance in float is 0.518976
+tello distance between the two points is 164.521
+Scanning coords x: 1125 to 1129 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 40
+exploring nearby nodes1129, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 582
+exploring nearby nodes1128, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 583
+exploring nearby nodes1130, 583 with probabiity-7 , visited-0 , visited locally-1
+exploring nearby nodes1129, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is91 DFS exploring nodes for path 1128, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1128583
+slam distance in float is 0.515632
+tello distance between the two points is 163.461
+Scanning coords x: 1125 to 1128 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 41
+exploring nearby nodes1128, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 582
+exploring nearby nodes1127, 583 with probabiity--1 , visited-0 , visited locally-0
+exploring nearby nodes1129, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 583
+exploring nearby nodes1128, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is92 DFS exploring nodes for path 1129, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1129583
+slam distance in float is 0.518976
+tello distance between the two points is 164.521
+Scanning coords x: 1125 to 1129 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 42
+exploring nearby nodes1129, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 582
+exploring nearby nodes1128, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 583
+exploring nearby nodes1130, 583 with probabiity-7 , visited-0 , visited locally-1
+exploring nearby nodes1129, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is93 DFS exploring nodes for path 1128, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1128583
+slam distance in float is 0.515632
+tello distance between the two points is 163.461
+Scanning coords x: 1125 to 1128 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 43
+exploring nearby nodes1128, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 582
+exploring nearby nodes1127, 583 with probabiity--1 , visited-0 , visited locally-0
+exploring nearby nodes1129, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 583
+exploring nearby nodes1128, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is94 DFS exploring nodes for path 1129, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1129583
+slam distance in float is 0.518976
+tello distance between the two points is 164.521
+Scanning coords x: 1125 to 1129 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 44
+exploring nearby nodes1129, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 582
+exploring nearby nodes1128, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 583
+exploring nearby nodes1130, 583 with probabiity-7 , visited-0 , visited locally-1
+exploring nearby nodes1129, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is95 DFS exploring nodes for path 1128, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1128583
+slam distance in float is 0.515632
+tello distance between the two points is 163.461
+Scanning coords x: 1125 to 1128 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 45
+exploring nearby nodes1128, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 582
+exploring nearby nodes1127, 583 with probabiity--1 , visited-0 , visited locally-0
+exploring nearby nodes1129, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 583
+exploring nearby nodes1128, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is96 DFS exploring nodes for path 1129, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1129583
+slam distance in float is 0.518976
+tello distance between the two points is 164.521
+Scanning coords x: 1125 to 1129 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 46
+exploring nearby nodes1129, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 582
+exploring nearby nodes1128, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 583
+exploring nearby nodes1130, 583 with probabiity-7 , visited-0 , visited locally-1
+exploring nearby nodes1129, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is97 DFS exploring nodes for path 1128, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1128583
+slam distance in float is 0.515632
+tello distance between the two points is 163.461
+Scanning coords x: 1125 to 1128 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 47
+exploring nearby nodes1128, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 582
+exploring nearby nodes1127, 583 with probabiity--1 , visited-0 , visited locally-0
+exploring nearby nodes1129, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 583
+exploring nearby nodes1128, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is98 DFS exploring nodes for path 1129, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1129583
+slam distance in float is 0.518976
+tello distance between the two points is 164.521
+Scanning coords x: 1125 to 1129 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 48
+exploring nearby nodes1129, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 582
+exploring nearby nodes1128, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 583
+exploring nearby nodes1130, 583 with probabiity-7 , visited-0 , visited locally-1
+exploring nearby nodes1129, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is99 DFS exploring nodes for path 1128, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1128583
+slam distance in float is 0.515632
+tello distance between the two points is 163.461
+Scanning coords x: 1125 to 1128 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs_destinations.size() == 49
+exploring nearby nodes1128, 582 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1128, 582
+exploring nearby nodes1127, 583 with probabiity--1 , visited-0 , visited locally-0
+exploring nearby nodes1129, 583 with probabiity-0 , visited-0 , visited locally-0
+DFS adding nearby nodes 1129, 583
+exploring nearby nodes1128, 584 with probabiity--1 , visited-0 , visited locally-0
+size of dfs stack is100 DFS exploring nodes for path 1129, 583
+DFS occupied 0
+DFS visited 0
+DFS TRAVERSAL PRINTS  1129583
+slam distance in float is 0.518976
+tello distance between the two points is 164.521
+Scanning coords x: 1125 to 1129 and y: 560 to 583 with xdiff: 1 and ydiff: 4
+Horizontal length is 5.675694 and Vertical length is 5.675928
+is obstacle succeeded: TRUE
+dfs returning, destination found1126,580 with angle to drone at 1
+starting from 1125,560
+moving to1126,580
+the commands generated are
+cw 1forward 141
+setting the mode to moving the tello now
+The blue dot is1125561
+Transmitting tello command: cw 1
+Transmitting tello command: forward 141
+Transmitting tello command: done
+The blue dot is1125561
+The blue dot is1125560
+The blue dot is1125560
+The blue dot is1125560
+The blue dot is1125561
+The blue dot is1125562
+The blue dot is1125562
+The blue dot is1125562
+The blue dot is1125562
+The blue dot is1125562
+The blue dot is1125562
+The blue dot is1125562
+The blue dot is1125562
+The blue dot is1125562
+The blue dot is1125562
+The blue dot is1125562
+The blue dot is1125562
+The blue dot is1125562
+The blue dot is1125562
+The blue dot is1124561
