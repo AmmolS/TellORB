@@ -132,7 +132,7 @@ vector<std::string> returnNextCommand(int init_x, int init_y);
 void generatePath(vector<geometry_msgs::Point> &path);
 void printPointPath(vector<geometry_msgs::Point> &path);
 void publishCommand(std::string tello_mode);
-bool within_distance(int init_x, int init_y, int final_x, int final_y);
+int within_distance(int init_x, int init_y, int final_x, int final_y);
 bool is_obstacle(int init_x, int init_y, int final_x, int final_y);
 ros::Time next_command_time;
 
@@ -435,7 +435,7 @@ void DFS(int init_x, int init_y)
 												cv::Size(2 * erodeSize + 1, 2 * erodeSize + 1),
 												cv::Point(erodeSize, erodeSize));
 
-	cv::erode(img_first, img_final, element);
+	cv::dilate(img_first, img_final, element);
 
 	// running simple dfs without any path finding
 	////////////////////////////////////
@@ -444,8 +444,11 @@ void DFS(int init_x, int init_y)
 
 	// Distance of source cell is 0
 	// the current position of the drone is marked visited since it is already there
-	dfs_visited.at<int>(init_y, init_x) = 1;
+	
 	cv::Mat dfs_visited_local = dfs_visited.clone();
+	cv::Mat dfs_visited_local_distance = dfs_visited.clone();
+
+	dfs_visited_local_distance.at<int>(init_y, init_x) = 1;
 	
 
 	geometry_msgs::Point s;
@@ -464,14 +467,17 @@ void DFS(int init_x, int init_y)
 		printf(" DFS exploring nodes for path %d, %d\n", int(pt.x), int(pt.y));
 		printf("DFS occupied %d\n", probability_current);
 		printf("DFS visited %d\n", dfs_visited.at<int>(pt.y, pt.x));
-		if (isValid(pt.x, pt.y) && probability_current < MAX_OCCUPIED_PROB && probability_current >= 0 && dfs_visited.at<int>(pt.y, pt.x) != 1 && dfs_visited_local.at<int>(pt.y, pt.x) != 1)
+		if (isValid(pt.x, pt.y) && probability_current < MAX_OCCUPIED_PROB && probability_current >= 0 && dfs_visited_local.at<int>(pt.y, pt.x) != 1 && dfs_visited_local_distance.at<int>(pt.y, pt.x) != 1)
 		{
 			// these are the possible candidates as destinations
 			cout << "DFS TRAVERSAL PRINTS  " << pt.x << pt.y << endl;
 			// check if these candidates are within x (threshold cm), if so mark it visited
 			// if not, add it to the destination list
-			if (within_distance(init_x, init_y, pt.x, pt.y)) {
-				// dfs_visited.at<int>(pt.y, pt.x) = 1;
+			int ret = within_distance(init_x, init_y, pt.x, pt.y);
+			if (ret == 1) {
+				dfs_visited_local_distance.at<int>(pt.y, pt.x) = 1;
+			} else if (ret == 2) {	
+				dfs_visited_local.at<int>(pt.y, pt.x) = 1;
 			} else if (is_obstacle(init_x, init_y, pt.x, pt.y)) {
 				dfs_visited_local.at<int>(pt.y, pt.x) = 1;
 			} else {
@@ -507,6 +513,7 @@ void DFS(int init_x, int init_y)
 			}
 			cout << "dfs_destinations.size() == " << dfs_destinations.size() << endl;
 		}
+		dfs_visited_local.at<int>(pt.y, pt.x) = 1;
 
 		// get the adjacent vertices of the current source, if they are not visited,unoccupied
 		// push it on the stack
@@ -515,9 +522,9 @@ void DFS(int init_x, int init_y)
 			int col = pt.x + rowNum[i];
 			int row = pt.y + colNum[i];
 			int probability_nearby = (int)img_final.at<short>(row, col);
-			printf("exploring nearby nodes%d, %d with probabiity-%d , visited-%d , visited locally-%d\n",col,row,probability_nearby,dfs_visited.at<int>(row, col),dfs_visited_local.at<int>(row,col));
+			printf("exploring nearby nodes%d, %d with probabiity-%d , visited-%d , visited locally-%d , visited locally distance-%d\n",col,row,probability_nearby,dfs_visited.at<int>(row, col),dfs_visited_local.at<int>(row,col), dfs_visited_local_distance.at<int>(row, col));
 
-			if (isValid(row, col) && probability_nearby < MAX_OCCUPIED_PROB && probability_nearby >= 0 && dfs_visited.at<int>(row, col) != 1 && dfs_visited_local.at<int>(row, col) != 1)
+			if (isValid(row, col) && probability_nearby < MAX_OCCUPIED_PROB && probability_nearby >= 0 && dfs_visited_local.at<int>(row, col) != 1 && dfs_visited_local_distance.at<int>(row, col) != 1)
 			{
 				// push onto the stack
 				printf("DFS adding nearby nodes %d, %d\n", col, row);
@@ -528,7 +535,34 @@ void DFS(int init_x, int init_y)
 			}
 		}
 	}
+	if (dfs_destinations.size() > 0)
+	{
+		int minAngle = 180;
+		geometry_msgs::Point best;
+		for (int i = 0; i < dfs_destinations.size(); i++)
+		{
+			int x_diff = dfs_destinations[i].x - init_x;
+			int y_diff = dfs_destinations[i].y - init_y;
+
+			int angleDiff = abs(getDroneAngle(x_diff, y_diff));
+
+			if (angleDiff < minAngle)
+			{
+				minAngle = angleDiff;
+				best = dfs_destinations[i];
+			}
+		}
+
+		dfs_destinations.clear();
+		dfs_destinations.push_back(best);
+		cout << "dfs returning, destination found" << best.x << "," << best.y << " with angle to drone at " << minAngle << endl;
+		// add to a temp array for visualization !
+		dfs_destinations_visual.push_back(best);
+		return;
+	}
+	cout << "dfs_destinations.size() == " << dfs_destinations.size() << endl;
 	dfs_destinations.clear();
+	dfs_visited = dfs_visited_local_distance;
 }
 
 bool isValid(int valid_x, int valid_y)
@@ -556,7 +590,7 @@ int getDroneAngle(const int &x_diff, const int &y_diff)
 
 // function that checks if two points on the grid are less than threshold cm apart, if so it returns true
 // if not, it returns false
-bool within_distance(int init_x, int init_y, int final_x, int final_y)
+int within_distance(int init_x, int init_y, int final_x, int final_y)
 {
 
 	// distance must be in world co ordinates that is m and then converted to cm for tello
@@ -587,11 +621,10 @@ bool within_distance(int init_x, int init_y, int final_x, int final_y)
 
 	// step 4: compare to threshold and determine whether point is ahead of drone, and return true or false
 	if (tello_distance < 30) {
-		dfs_visited.at<int>(final_y, final_x) = 1;
-		return true;
+		return 1;
 	} else if (tello_distance > distance_threshold)
-		return false;
-	return true;
+		return 0;
+	return 2;
 }
 
 bool is_obstacle(int init_x, int init_y, int final_x, int final_y)
@@ -1292,7 +1325,8 @@ void showGridMap(unsigned int id)
 		if (occupied_thresh >= free_thresh)
 		{
 			occupied_thresh = free_thresh - thresh_diff;
-			MAX_OCCUPIED_PROB = (1 - occupied_thresh) * 100;
+			// MAX_OCCUPIED_PROB = (1 - occupied_thresh) * 100;
+			MAX_OCCUPIED_PROB = 5;
 		}
 		printf("Setting occupied_thresh to: %f\n", occupied_thresh);
 	}
@@ -1406,7 +1440,8 @@ void parseParams(int argc, char **argv)
 	if (argc > arg_id)
 	{
 		occupied_thresh = atof(argv[arg_id++]);
-		MAX_OCCUPIED_PROB = (1 - occupied_thresh) * 100;
+		// MAX_OCCUPIED_PROB = (1 - occupied_thresh) * 100;
+		MAX_OCCUPIED_PROB = 5;
 	}
 	if (argc > arg_id)
 	{
